@@ -6,8 +6,7 @@ difficulty: "medium"
 visualization: "none"
 stdin: ""
 complexity: "O(n log n) time, O(1) space"
-expectedOutput: |
-  heapSort: 5 6 7 11 12 13
+expectedOutput: "heapSort: 5 6 7 11 12 13\n"
 ---
 
 ## Description

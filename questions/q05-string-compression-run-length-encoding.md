@@ -6,8 +6,7 @@ difficulty: "easy"
 visualization: "none"
 stdin: ""
 complexity: "O(n) time, O(n) space for output"
-expectedOutput: |
-  compress=a2b1c5a3
+expectedOutput: "compress=a2b1c5a3\n"
 ---
 
 ## Description

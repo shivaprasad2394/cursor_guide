@@ -5,8 +5,7 @@ pattern: "parsing"
 difficulty: "medium"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  01:30:45 -> 5445 sec
+expectedOutput: "01:30:45 -> 5445 sec\n"
 ---
 
 ## Description

@@ -6,8 +6,7 @@ difficulty: "easy"
 visualization: "none"
 stdin: ""
 complexity: "O(n) time, O(1) space"
-expectedOutput: |
-  reverse("hello") = olleh
+expectedOutput: "reverse(\"hello\") = olleh\n"
 ---
 
 ## Description

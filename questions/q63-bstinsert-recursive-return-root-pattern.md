@@ -6,8 +6,7 @@ difficulty: "hard"
 visualization: "none"
 stdin: ""
 complexity: "O(h) where h = height. Balanced: O(log n). Worst: O(n)."
-expectedOutput: |
-  inserted 5 keys; root=50 left=30 right=70
+expectedOutput: "inserted 5 keys; root=50 left=30 right=70\n"
 ---
 
 ## Description

@@ -5,10 +5,7 @@ pattern: "bit manipulation"
 difficulty: "easy"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  setRange[1..3] of 0=0xE
-  clearRange[1..3] of 0xFF=0xF1
-  write 5 into [1..3] of 0=0xA
+expectedOutput: "setRange[1..3] of 0=0xE\nclearRange[1..3] of 0xFF=0xF1\nwrite 5 into [1..3] of 0=0xA\n"
 ---
 
 ## Description

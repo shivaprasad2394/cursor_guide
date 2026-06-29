@@ -6,9 +6,7 @@ difficulty: "medium"
 visualization: "none"
 stdin: ""
 complexity: "O(1) push and pop."
-expectedOutput: |
-  pop=200
-  pop=100
+expectedOutput: "pop=200\npop=100\n"
 ---
 
 ## Description

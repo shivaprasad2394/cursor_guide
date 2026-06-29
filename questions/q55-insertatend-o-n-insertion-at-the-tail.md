@@ -5,8 +5,7 @@ pattern: "linked list"
 difficulty: "medium"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  10 -> 20 -> 30 -> NULL
+expectedOutput: "10 -> 20 -> 30 -> NULL\n"
 ---
 
 ## Description

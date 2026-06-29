@@ -6,9 +6,7 @@ difficulty: "medium"
 visualization: "none"
 stdin: ""
 complexity: "O(1) enqueue, dequeue, and peek."
-expectedOutput: |
-  dequeue=10
-  peek=20
+expectedOutput: "dequeue=10\npeek=20\n"
 ---
 
 ## Description

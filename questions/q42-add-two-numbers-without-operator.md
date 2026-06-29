@@ -6,8 +6,7 @@ difficulty: "easy"
 visualization: "none"
 stdin: ""
 complexity: "O(32) worst case = O(1)"
-expectedOutput: |
-  addNoPlus(15,32)=47
+expectedOutput: "addNoPlus(15,32)=47\n"
 ---
 
 ## Description

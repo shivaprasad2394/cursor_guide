@@ -5,8 +5,7 @@ pattern: "math / number"
 difficulty: "easy"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  armstrong(153)=1 armstrong(123)=0
+expectedOutput: "armstrong(153)=1 armstrong(123)=0\n"
 ---
 
 ## Description

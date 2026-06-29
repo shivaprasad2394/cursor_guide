@@ -5,8 +5,7 @@ pattern: "math / number"
 difficulty: "easy"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  digits of 5283: 3 8 2 5
+expectedOutput: "digits of 5283: 3 8 2 5\n"
 ---
 
 ## Description

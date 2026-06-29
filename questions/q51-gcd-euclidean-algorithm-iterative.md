@@ -5,8 +5,7 @@ pattern: "math / number"
 difficulty: "easy"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  gcd(48,18)=6 lcm(12,18)=36
+expectedOutput: "gcd(48,18)=6 lcm(12,18)=36\n"
 ---
 
 ## Description

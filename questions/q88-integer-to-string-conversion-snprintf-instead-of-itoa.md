@@ -5,8 +5,7 @@ pattern: "parsing"
 difficulty: "medium"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  intToStr(-42)=-42
+expectedOutput: "intToStr(-42)=-42\n"
 ---
 
 ## Description

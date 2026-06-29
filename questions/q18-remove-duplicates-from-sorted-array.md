@@ -6,8 +6,7 @@ difficulty: "medium"
 visualization: "none"
 stdin: ""
 complexity: "O(n) time, O(1) space"
-expectedOutput: |
-  removeDups: 1 2 3 4
+expectedOutput: "removeDups: 1 2 3 4\n"
 ---
 
 ## Description

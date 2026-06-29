@@ -67,7 +67,13 @@
         if (val === "") {
           list = [];
           meta[key] = list;
-        } else if (val.startsWith('"') || val.startsWith("'")) {
+        } else if (val.startsWith('"')) {
+          try {
+            meta[key] = JSON.parse(val);
+          } catch {
+            meta[key] = val.slice(1, -1);
+          }
+        } else if (val.startsWith("'")) {
           meta[key] = val.slice(1, -1);
         } else if (val === "true" || val === "false") {
           meta[key] = val === "true";
@@ -251,7 +257,7 @@
   async function runInBrowser(source, stdin, onProgress) {
     if (!runnerModule) {
       if (onProgress) onProgress("Loading in-browser C compiler (first run ~60 MB, cached after)…");
-      runnerModule = await import("./runner.js?v=4");
+      runnerModule = await import("./runner.js?v=5");
     }
     if (onProgress) onProgress("Compiling & running…");
     return runnerModule.compileAndRun(source, stdin || "");

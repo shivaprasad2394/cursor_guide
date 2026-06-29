@@ -5,8 +5,7 @@ pattern: "binary search tree"
 difficulty: "hard"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  tree freed (postorder)
+expectedOutput: "tree freed (postorder)\n"
 ---
 
 ## Description

@@ -6,8 +6,7 @@ difficulty: "easy"
 visualization: "none"
 stdin: ""
 complexity: "O(m * n * min(m,n)) time, O(result) space"
-expectedOutput: |
-  LCS substr=cd
+expectedOutput: "LCS substr=cd\n"
 ---
 
 ## Description

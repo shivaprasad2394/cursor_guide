@@ -5,8 +5,7 @@ pattern: "parsing"
 difficulty: "medium"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  roundTrip(1,2,3)=MATCHED
+expectedOutput: "roundTrip(1,2,3)=MATCHED\n"
 ---
 
 ## Description

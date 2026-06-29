@@ -5,8 +5,7 @@ pattern: "binary search tree"
 difficulty: "hard"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  after delete 50, inorder: 20 30 40 60 70 80
+expectedOutput: "after delete 50, inorder: 20 30 40 60 70 80\n"
 ---
 
 ## Description

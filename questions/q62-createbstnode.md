@@ -5,8 +5,7 @@ pattern: "binary search tree"
 difficulty: "hard"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  createBstNode(5): id=5
+expectedOutput: "createBstNode(5): id=5\n"
 ---
 
 ## Description

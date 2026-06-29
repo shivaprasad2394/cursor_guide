@@ -5,8 +5,7 @@ pattern: "bit manipulation"
 difficulty: "easy"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  missing 1..5=3
+expectedOutput: "missing 1..5=3\n"
 ---
 
 ## Description

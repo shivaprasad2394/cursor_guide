@@ -6,8 +6,7 @@ difficulty: "easy"
 visualization: "none"
 stdin: ""
 complexity: "O(1) time, O(1) space"
-expectedOutput: |
-  isPow2(8)=1 isPow2(6)=0
+expectedOutput: "isPow2(8)=1 isPow2(6)=0\n"
 ---
 
 ## Description

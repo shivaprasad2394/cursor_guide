@@ -5,8 +5,7 @@ pattern: "math / number"
 difficulty: "easy"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  999+1=1000
+expectedOutput: "999+1=1000\n"
 ---
 
 ## Description

@@ -5,11 +5,7 @@ pattern: "memory, dma, mmap"
 difficulty: "hard"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  MY_SIZEOF(int)    = 4 (real sizeof = 4)
-  MY_SIZEOF(double) = 8 (real sizeof = 8)
-  MY_SIZEOF(arr)    = 40 (real sizeof = 40)
-  array length = sizeof(arr)/sizeof(arr[0]) = 10
+expectedOutput: "MY_SIZEOF(int)    = 4 (real sizeof = 4)\nMY_SIZEOF(double) = 8 (real sizeof = 8)\nMY_SIZEOF(arr)    = 40 (real sizeof = 40)\narray length = sizeof(arr)/sizeof(arr[0]) = 10\n"
 ---
 
 ## Description

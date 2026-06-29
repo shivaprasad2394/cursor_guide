@@ -6,8 +6,7 @@ difficulty: "easy"
 visualization: "none"
 stdin: ""
 complexity: "O(position) time, O(1) space"
-expectedOutput: |
-  rightmostSetBit(12)=3
+expectedOutput: "rightmostSetBit(12)=3\n"
 ---
 
 ## Description

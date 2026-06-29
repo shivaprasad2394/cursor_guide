@@ -5,8 +5,7 @@ pattern: "math / number"
 difficulty: "easy"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  palin(121)=1 palin(123)=0
+expectedOutput: "palin(121)=1 palin(123)=0\n"
 ---
 
 ## Description

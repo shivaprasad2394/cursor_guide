@@ -6,8 +6,7 @@ difficulty: "easy"
 visualization: "none"
 stdin: ""
 complexity: "O(n^2) time, O(1) space"
-expectedOutput: |
-  LPS(babad)="bab" len 3
+expectedOutput: "LPS(babad)=\"bab\" len 3\n"
 ---
 
 ## Description

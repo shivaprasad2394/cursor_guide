@@ -5,27 +5,7 @@ pattern: "buffers"
 difficulty: "hard"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  PART A - EXTRACT 802.11 Frame Control = 0x0108
-    Protocol Version: 0
-    Type            : 2
-    Subtype         : 0
-    ToDS            : 1
-    FromDS          : 0
-  
-  PART B - PACK then UNPACK MAC header
-    packed 24 bytes: 08012C00001122334455AABBCCDDEEFF66778899AABB1000
-    unpacked FC=0x0108 dur=0x002C seq=0x0010
-    addr1 (RA) = 00:11:22:33:44:55
-    addr2 (TA) = AA:BB:CC:DD:EE:FF
-    addr3 (BSSID) = 66:77:88:99:AA:BB
-    round-trip MATCHED
-  
-  PART C - PACK then UNPACK TLV information elements
-    packed 12 TLV bytes
-    TLV type=0 len=4 value="Home"
-    TLV type=1 len=4 value="
-  "
+expectedOutput: "PART A - EXTRACT 802.11 Frame Control = 0x0108\n  Protocol Version: 0\n  Type            : 2\n  Subtype         : 0\n  ToDS            : 1\n  FromDS          : 0\n\nPART B - PACK then UNPACK MAC header\n  packed 24 bytes: 08012C00001122334455AABBCCDDEEFF66778899AABB1000\n  unpacked FC=0x0108 dur=0x002C seq=0x0010\n  addr1 (RA) = 00:11:22:33:44:55\n  addr2 (TA) = AA:BB:CC:DD:EE:FF\n  addr3 (BSSID) = 66:77:88:99:AA:BB\n  round-trip MATCHED\n\nPART C - PACK then UNPACK TLV information elements\n  packed 12 TLV bytes\n  TLV type=0 len=4 value=\"Home\"\n  TLV type=1 len=4 value=\"\u0002\u0004\u000b\u0016\"\n"
 ---
 
 ## Description

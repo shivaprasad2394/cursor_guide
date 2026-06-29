@@ -6,8 +6,7 @@ difficulty: "medium"
 visualization: "none"
 stdin: ""
 complexity: "O(n) time, O(1) space"
-expectedOutput: |
-  2nd largest=34
+expectedOutput: "2nd largest=34\n"
 ---
 
 ## Description

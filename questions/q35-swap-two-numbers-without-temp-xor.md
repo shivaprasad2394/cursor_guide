@@ -5,8 +5,7 @@ pattern: "bit manipulation"
 difficulty: "easy"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  after swap a=10 b=5
+expectedOutput: "after swap a=10 b=5\n"
 ---
 
 ## Description

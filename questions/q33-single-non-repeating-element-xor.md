@@ -6,8 +6,7 @@ difficulty: "easy"
 visualization: "none"
 stdin: ""
 complexity: "O(n) time, O(1) space"
-expectedOutput: |
-  single=4
+expectedOutput: "single=4\n"
 ---
 
 ## Description

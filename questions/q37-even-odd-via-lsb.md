@@ -5,8 +5,7 @@ pattern: "bit manipulation"
 difficulty: "easy"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  isEven(4)=1 isEven(7)=0
+expectedOutput: "isEven(4)=1 isEven(7)=0\n"
 ---
 
 ## Description

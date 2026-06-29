@@ -6,8 +6,7 @@ difficulty: "easy"
 visualization: "none"
 stdin: ""
 complexity: "O(n) time, O(1) space"
-expectedOutput: |
-  isSubsequence(capgemini,cgm)=1
+expectedOutput: "isSubsequence(capgemini,cgm)=1\n"
 ---
 
 ## Description

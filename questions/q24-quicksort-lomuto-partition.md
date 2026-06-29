@@ -6,8 +6,7 @@ difficulty: "medium"
 visualization: "none"
 stdin: ""
 complexity: "O(n log n) average, O(n^2) worst (sorted input)"
-expectedOutput: |
-  quickSort: 1 5 7 8 9 10
+expectedOutput: "quickSort: 1 5 7 8 9 10\n"
 ---
 
 ## Description

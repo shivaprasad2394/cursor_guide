@@ -6,8 +6,7 @@ difficulty: "easy"
 visualization: "none"
 stdin: ""
 complexity: "O(n) time, O(1) space"
-expectedOutput: |
-  validPalindrome("A man, a plan, a canal: Panama")=1
+expectedOutput: "validPalindrome(\"A man, a plan, a canal: Panama\")=1\n"
 ---
 
 ## Description

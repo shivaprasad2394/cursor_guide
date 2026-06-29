@@ -6,8 +6,7 @@ difficulty: "medium"
 visualization: "none"
 stdin: ""
 complexity: "O(n) time, O(1) space"
-expectedOutput: |
-  revGroups3: 3 2 1 6 5 4 9 8 7
+expectedOutput: "revGroups3: 3 2 1 6 5 4 9 8 7\n"
 ---
 
 ## Description

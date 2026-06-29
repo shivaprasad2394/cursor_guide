@@ -5,8 +5,7 @@ pattern: "parsing"
 difficulty: "medium"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  key=timeout value=30
+expectedOutput: "key=timeout value=30\n"
 ---
 
 ## Description

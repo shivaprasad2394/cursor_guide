@@ -5,9 +5,7 @@ pattern: "memory, dma, mmap"
 difficulty: "hard"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  my_memmove(shift right 2) -> ABABCDE
-  my_memmove(shift left 3) -> 123
+expectedOutput: "my_memmove(shift right 2) -> ABABCDE\nmy_memmove(shift left 3) -> 123\n"
 ---
 
 ## Description

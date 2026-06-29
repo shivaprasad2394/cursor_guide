@@ -6,8 +6,7 @@ difficulty: "medium"
 visualization: "none"
 stdin: ""
 complexity: "O(m+n) time, O(m+n) space"
-expectedOutput: |
-  merge: 1 2 3 4 5 6
+expectedOutput: "merge: 1 2 3 4 5 6\n"
 ---
 
 ## Description

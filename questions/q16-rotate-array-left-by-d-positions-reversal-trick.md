@@ -6,8 +6,7 @@ difficulty: "medium"
 visualization: "none"
 stdin: ""
 complexity: "O(n) time, O(1) space"
-expectedOutput: |
-  rotateLeft2: 3 4 5 6 7 1 2
+expectedOutput: "rotateLeft2: 3 4 5 6 7 1 2\n"
 ---
 
 ## Description

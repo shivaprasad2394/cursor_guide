@@ -5,8 +5,7 @@ pattern: "parsing"
 difficulty: "medium"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  rc=0 buf=User: Alice (age 30)
+expectedOutput: "rc=0 buf=User: Alice (age 30)\n"
 ---
 
 ## Description

@@ -5,8 +5,7 @@ pattern: "memory, dma, mmap"
 difficulty: "hard"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  my_memcpy(ABCDEFG) -> ABCDEFG
+expectedOutput: "my_memcpy(ABCDEFG) -> ABCDEFG\n"
 ---
 
 ## Description

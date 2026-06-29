@@ -5,8 +5,7 @@ pattern: "parsing"
 difficulty: "medium"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  matched=3 -> 10,20,30
+expectedOutput: "matched=3 -> 10,20,30\n"
 ---
 
 ## Description

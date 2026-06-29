@@ -5,8 +5,7 @@ pattern: "parsing"
 difficulty: "medium"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  csv=id,name,age
+expectedOutput: "csv=id,name,age\n"
 ---
 
 ## Description

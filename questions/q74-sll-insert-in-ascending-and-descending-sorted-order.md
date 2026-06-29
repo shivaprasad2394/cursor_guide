@@ -6,9 +6,7 @@ difficulty: "hard"
 visualization: "none"
 stdin: ""
 complexity: "O(n) per insert (you may walk the whole list to find the spot), O(1) extra space."
-expectedOutput: |
-  Ascending : 10 -> 20 -> 30 -> 40 -> 50 -> NULL
-  Descending: 50 -> 40 -> 30 -> 20 -> 10 -> NULL
+expectedOutput: "Ascending : 10 -> 20 -> 30 -> 40 -> 50 -> NULL\nDescending: 50 -> 40 -> 30 -> 20 -> 10 -> NULL\n"
 ---
 
 ## Description

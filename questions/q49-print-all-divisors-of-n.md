@@ -5,8 +5,7 @@ pattern: "math / number"
 difficulty: "easy"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  divisors of 36: 1 36 2 18 3 12 4 9 6
+expectedOutput: "divisors of 36: 1 36 2 18 3 12 4 9 6\n"
 ---
 
 ## Description

@@ -6,8 +6,7 @@ difficulty: "medium"
 visualization: "none"
 stdin: ""
 complexity: "O(n) time, O(1) space"
-expectedOutput: |
-  majority=2
+expectedOutput: "majority=2\n"
 ---
 
 ## Description

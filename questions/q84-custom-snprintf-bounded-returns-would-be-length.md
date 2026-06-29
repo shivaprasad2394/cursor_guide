@@ -5,9 +5,7 @@ pattern: "memory, dma, mmap"
 difficulty: "hard"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  my_snprintf -> "x=42 s=hi" (returned 9)
-  truncated -> "1234" (would-be 6, TRUNCATED)
+expectedOutput: "my_snprintf -> \"x=42 s=hi\" (returned 9)\ntruncated -> \"1234\" (would-be 6, TRUNCATED)\n"
 ---
 
 ## Description

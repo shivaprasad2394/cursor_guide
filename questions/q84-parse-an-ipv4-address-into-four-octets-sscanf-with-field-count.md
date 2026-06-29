@@ -5,8 +5,7 @@ pattern: "parsing"
 difficulty: "medium"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  valid=1 -> 192.168.1.10
+expectedOutput: "valid=1 -> 192.168.1.10\n"
 ---
 
 ## Description

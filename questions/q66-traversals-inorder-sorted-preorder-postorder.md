@@ -5,10 +5,7 @@ pattern: "binary search tree"
 difficulty: "hard"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  inorder: 20 30 40 50 70 
-  preorder: 50 30 20 40 70 
-  postorder: 20 40 30 70 50
+expectedOutput: "inorder: 20 30 40 50 70 \npreorder: 50 30 20 40 70 \npostorder: 20 40 30 70 50\n"
 ---
 
 ## Description

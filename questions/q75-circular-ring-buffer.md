@@ -6,19 +6,7 @@ difficulty: "hard"
 visualization: "none"
 stdin: ""
 complexity: "O(1) put and get. O(CAP) fixed memory, zero allocations after init."
-expectedOutput: |
-  put 1 -> ok
-  put 2 -> ok
-  put 3 -> ok
-  put 4 -> ok
-  put 5 -> ok
-  put 6 -> FULL (rejected)
-  put 7 -> FULL (rejected)
-  get -> 1
-  get -> 2
-  put 6 -> ok (wraps to index 0)
-  put 7 -> ok
-  drain: 3 4 5 6 7
+expectedOutput: "put 1 -> ok\nput 2 -> ok\nput 3 -> ok\nput 4 -> ok\nput 5 -> ok\nput 6 -> FULL (rejected)\nput 7 -> FULL (rejected)\nget -> 1\nget -> 2\nput 6 -> ok (wraps to index 0)\nput 7 -> ok\ndrain: 3 4 5 6 7\n"
 ---
 
 ## Description

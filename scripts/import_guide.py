@@ -221,7 +221,7 @@ def write_question(q: dict) -> str:
     fm_lines = ["---"]
     for k, v in meta.items():
         if k == "expectedOutput":
-            fm_lines.append(f"expectedOutput: {yaml_escape(v)}")
+            fm_lines.append(f"expectedOutput: {json.dumps(v)}")
         elif isinstance(v, str) and "\n" in v:
             fm_lines.append(f"{k}: {yaml_escape(v)}")
         else:

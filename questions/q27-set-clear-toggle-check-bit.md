@@ -5,11 +5,7 @@ pattern: "bit manipulation"
 difficulty: "easy"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  set bit1 of 12=14
-  clear bit2 of 12=8
-  toggle bit1 of 12=14
-  check bit2 of 12=1
+expectedOutput: "set bit1 of 12=14\nclear bit2 of 12=8\ntoggle bit1 of 12=14\ncheck bit2 of 12=1\n"
 ---
 
 ## Description

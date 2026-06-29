@@ -5,9 +5,7 @@ pattern: "memory, dma, mmap"
 difficulty: "hard"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  my_strncpy(Hi,6) -> "Hi" (padded with nulls)
-  my_strncpy(Hello,4)+manual NUL -> "Hel"
+expectedOutput: "my_strncpy(Hi,6) -> \"Hi\" (padded with nulls)\nmy_strncpy(Hello,4)+manual NUL -> \"Hel\"\n"
 ---
 
 ## Description

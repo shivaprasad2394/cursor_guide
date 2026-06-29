@@ -5,18 +5,7 @@ pattern: "buffers"
 difficulty: "hard"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  [nic] wrote 9 bytes into slot 0, OWN->SW
-  [drv] slot 0 received "PKT-alpha" (9 bytes)
-    [nic] wrote 9 bytes into slot 1, OWN->SW
-  [drv] slot 1 received "PKT-bravo" (9 bytes)
-    [nic] wrote 11 bytes into slot 2, OWN->SW
-  [drv] slot 2 received "PKT-charlie" (11 bytes)
-    [nic] wrote 9 bytes into slot 3, OWN->SW
-  [drv] slot 3 received "PKT-delta" (9 bytes)
-    [nic] wrote 8 bytes into slot 0, OWN->SW
-  [drv] slot 0 received "PKT-echo" (8 bytes)
-  Processed 5 packets through a 4-slot descriptor ring.
+expectedOutput: "[nic] wrote 9 bytes into slot 0, OWN->SW\n[drv] slot 0 received \"PKT-alpha\" (9 bytes)\n  [nic] wrote 9 bytes into slot 1, OWN->SW\n[drv] slot 1 received \"PKT-bravo\" (9 bytes)\n  [nic] wrote 11 bytes into slot 2, OWN->SW\n[drv] slot 2 received \"PKT-charlie\" (11 bytes)\n  [nic] wrote 9 bytes into slot 3, OWN->SW\n[drv] slot 3 received \"PKT-delta\" (9 bytes)\n  [nic] wrote 8 bytes into slot 0, OWN->SW\n[drv] slot 0 received \"PKT-echo\" (8 bytes)\nProcessed 5 packets through a 4-slot descriptor ring.\n"
 ---
 
 ## Description

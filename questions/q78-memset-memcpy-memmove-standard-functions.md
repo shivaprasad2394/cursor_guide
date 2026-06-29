@@ -5,10 +5,7 @@ pattern: "memory, dma, mmap"
 difficulty: "hard"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  memset 'A' x5 -> AAAAA
-  memcpy HELLO -> HELLO
-  memmove overlap (shift right 2): ABABCDE.
+expectedOutput: "memset 'A' x5 -> AAAAA\nmemcpy HELLO -> HELLO\nmemmove overlap (shift right 2): ABABCDE.\n"
 ---
 
 ## Description

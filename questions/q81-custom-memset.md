@@ -5,9 +5,7 @@ pattern: "memory, dma, mmap"
 difficulty: "hard"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  my_memset('*',4) -> ****
-  my_memset(arr,1) -> arr[0]=0x01010101 (NOT 1!)
+expectedOutput: "my_memset('*',4) -> ****\nmy_memset(arr,1) -> arr[0]=0x01010101 (NOT 1!)\n"
 ---
 
 ## Description

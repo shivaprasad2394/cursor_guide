@@ -6,8 +6,7 @@ difficulty: "easy"
 visualization: "none"
 stdin: ""
 complexity: "O(n) time (assuming strstr is O(n)), O(n) space"
-expectedOutput: |
-  isRotation(waterbottle,erbottlewat)=1
+expectedOutput: "isRotation(waterbottle,erbottlewat)=1\n"
 ---
 
 ## Description

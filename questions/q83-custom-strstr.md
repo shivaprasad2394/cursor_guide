@@ -5,9 +5,7 @@ pattern: "memory, dma, mmap"
 difficulty: "hard"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  my_strstr("hello world","wor") -> "world"
-  my_strstr("hello world","xyz") -> (null)
+expectedOutput: "my_strstr(\"hello world\",\"wor\") -> \"world\"\nmy_strstr(\"hello world\",\"xyz\") -> (null)\n"
 ---
 
 ## Description

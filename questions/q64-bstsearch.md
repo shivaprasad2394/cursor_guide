@@ -5,9 +5,7 @@ pattern: "binary search tree"
 difficulty: "hard"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  search 40: found
-  search 99: not found
+expectedOutput: "search 40: found\nsearch 99: not found\n"
 ---
 
 ## Description

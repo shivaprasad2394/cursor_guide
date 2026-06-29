@@ -6,8 +6,7 @@ difficulty: "medium"
 visualization: "none"
 stdin: ""
 complexity: "O(n) time, O(1) space"
-expectedOutput: |
-  moveZeros: 1 3 12 0 0
+expectedOutput: "moveZeros: 1 3 12 0 0\n"
 ---
 
 ## Description

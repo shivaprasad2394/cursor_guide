@@ -6,8 +6,7 @@ difficulty: "medium"
 visualization: "none"
 stdin: ""
 complexity: "O(n) time, O(1) space"
-expectedOutput: |
-  hasCycle(linear)=0
+expectedOutput: "hasCycle(linear)=0\n"
 ---
 
 ## Description

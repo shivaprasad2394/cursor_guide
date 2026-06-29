@@ -6,9 +6,7 @@ difficulty: "easy"
 visualization: "none"
 stdin: ""
 complexity: "O(n) time, O(1) space (256 is constant)"
-expectedOutput: |
-  isAnagram(listen,silent)=1
-  isAnagram(hello,world)=0
+expectedOutput: "isAnagram(listen,silent)=1\nisAnagram(hello,world)=0\n"
 ---
 
 ## Description

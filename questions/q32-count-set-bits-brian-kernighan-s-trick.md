@@ -6,8 +6,7 @@ difficulty: "easy"
 visualization: "none"
 stdin: ""
 complexity: "O(number of set bits), NOT O(32)"
-expectedOutput: |
-  countSetBits(13)=3
+expectedOutput: "countSetBits(13)=3\n"
 ---
 
 ## Description

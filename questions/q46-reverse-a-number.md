@@ -5,8 +5,7 @@ pattern: "math / number"
 difficulty: "easy"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  reverse(1234)=4321
+expectedOutput: "reverse(1234)=4321\n"
 ---
 
 ## Description

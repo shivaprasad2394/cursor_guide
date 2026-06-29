@@ -6,8 +6,7 @@ difficulty: "medium"
 visualization: "none"
 stdin: ""
 complexity: "O(n) time, O(1) space"
-expectedOutput: |
-  missing in 0..3=2
+expectedOutput: "missing in 0..3=2\n"
 ---
 
 ## Description

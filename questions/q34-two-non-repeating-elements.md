@@ -6,8 +6,7 @@ difficulty: "easy"
 visualization: "none"
 stdin: ""
 complexity: "O(n) time, O(1) space"
-expectedOutput: |
-  two uniques=7,9
+expectedOutput: "two uniques=7,9\n"
 ---
 
 ## Description

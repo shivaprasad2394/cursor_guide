@@ -6,8 +6,7 @@ difficulty: "medium"
 visualization: "none"
 stdin: ""
 complexity: "O(n) time, O(1) space"
-expectedOutput: |
-  middle=3
+expectedOutput: "middle=3\n"
 ---
 
 ## Description

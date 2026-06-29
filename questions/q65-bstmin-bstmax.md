@@ -5,8 +5,7 @@ pattern: "binary search tree"
 difficulty: "hard"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  min=20 max=80
+expectedOutput: "min=20 max=80\n"
 ---
 
 ## Description

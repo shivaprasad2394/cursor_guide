@@ -6,8 +6,7 @@ difficulty: "easy"
 visualization: "none"
 stdin: ""
 complexity: "O(32) = O(1) time"
-expectedOutput: |
-  reverseBits(5)=2684354560
+expectedOutput: "reverseBits(5)=2684354560\n"
 ---
 
 ## Description

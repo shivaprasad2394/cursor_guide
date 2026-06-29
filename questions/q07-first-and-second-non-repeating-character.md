@@ -6,10 +6,7 @@ difficulty: "easy"
 visualization: "none"
 stdin: ""
 complexity: "O(n) time, O(1) space"
-expectedOutput: |
-  findNonRepeating(aabccbde):
-  First non-repeating: 'd'
-  Second non-repeating: 'e'
+expectedOutput: "findNonRepeating(aabccbde):\nFirst non-repeating: 'd'\nSecond non-repeating: 'e'\n"
 ---
 
 ## Description

@@ -6,8 +6,7 @@ difficulty: "easy"
 visualization: "none"
 stdin: ""
 complexity: "O(n) time, O(1) space (256 is constant)"
-expectedOutput: |
-  removeDup(programming)=progamin
+expectedOutput: "removeDup(programming)=progamin\n"
 ---
 
 ## Description

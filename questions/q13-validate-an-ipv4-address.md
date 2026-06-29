@@ -6,9 +6,7 @@ difficulty: "easy"
 visualization: "none"
 stdin: ""
 complexity: "O(n) time, O(1) space"
-expectedOutput: |
-  isValidIPv4(192.168.1.10)=1
-  isValidIPv4(1.2.3)=0
+expectedOutput: "isValidIPv4(192.168.1.10)=1\nisValidIPv4(1.2.3)=0\n"
 ---
 
 ## Description

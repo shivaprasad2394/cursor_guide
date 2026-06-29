@@ -5,8 +5,7 @@ pattern: "linked list"
 difficulty: "medium"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  createNode(42): id=42 next=0x0
+expectedOutput: "createNode(42): id=42 next=0x0\n"
 ---
 
 ## Description

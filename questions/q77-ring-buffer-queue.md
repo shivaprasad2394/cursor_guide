@@ -6,9 +6,7 @@ difficulty: "medium"
 visualization: "none"
 stdin: ""
 complexity: "O(1) enqueue and dequeue; O(capacity) fixed memory."
-expectedOutput: |
-  ring dequeue=1
-  ring peek=2
+expectedOutput: "ring dequeue=1\nring peek=2\n"
 ---
 
 ## Description

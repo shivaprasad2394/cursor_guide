@@ -5,9 +5,7 @@ pattern: "memory, dma, mmap"
 difficulty: "hard"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  single transfer -> "DMA_PAYLOAD_DATA" (17 bytes)
-  scatter-gather -> "GET /index HTTP/1.1" (19 bytes in 3 descriptors)
+expectedOutput: "single transfer -> \"DMA_PAYLOAD_DATA\" (17 bytes)\nscatter-gather -> \"GET /index HTTP/1.1\" (19 bytes in 3 descriptors)\n"
 ---
 
 ## Description

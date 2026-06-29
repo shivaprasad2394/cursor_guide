@@ -5,8 +5,7 @@ pattern: "math / number"
 difficulty: "easy"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  isPrime(29)=1 isPrime(15)=0
+expectedOutput: "isPrime(29)=1 isPrime(15)=0\n"
 ---
 
 ## Description

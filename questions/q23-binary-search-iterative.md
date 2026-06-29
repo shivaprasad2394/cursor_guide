@@ -6,8 +6,7 @@ difficulty: "medium"
 visualization: "none"
 stdin: ""
 complexity: "O(log n) time, O(1) space Precondition: array MUST be sorted"
-expectedOutput: |
-  binSearch(7)=3
+expectedOutput: "binSearch(7)=3\n"
 ---
 
 ## Description

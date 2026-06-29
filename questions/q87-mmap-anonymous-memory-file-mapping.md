@@ -5,10 +5,7 @@ pattern: "memory, dma, mmap"
 difficulty: "hard"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  anonymous map -> "anonymous mmap memory works like an array"
-  file map (before) -> "hello mmap file"
-  file map (after)  -> "Hello mmap file"
+expectedOutput: "anonymous map -> \"anonymous mmap memory works like an array\"\nfile map (before) -> \"hello mmap file\"\nfile map (after)  -> \"Hello mmap file\"\n"
 ---
 
 ## Description

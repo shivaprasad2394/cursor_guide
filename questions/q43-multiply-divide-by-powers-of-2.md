@@ -5,8 +5,7 @@ pattern: "bit manipulation"
 difficulty: "easy"
 visualization: "none"
 stdin: ""
-expectedOutput: |
-  5*8=40 40/4=10
+expectedOutput: "5*8=40 40/4=10\n"
 ---
 
 ## Description

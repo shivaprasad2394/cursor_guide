@@ -6,8 +6,7 @@ difficulty: "medium"
 visualization: "none"
 stdin: ""
 complexity: "O(log n) time, O(1) space"
-expectedOutput: |
-  minRotated=0
+expectedOutput: "minRotated=0\n"
 ---
 
 ## Description

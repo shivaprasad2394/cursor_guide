@@ -6,8 +6,7 @@ difficulty: "easy"
 visualization: "none"
 stdin: ""
 complexity: "O(n * L) where L is the length of each term"
-expectedOutput: |
-  Term 5: 111221
+expectedOutput: "Term 5: 111221\n"
 ---
 
 ## Description
