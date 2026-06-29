@@ -29,10 +29,12 @@ export async function compileAndRun(source, stdin = "") {
   const [{ compile }, wasi] = await loadDeps();
   const { WASI, File, OpenFile, ConsoleStdout } = wasi;
 
+  // browsercc uses the clang++ driver with the filename *before* flags, so
+  // -std=c11 triggers "not allowed with C++". .c extension + -Wall is enough.
   const { module, compileOutput } = await compile({
     source,
     fileName: "main.c",
-    flags: ["-x", "c", "-std=c11", "-Wall"],
+    flags: ["-Wall"],
   });
 
   if (!module) {
