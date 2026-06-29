@@ -32,7 +32,7 @@ export async function compileAndRun(source, stdin = "") {
   const { module, compileOutput } = await compile({
     source,
     fileName: "main.c",
-    flags: ["-std=c11", "-Wall"],
+    flags: ["-x", "c", "-std=c11", "-Wall"],
   });
 
   if (!module) {
