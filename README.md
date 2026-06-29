@@ -48,3 +48,6 @@ git push -u origin main
 | Parsing & formatting | 8 |
 | Buffers & driver patterns | 4 |
 | Memory / DMA / mmap / libc | 10 |
+
+
+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
