@@ -15,6 +15,17 @@
     let key = null;
     let list = null;
     let objLines = [];
+    let blockKey = null;
+    let blockLines = [];
+
+    const flushBlock = () => {
+      if (blockKey !== null) {
+        meta[blockKey] = blockLines.join("\n");
+        if (meta[blockKey]) meta[blockKey] += "\n";
+        blockKey = null;
+        blockLines = [];
+      }
+    };
 
     const flushObject = () => {
       if (key && objLines.length) {
@@ -32,13 +43,27 @@
 
     for (const line of text.split("\n")) {
       const trimmed = line.trim();
-      if (!trimmed) continue;
+      if (!trimmed && blockKey === null) continue;
+
+      if (blockKey !== null) {
+        if (line.startsWith("  ") || line.startsWith("\t")) {
+          blockLines.push(line.replace(/^\s{2}/, ""));
+          continue;
+        }
+        flushBlock();
+      }
 
       const root = trimmed.match(/^(\w+)\s*:\s*(.*)$/);
       if (root && !line.startsWith("  ") && !line.startsWith("\t")) {
         flushObject();
         key = root[1];
         const val = root[2].trim();
+        if (val === "|" || val === "|-" || val === ">" || val === ">-" ) {
+          blockKey = key;
+          blockLines = [];
+          key = null;
+          continue;
+        }
         if (val === "") {
           list = [];
           meta[key] = list;
@@ -73,6 +98,7 @@
         objLines.push(trimmed);
       }
     }
+    flushBlock();
     flushObject();
     return meta;
   }
@@ -225,7 +251,7 @@
   async function runInBrowser(source, stdin, onProgress) {
     if (!runnerModule) {
       if (onProgress) onProgress("Loading in-browser C compiler (first run ~60 MB, cached after)…");
-      runnerModule = await import("./runner.js?v=3");
+      runnerModule = await import("./runner.js?v=4");
     }
     if (onProgress) onProgress("Compiling & running…");
     return runnerModule.compileAndRun(source, stdin || "");
