@@ -1,0 +1,700 @@
+{
+  "questions": [
+    {
+      "id": "q01-reverse-a-string-in-place",
+      "file": "q01-reverse-a-string-in-place.md",
+      "title": "Reverse a String (in-place)",
+      "pattern": "two-pointer (opposite ends)",
+      "difficulty": "easy",
+      "section": "strings"
+    },
+    {
+      "id": "q02-check-for-anagram",
+      "file": "q02-check-for-anagram.md",
+      "title": "Check for Anagram",
+      "pattern": "frequency table",
+      "difficulty": "easy",
+      "section": "strings"
+    },
+    {
+      "id": "q03-longest-palindromic-substring-expand-around-center",
+      "file": "q03-longest-palindromic-substring-expand-around-center.md",
+      "title": "Longest Palindromic Substring (expand around center)",
+      "pattern": "expand from center",
+      "difficulty": "easy",
+      "section": "strings"
+    },
+    {
+      "id": "q04-remove-all-duplicate-characters-from-a-string",
+      "file": "q04-remove-all-duplicate-characters-from-a-string.md",
+      "title": "Remove All Duplicate Characters from a String",
+      "pattern": "frequency table (boolean variant)",
+      "difficulty": "easy",
+      "section": "strings"
+    },
+    {
+      "id": "q05-string-compression-run-length-encoding",
+      "file": "q05-string-compression-run-length-encoding.md",
+      "title": "String Compression (Run-Length Encoding)",
+      "pattern": "count runs",
+      "difficulty": "easy",
+      "section": "strings"
+    },
+    {
+      "id": "q06-check-if-one-string-is-a-rotation-of-another",
+      "file": "q06-check-if-one-string-is-a-rotation-of-another.md",
+      "title": "Check If One String Is a Rotation of Another",
+      "pattern": "string concatenation trick",
+      "difficulty": "easy",
+      "section": "strings"
+    },
+    {
+      "id": "q07-first-and-second-non-repeating-character",
+      "file": "q07-first-and-second-non-repeating-character.md",
+      "title": "First and Second Non-Repeating Character",
+      "pattern": "frequency table (two-pass)",
+      "difficulty": "easy",
+      "section": "strings"
+    },
+    {
+      "id": "q08-valid-palindrome-alphanumeric-only-case-insensitive",
+      "file": "q08-valid-palindrome-alphanumeric-only-case-insensitive.md",
+      "title": "Valid Palindrome (alphanumeric only, case-insensitive)",
+      "pattern": "two-pointer (opposite ends) + skip",
+      "difficulty": "easy",
+      "section": "strings"
+    },
+    {
+      "id": "q09-count-and-say-sequence",
+      "file": "q09-count-and-say-sequence.md",
+      "title": "Count and Say Sequence",
+      "pattern": "strings",
+      "difficulty": "easy",
+      "section": "strings"
+    },
+    {
+      "id": "q10-check-if-t-is-a-subsequence-of-s",
+      "file": "q10-check-if-t-is-a-subsequence-of-s.md",
+      "title": "Check If t Is a Subsequence of s",
+      "pattern": "two-pointer (merge walk)",
+      "difficulty": "easy",
+      "section": "strings"
+    },
+    {
+      "id": "q11-reverse-words-in-a-string-in-place-three-reversal-trick",
+      "file": "q11-reverse-words-in-a-string-in-place-three-reversal-trick.md",
+      "title": "Reverse Words in a String (in-place, three-reversal trick)",
+      "pattern": "reversal trick (three reverses)",
+      "difficulty": "easy",
+      "section": "strings"
+    },
+    {
+      "id": "q12-longest-common-substring-brute-force",
+      "file": "q12-longest-common-substring-brute-force.md",
+      "title": "Longest Common Substring (brute force)",
+      "pattern": "strings",
+      "difficulty": "easy",
+      "section": "strings"
+    },
+    {
+      "id": "q13-validate-an-ipv4-address",
+      "file": "q13-validate-an-ipv4-address.md",
+      "title": "Validate an IPv4 Address",
+      "pattern": "state machine (single pass)",
+      "difficulty": "easy",
+      "section": "strings"
+    },
+    {
+      "id": "q14-find-second-largest-element",
+      "file": "q14-find-second-largest-element.md",
+      "title": "Find Second Largest Element",
+      "pattern": "single pass (two trackers)",
+      "difficulty": "medium",
+      "section": "arrays"
+    },
+    {
+      "id": "q15-move-all-zeros-to-end",
+      "file": "q15-move-all-zeros-to-end.md",
+      "title": "Move All Zeros to End",
+      "pattern": "two-pointer (read/write)",
+      "difficulty": "medium",
+      "section": "arrays"
+    },
+    {
+      "id": "q16-rotate-array-left-by-d-positions-reversal-trick",
+      "file": "q16-rotate-array-left-by-d-positions-reversal-trick.md",
+      "title": "Rotate Array Left by d Positions (reversal trick)",
+      "pattern": "reversal trick (three reverses)",
+      "difficulty": "medium",
+      "section": "arrays"
+    },
+    {
+      "id": "q17-kadane-s-algorithm-maximum-subarray-sum",
+      "file": "q17-kadane-s-algorithm-maximum-subarray-sum.md",
+      "title": "Kadane's Algorithm (Maximum Subarray Sum)",
+      "pattern": "single pass greedy (extend or restart)",
+      "difficulty": "medium",
+      "section": "arrays"
+    },
+    {
+      "id": "q18-remove-duplicates-from-sorted-array",
+      "file": "q18-remove-duplicates-from-sorted-array.md",
+      "title": "Remove Duplicates from Sorted Array",
+      "pattern": "two-pointer (slow/fast)",
+      "difficulty": "medium",
+      "section": "arrays"
+    },
+    {
+      "id": "q19-majority-element-boyer-moore-voting",
+      "file": "q19-majority-element-boyer-moore-voting.md",
+      "title": "Majority Element (Boyer-Moore Voting)",
+      "pattern": "single pass greedy (vote + verify)",
+      "difficulty": "medium",
+      "section": "arrays"
+    },
+    {
+      "id": "q20-missing-number-in-0-n-xor-method",
+      "file": "q20-missing-number-in-0-n-xor-method.md",
+      "title": "Missing Number in 0..n (XOR method)",
+      "pattern": "xor cancel",
+      "difficulty": "medium",
+      "section": "arrays"
+    },
+    {
+      "id": "q21-reverse-array-in-groups-of-k",
+      "file": "q21-reverse-array-in-groups-of-k.md",
+      "title": "Reverse Array in Groups of k",
+      "pattern": "arrays",
+      "difficulty": "medium",
+      "section": "arrays"
+    },
+    {
+      "id": "q22-find-minimum-in-rotated-sorted-array-binary-search",
+      "file": "q22-find-minimum-in-rotated-sorted-array-binary-search.md",
+      "title": "Find Minimum in Rotated Sorted Array (binary search)",
+      "pattern": "binary search",
+      "difficulty": "medium",
+      "section": "arrays"
+    },
+    {
+      "id": "q23-binary-search-iterative",
+      "file": "q23-binary-search-iterative.md",
+      "title": "Binary Search (iterative)",
+      "pattern": "arrays",
+      "difficulty": "medium",
+      "section": "arrays"
+    },
+    {
+      "id": "q24-quicksort-lomuto-partition",
+      "file": "q24-quicksort-lomuto-partition.md",
+      "title": "Quicksort (Lomuto partition)",
+      "pattern": "arrays",
+      "difficulty": "medium",
+      "section": "arrays"
+    },
+    {
+      "id": "q25-merge-two-sorted-arrays",
+      "file": "q25-merge-two-sorted-arrays.md",
+      "title": "Merge Two Sorted Arrays",
+      "pattern": "arrays",
+      "difficulty": "medium",
+      "section": "arrays"
+    },
+    {
+      "id": "q26-heap-sort",
+      "file": "q26-heap-sort.md",
+      "title": "Heap Sort",
+      "pattern": "arrays",
+      "difficulty": "medium",
+      "section": "arrays"
+    },
+    {
+      "id": "q27-set-clear-toggle-check-bit",
+      "file": "q27-set-clear-toggle-check-bit.md",
+      "title": "Set / Clear / Toggle / Check Bit",
+      "pattern": "bit manipulation",
+      "difficulty": "easy",
+      "section": "bit manipulation"
+    },
+    {
+      "id": "q31-check-if-n-is-a-power-of-2",
+      "file": "q31-check-if-n-is-a-power-of-2.md",
+      "title": "Check if n is a Power of 2",
+      "pattern": "bit manipulation",
+      "difficulty": "easy",
+      "section": "bit manipulation"
+    },
+    {
+      "id": "q32-count-set-bits-brian-kernighan-s-trick",
+      "file": "q32-count-set-bits-brian-kernighan-s-trick.md",
+      "title": "Count Set Bits (Brian Kernighan's Trick)",
+      "pattern": "bit manipulation",
+      "difficulty": "easy",
+      "section": "bit manipulation"
+    },
+    {
+      "id": "q33-single-non-repeating-element-xor",
+      "file": "q33-single-non-repeating-element-xor.md",
+      "title": "Single Non-Repeating Element (XOR)",
+      "pattern": "xor cancel",
+      "difficulty": "easy",
+      "section": "bit manipulation"
+    },
+    {
+      "id": "q34-two-non-repeating-elements",
+      "file": "q34-two-non-repeating-elements.md",
+      "title": "Two Non-Repeating Elements",
+      "pattern": "bit manipulation",
+      "difficulty": "easy",
+      "section": "bit manipulation"
+    },
+    {
+      "id": "q35-swap-two-numbers-without-temp-xor",
+      "file": "q35-swap-two-numbers-without-temp-xor.md",
+      "title": "Swap Two Numbers Without Temp (XOR)",
+      "pattern": "bit manipulation",
+      "difficulty": "easy",
+      "section": "bit manipulation"
+    },
+    {
+      "id": "q36-reverse-bits-of-a-32-bit-number",
+      "file": "q36-reverse-bits-of-a-32-bit-number.md",
+      "title": "Reverse Bits of a 32-bit Number",
+      "pattern": "bit manipulation",
+      "difficulty": "easy",
+      "section": "bit manipulation"
+    },
+    {
+      "id": "q37-even-odd-via-lsb",
+      "file": "q37-even-odd-via-lsb.md",
+      "title": "Even / Odd via LSB",
+      "pattern": "bit manipulation",
+      "difficulty": "easy",
+      "section": "bit manipulation"
+    },
+    {
+      "id": "q38-position-of-rightmost-set-bit-1-indexed",
+      "file": "q38-position-of-rightmost-set-bit-1-indexed.md",
+      "title": "Position of Rightmost Set Bit (1-indexed)",
+      "pattern": "bit manipulation",
+      "difficulty": "easy",
+      "section": "bit manipulation"
+    },
+    {
+      "id": "q39-bit-range-operations-set-clear-write-bits-in-start-end",
+      "file": "q39-bit-range-operations-set-clear-write-bits-in-start-end.md",
+      "title": "Bit Range Operations (Set / Clear / Write bits in [start..end])",
+      "pattern": "bit manipulation",
+      "difficulty": "easy",
+      "section": "bit manipulation"
+    },
+    {
+      "id": "q42-add-two-numbers-without-operator",
+      "file": "q42-add-two-numbers-without-operator.md",
+      "title": "Add Two Numbers Without + Operator",
+      "pattern": "bit manipulation",
+      "difficulty": "easy",
+      "section": "bit manipulation"
+    },
+    {
+      "id": "q43-multiply-divide-by-powers-of-2",
+      "file": "q43-multiply-divide-by-powers-of-2.md",
+      "title": "Multiply / Divide by Powers of 2",
+      "pattern": "bit manipulation",
+      "difficulty": "easy",
+      "section": "bit manipulation"
+    },
+    {
+      "id": "q44-missing-number-from-1-n-xor-variant",
+      "file": "q44-missing-number-from-1-n-xor-variant.md",
+      "title": "Missing Number from 1..N (XOR variant)",
+      "pattern": "bit manipulation",
+      "difficulty": "easy",
+      "section": "bit manipulation"
+    },
+    {
+      "id": "q45-digit-extraction",
+      "file": "q45-digit-extraction.md",
+      "title": "Digit Extraction",
+      "pattern": "math / number",
+      "difficulty": "easy",
+      "section": "math / number"
+    },
+    {
+      "id": "q46-reverse-a-number",
+      "file": "q46-reverse-a-number.md",
+      "title": "Reverse a Number",
+      "pattern": "math / number",
+      "difficulty": "easy",
+      "section": "math / number"
+    },
+    {
+      "id": "q47-palindrome-number-check",
+      "file": "q47-palindrome-number-check.md",
+      "title": "Palindrome Number Check",
+      "pattern": "math / number",
+      "difficulty": "easy",
+      "section": "math / number"
+    },
+    {
+      "id": "q48-armstrong-number-narcissistic-number",
+      "file": "q48-armstrong-number-narcissistic-number.md",
+      "title": "Armstrong Number (Narcissistic Number)",
+      "pattern": "math / number",
+      "difficulty": "easy",
+      "section": "math / number"
+    },
+    {
+      "id": "q49-print-all-divisors-of-n",
+      "file": "q49-print-all-divisors-of-n.md",
+      "title": "Print All Divisors of N",
+      "pattern": "math / number",
+      "difficulty": "easy",
+      "section": "math / number"
+    },
+    {
+      "id": "q50-prime-number-check-6k-1-optimization",
+      "file": "q50-prime-number-check-6k-1-optimization.md",
+      "title": "Prime Number Check (6k +/- 1 optimization)",
+      "pattern": "math / number",
+      "difficulty": "easy",
+      "section": "math / number"
+    },
+    {
+      "id": "q51-gcd-euclidean-algorithm-iterative",
+      "file": "q51-gcd-euclidean-algorithm-iterative.md",
+      "title": "GCD - Euclidean Algorithm (iterative)",
+      "pattern": "math / number",
+      "difficulty": "easy",
+      "section": "math / number"
+    },
+    {
+      "id": "q52-big-integer-addition-string-based",
+      "file": "q52-big-integer-addition-string-based.md",
+      "title": "Big Integer Addition (string-based)",
+      "pattern": "math / number",
+      "difficulty": "easy",
+      "section": "math / number"
+    },
+    {
+      "id": "q53-createnode-allocate-initialize-a-new-node",
+      "file": "q53-createnode-allocate-initialize-a-new-node.md",
+      "title": "createNode - allocate + initialize a new node",
+      "pattern": "linked list",
+      "difficulty": "medium",
+      "section": "linked list"
+    },
+    {
+      "id": "q54-insertathead-o-1-insertion-at-the-beginning",
+      "file": "q54-insertathead-o-1-insertion-at-the-beginning.md",
+      "title": "insertAtHead - O(1) insertion at the beginning",
+      "pattern": "linked list",
+      "difficulty": "medium",
+      "section": "linked list"
+    },
+    {
+      "id": "q55-insertatend-o-n-insertion-at-the-tail",
+      "file": "q55-insertatend-o-n-insertion-at-the-tail.md",
+      "title": "insertAtEnd - O(n) insertion at the tail",
+      "pattern": "linked list",
+      "difficulty": "medium",
+      "section": "linked list"
+    },
+    {
+      "id": "q56-deletenode-remove-first-node-matching-key",
+      "file": "q56-deletenode-remove-first-node-matching-key.md",
+      "title": "deleteNode - remove first node matching 'key'",
+      "pattern": "linked list",
+      "difficulty": "medium",
+      "section": "linked list"
+    },
+    {
+      "id": "q57-printlist-58-freelist",
+      "file": "q57-printlist-58-freelist.md",
+      "title": "printList & 58. freeList",
+      "pattern": "linked list",
+      "difficulty": "medium",
+      "section": "linked list"
+    },
+    {
+      "id": "q59-reverselist-the-three-pointer-classic",
+      "file": "q59-reverselist-the-three-pointer-classic.md",
+      "title": "reverseList - THE three-pointer classic",
+      "pattern": "linked list",
+      "difficulty": "medium",
+      "section": "linked list"
+    },
+    {
+      "id": "q60-findmiddle-slow-fast-pointer",
+      "file": "q60-findmiddle-slow-fast-pointer.md",
+      "title": "findMiddle - slow & fast pointer",
+      "pattern": "linked list",
+      "difficulty": "medium",
+      "section": "linked list"
+    },
+    {
+      "id": "q61-hascycle-floyd-s-tortoise-and-hare",
+      "file": "q61-hascycle-floyd-s-tortoise-and-hare.md",
+      "title": "hasCycle - Floyd's Tortoise and Hare",
+      "pattern": "linked list",
+      "difficulty": "medium",
+      "section": "linked list"
+    },
+    {
+      "id": "q62-createbstnode",
+      "file": "q62-createbstnode.md",
+      "title": "createBstNode",
+      "pattern": "binary search tree",
+      "difficulty": "hard",
+      "section": "binary search tree"
+    },
+    {
+      "id": "q63-bstinsert-recursive-return-root-pattern",
+      "file": "q63-bstinsert-recursive-return-root-pattern.md",
+      "title": "bstInsert - recursive, return-root pattern",
+      "pattern": "binary search tree",
+      "difficulty": "hard",
+      "section": "binary search tree"
+    },
+    {
+      "id": "q64-bstsearch",
+      "file": "q64-bstsearch.md",
+      "title": "bstSearch",
+      "pattern": "binary search tree",
+      "difficulty": "hard",
+      "section": "binary search tree"
+    },
+    {
+      "id": "q65-bstmin-bstmax",
+      "file": "q65-bstmin-bstmax.md",
+      "title": "bstMin / bstMax",
+      "pattern": "binary search tree",
+      "difficulty": "hard",
+      "section": "binary search tree"
+    },
+    {
+      "id": "q66-traversals-inorder-sorted-preorder-postorder",
+      "file": "q66-traversals-inorder-sorted-preorder-postorder.md",
+      "title": "Traversals: inorder (sorted!), preorder, postorder",
+      "pattern": "binary search tree",
+      "difficulty": "hard",
+      "section": "binary search tree"
+    },
+    {
+      "id": "q69-bstdelete-the-three-cases",
+      "file": "q69-bstdelete-the-three-cases.md",
+      "title": "bstDelete - the three cases",
+      "pattern": "binary search tree",
+      "difficulty": "hard",
+      "section": "binary search tree"
+    },
+    {
+      "id": "q70-freetree-must-use-postorder-children-before-parent",
+      "file": "q70-freetree-must-use-postorder-children-before-parent.md",
+      "title": "freeTree - MUST use postorder (children before parent!)",
+      "pattern": "binary search tree",
+      "difficulty": "hard",
+      "section": "binary search tree"
+    },
+    {
+      "id": "q71-linked-queue",
+      "file": "q71-linked-queue.md",
+      "title": "Linked Queue",
+      "pattern": "queues",
+      "difficulty": "medium",
+      "section": "queues & stacks"
+    },
+    {
+      "id": "q77-ring-buffer-queue",
+      "file": "q77-ring-buffer-queue.md",
+      "title": "Ring Buffer Queue",
+      "pattern": "queues",
+      "difficulty": "medium",
+      "section": "queues & stacks"
+    },
+    {
+      "id": "q81-linked-stack",
+      "file": "q81-linked-stack.md",
+      "title": "Linked Stack",
+      "pattern": "queues",
+      "difficulty": "medium",
+      "section": "queues & stacks"
+    },
+    {
+      "id": "q82-parse-three-integers-from-a-string-sscanf-basics",
+      "file": "q82-parse-three-integers-from-a-string-sscanf-basics.md",
+      "title": "Parse three integers from a string (sscanf basics)",
+      "pattern": "parsing",
+      "difficulty": "medium",
+      "section": "parsing & formatting"
+    },
+    {
+      "id": "q83-parse-a-key-value-configuration-line-sscanf-with",
+      "file": "q83-parse-a-key-value-configuration-line-sscanf-with.md",
+      "title": "Parse a \"key=value\" configuration line (sscanf with %[ ])",
+      "pattern": "parsing",
+      "difficulty": "medium",
+      "section": "parsing & formatting"
+    },
+    {
+      "id": "q84-parse-an-ipv4-address-into-four-octets-sscanf-with-field-count",
+      "file": "q84-parse-an-ipv4-address-into-four-octets-sscanf-with-field-count.md",
+      "title": "Parse an IPv4 address into four octets (sscanf with field count)",
+      "pattern": "parsing",
+      "difficulty": "medium",
+      "section": "parsing & formatting"
+    },
+    {
+      "id": "q85-parse-hh-mm-ss-time-and-convert-to-total-seconds-sscanf",
+      "file": "q85-parse-hh-mm-ss-time-and-convert-to-total-seconds-sscanf.md",
+      "title": "Parse \"HH:MM:SS\" time and convert to total seconds (sscanf)",
+      "pattern": "parsing",
+      "difficulty": "medium",
+      "section": "parsing & formatting"
+    },
+    {
+      "id": "q86-safe-string-building-with-snprintf-no-overflow",
+      "file": "q86-safe-string-building-with-snprintf-no-overflow.md",
+      "title": "Safe string building with snprintf (no overflow)",
+      "pattern": "parsing",
+      "difficulty": "medium",
+      "section": "parsing & formatting"
+    },
+    {
+      "id": "q87-build-a-csv-row-safely-by-appending-with-snprintf",
+      "file": "q87-build-a-csv-row-safely-by-appending-with-snprintf.md",
+      "title": "Build a CSV row safely by appending with snprintf",
+      "pattern": "parsing",
+      "difficulty": "medium",
+      "section": "parsing & formatting"
+    },
+    {
+      "id": "q88-integer-to-string-conversion-snprintf-instead-of-itoa",
+      "file": "q88-integer-to-string-conversion-snprintf-instead-of-itoa.md",
+      "title": "Integer to string conversion (snprintf instead of itoa)",
+      "pattern": "parsing",
+      "difficulty": "medium",
+      "section": "parsing & formatting"
+    },
+    {
+      "id": "q89-round-trip-format-with-snprintf-then-parse-back-with-sscanf",
+      "file": "q89-round-trip-format-with-snprintf-then-parse-back-with-sscanf.md",
+      "title": "Round-trip: format with snprintf, then parse back with sscanf",
+      "pattern": "parsing",
+      "difficulty": "medium",
+      "section": "parsing & formatting"
+    },
+    {
+      "id": "q74-sll-insert-in-ascending-and-descending-sorted-order",
+      "file": "q74-sll-insert-in-ascending-and-descending-sorted-order.md",
+      "title": "SLL \u2014 Insert in Ascending and Descending (Sorted) Order",
+      "pattern": "buffers",
+      "difficulty": "hard",
+      "section": "buffers & driver patterns"
+    },
+    {
+      "id": "q75-circular-ring-buffer",
+      "file": "q75-circular-ring-buffer.md",
+      "title": "Circular Ring Buffer",
+      "pattern": "buffers",
+      "difficulty": "hard",
+      "section": "buffers & driver patterns"
+    },
+    {
+      "id": "q76-dma-descriptor-ring-nic-hardware-driver-style",
+      "file": "q76-dma-descriptor-ring-nic-hardware-driver-style.md",
+      "title": "DMA Descriptor Ring (NIC / hardware-driver style)",
+      "pattern": "buffers",
+      "difficulty": "hard",
+      "section": "buffers & driver patterns"
+    },
+    {
+      "id": "q77-wifi-driver-pack-unpack-extract",
+      "file": "q77-wifi-driver-pack-unpack-extract.md",
+      "title": "WiFi Driver \u2014 Pack / Unpack / Extract",
+      "pattern": "buffers",
+      "difficulty": "hard",
+      "section": "buffers & driver patterns"
+    },
+    {
+      "id": "q78-memset-memcpy-memmove-standard-functions",
+      "file": "q78-memset-memcpy-memmove-standard-functions.md",
+      "title": "memset / memcpy / memmove (standard functions)",
+      "pattern": "memory, dma, mmap",
+      "difficulty": "hard",
+      "section": "memory, dma, mmap & reimplementing libc"
+    },
+    {
+      "id": "q79-custom-memcpy",
+      "file": "q79-custom-memcpy.md",
+      "title": "Custom memcpy",
+      "pattern": "memory, dma, mmap",
+      "difficulty": "hard",
+      "section": "memory, dma, mmap & reimplementing libc"
+    },
+    {
+      "id": "q80-custom-memmove-overlap-safe",
+      "file": "q80-custom-memmove-overlap-safe.md",
+      "title": "Custom memmove (overlap-safe)",
+      "pattern": "memory, dma, mmap",
+      "difficulty": "hard",
+      "section": "memory, dma, mmap & reimplementing libc"
+    },
+    {
+      "id": "q81-custom-memset",
+      "file": "q81-custom-memset.md",
+      "title": "Custom memset",
+      "pattern": "memory, dma, mmap",
+      "difficulty": "hard",
+      "section": "memory, dma, mmap & reimplementing libc"
+    },
+    {
+      "id": "q82-custom-strncpy",
+      "file": "q82-custom-strncpy.md",
+      "title": "Custom strncpy",
+      "pattern": "memory, dma, mmap",
+      "difficulty": "hard",
+      "section": "memory, dma, mmap & reimplementing libc"
+    },
+    {
+      "id": "q83-custom-strstr",
+      "file": "q83-custom-strstr.md",
+      "title": "Custom strstr",
+      "pattern": "memory, dma, mmap",
+      "difficulty": "hard",
+      "section": "memory, dma, mmap & reimplementing libc"
+    },
+    {
+      "id": "q84-custom-snprintf-bounded-returns-would-be-length",
+      "file": "q84-custom-snprintf-bounded-returns-would-be-length.md",
+      "title": "Custom snprintf (bounded, returns would-be length)",
+      "pattern": "memory, dma, mmap",
+      "difficulty": "hard",
+      "section": "memory, dma, mmap & reimplementing libc"
+    },
+    {
+      "id": "q85-understanding-sizeof-compile-time-operator",
+      "file": "q85-understanding-sizeof-compile-time-operator.md",
+      "title": "Understanding sizeof (compile-time operator)",
+      "pattern": "memory, dma, mmap",
+      "difficulty": "hard",
+      "section": "memory, dma, mmap & reimplementing libc"
+    },
+    {
+      "id": "q86-dma-style-buffer-copy-descriptor-scatter-gather",
+      "file": "q86-dma-style-buffer-copy-descriptor-scatter-gather.md",
+      "title": "DMA-style buffer copy (descriptor + scatter-gather)",
+      "pattern": "memory, dma, mmap",
+      "difficulty": "hard",
+      "section": "memory, dma, mmap & reimplementing libc"
+    },
+    {
+      "id": "q87-mmap-anonymous-memory-file-mapping",
+      "file": "q87-mmap-anonymous-memory-file-mapping.md",
+      "title": "mmap (anonymous memory + file mapping)",
+      "pattern": "memory, dma, mmap",
+      "difficulty": "hard",
+      "section": "memory, dma, mmap & reimplementing libc"
+    }
+  ]
+}
