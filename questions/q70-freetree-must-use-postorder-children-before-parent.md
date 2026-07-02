@@ -7,10 +7,16 @@ visualization: "none"
 stdin: ""
 expectedOutput: "tree freed (postorder)\n"
 ---
+## At a glance
+
+- **Goal:** freeTree - MUST use postorder (children before parent!)
+- **Pattern:** Binary search tree
+- **Complexity:** See algorithm
+- **Expected output:** `tree freed (postorder)`
 
 ## Description
 
-freeTree - MUST use postorder (children before parent!)
+Implement **freeTree - MUST use postorder (children before parent!)** using the pattern above. Write the helper function(s); `main()` is provided.
 
 ## Starter Code
 

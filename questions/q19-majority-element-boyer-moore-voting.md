@@ -8,10 +8,20 @@ stdin: ""
 complexity: "O(n) time, O(1) space"
 expectedOutput: "majority=2\n"
 ---
+## At a glance
+
+- **Goal:** Majority Element (Boyer-Moore Voting)
+- **Pattern:** Single pass greedy (vote + verify)
+- **Complexity:** O(n) time, O(1) space
+- **Expected output:** `majority=2`
 
 ## Description
 
 Find the element that appears MORE than n/2 times.
+
+**Walkthrough hint:**
+
+arr = [2, 2, 1, 1, 1, 2, 2]
 
 ## Algorithm
 

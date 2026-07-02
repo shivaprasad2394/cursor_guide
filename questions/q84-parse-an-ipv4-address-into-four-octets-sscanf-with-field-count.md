@@ -7,10 +7,20 @@ visualization: "none"
 stdin: ""
 expectedOutput: "valid=1 -> 192.168.1.10\n"
 ---
+## At a glance
+
+- **Goal:** Parse an IPv4 address into four octets (sscanf with field count)
+- **Pattern:** Parsing
+- **Complexity:** See algorithm
+- **Expected output:** `valid=1 -> 192.168.1.10`
 
 ## Description
 
 Convert "192.168.1.10" into four integers, validating the structure.
+
+**Walkthrough hint:**
+
+"192.168.1.10" -> 192,168,1,10 (valid)
 
 ## Algorithm
 

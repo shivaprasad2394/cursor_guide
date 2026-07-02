@@ -3,17 +3,25 @@ id: "q92-avl-insert-ll-rebalance"
 title: "AVL insert with LL rebalance"
 pattern: "avl tree"
 difficulty: "hard"
-visualization: "none"
+visualization: "tree"
+treeKeys: "30,20,10"
 stdin: ""
-complexity: "O(log n) per insert when tree stays balanced"
-expectedOutput: "insert 30,20,10 -> root=20 height=2\n"
+complexity: "O(log n) per insert"
+expectedOutput: "insert 30,20,10 -> root=20 height=2\\\\n"
 ---
+## At a glance
+
+- **Goal:** AVL insert with LL rebalance
+- **Pattern:** AVL tree
+- **Complexity:** O(log n) per insert
 
 ## Description
 
-Implement **avlInsert** that BST-inserts a key, updates heights bottom-up, and if balance factor is +2 (left-heavy), performs the correct rotation (LL → rotateRight, RR → rotateLeft, LR/RL → double rotation).
+Insert keys into an AVL tree; after each insert, update heights and rotate when |BF| > 1. Insert **30, 20, 10** triggers an **LL** case → **rotate right** at root.
 
-This question: insert **30, 20, 10** — triggers **LL** case; after rebalance root should be **20** with height 2.
+**Walkthrough hint:**
+
+After insert 10: root becomes 20
 
 ## Algorithm
 

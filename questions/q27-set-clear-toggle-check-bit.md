@@ -7,10 +7,16 @@ visualization: "none"
 stdin: ""
 expectedOutput: "set bit1 of 12=14\nclear bit2 of 12=8\ntoggle bit1 of 12=14\ncheck bit2 of 12=1\n"
 ---
+## At a glance
+
+- **Goal:** Set / Clear / Toggle / Check Bit
+- **Pattern:** Bit manipulation
+- **Complexity:** See algorithm
+- **Expected output:** `set bit1 of 12=14`
 
 ## Description
 
-Set / Clear / Toggle / Check Bit
+Implement **Set / Clear / Toggle / Check Bit** using the pattern above. Write the helper function(s); `main()` is provided.
 
 ## Starter Code
 

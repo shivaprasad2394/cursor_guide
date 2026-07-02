@@ -7,10 +7,20 @@ visualization: "none"
 stdin: ""
 expectedOutput: "my_strncpy(Hi,6) -> \"Hi\" (padded with nulls)\nmy_strncpy(Hello,4)+manual NUL -> \"Hel\"\n"
 ---
+## At a glance
+
+- **Goal:** Custom strncpy
+- **Pattern:** Memory, dma, mmap
+- **Complexity:** See algorithm
+- **Expected output:** `my_strncpy(Hi,6) -> "Hi" (padded with nulls)`
 
 ## Description
 
-Custom strncpy
+Implement **Custom strncpy** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+my_strncpy(dst, "Hi", 5)
 
 ## Algorithm
 

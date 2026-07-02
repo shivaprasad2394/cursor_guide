@@ -7,10 +7,20 @@ visualization: "none"
 stdin: ""
 expectedOutput: "csv=id,name,age\n"
 ---
+## At a glance
+
+- **Goal:** Build a CSV row safely by appending with snprintf
+- **Pattern:** Parsing
+- **Complexity:** See algorithm
+- **Expected output:** `csv=id,name,age`
 
 ## Description
 
 Concatenate several fields into one CSV line, tracking remaining space so we never overflow. This is the safe pattern for incremental string build.
+
+**Walkthrough hint:**
+
+fields {"id","name","age"} -> "id,name,age"
 
 ## Algorithm
 

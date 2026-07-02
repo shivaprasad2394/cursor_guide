@@ -8,10 +8,20 @@ stdin: ""
 complexity: "O(n) time, O(1) space"
 expectedOutput: "missing in 0..3=2\n"
 ---
+## At a glance
+
+- **Goal:** Missing Number in 0..n (XOR method)
+- **Pattern:** Xor cancel
+- **Complexity:** O(n) time, O(1) space
+- **Expected output:** `missing in 0..3=2`
 
 ## Description
 
 Given n distinct numbers from {0, 1, ..., n}, find the missing one.
+
+**Walkthrough hint:**
+
+arr = [3, 0, 1], n = 3 (should have 0,1,2,3)
 
 ## Algorithm
 

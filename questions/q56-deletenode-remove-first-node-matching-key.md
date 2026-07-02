@@ -3,14 +3,26 @@ id: "q56-deletenode-remove-first-node-matching-key"
 title: "deleteNode - remove first node matching 'key'"
 pattern: "linked list"
 difficulty: "medium"
-visualization: "none"
+visualization: "linked-list"
+listNodes: "1,2,3,4,5"
+listHighlight: "2"
 stdin: ""
 expectedOutput: "30 -> 10 -> NULL\n"
 ---
+## At a glance
+
+- **Goal:** deleteNode - remove first node matching 'key'
+- **Pattern:** Linked list
+- **Complexity:** See algorithm
+- **Expected output:** `30 -> 10 -> NULL`
 
 ## Description
 
-deleteNode - remove first node matching 'key'
+Implement **deleteNode - remove first node matching 'key'** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+head -> [10] -> [20] -> [30], delete 20
 
 ## Algorithm
 

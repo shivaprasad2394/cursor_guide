@@ -8,10 +8,20 @@ stdin: ""
 complexity: "O(number of set bits), NOT O(32)"
 expectedOutput: "countSetBits(13)=3\n"
 ---
+## At a glance
+
+- **Goal:** Count Set Bits (Brian Kernighan's Trick)
+- **Pattern:** Bit manipulation
+- **Complexity:** O(number of set bits), NOT O(32)
+- **Expected output:** `countSetBits(13)=3`
 
 ## Description
 
 Count how many bits are 1 in the binary representation of n.
+
+**Walkthrough hint:**
+
+n=13 (1101), count=0
 
 ## Algorithm
 

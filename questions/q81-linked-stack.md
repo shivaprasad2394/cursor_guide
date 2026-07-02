@@ -8,6 +8,12 @@ stdin: ""
 complexity: "O(1) push and pop."
 expectedOutput: "pop=200\npop=100\n"
 ---
+## At a glance
+
+- **Goal:** Linked Stack
+- **Pattern:** Queues
+- **Complexity:** O(1) push and pop.
+- **Expected output:** `pop=200`
 
 ## Description
 

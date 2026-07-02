@@ -7,10 +7,20 @@ visualization: "none"
 stdin: ""
 expectedOutput: "my_strstr(\"hello world\",\"wor\") -> \"world\"\nmy_strstr(\"hello world\",\"xyz\") -> (null)\n"
 ---
+## At a glance
+
+- **Goal:** Custom strstr
+- **Pattern:** Memory, dma, mmap
+- **Complexity:** See algorithm
+- **Expected output:** `my_strstr("hello world","wor") -> "world"`
 
 ## Description
 
-Custom strstr
+Implement **Custom strstr** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+haystack="hello world", needle="wor"
 
 ## Algorithm
 

@@ -3,11 +3,19 @@ id: "q77-ring-buffer-queue"
 title: "Ring Buffer Queue"
 pattern: "queues"
 difficulty: "medium"
-visualization: "none"
+visualization: "array-cells"
+tape: "0,1,2,3,4,5,6,7"
+arrayLabel: "ring buffer slots"
 stdin: ""
 complexity: "O(1) enqueue and dequeue; O(capacity) fixed memory."
 expectedOutput: "ring dequeue=1\nring peek=2\n"
 ---
+## At a glance
+
+- **Goal:** Ring Buffer Queue
+- **Pattern:** Queues
+- **Complexity:** O(1) enqueue and dequeue; O(capacity) fixed memory.
+- **Expected output:** `ring dequeue=1`
 
 ## Description
 

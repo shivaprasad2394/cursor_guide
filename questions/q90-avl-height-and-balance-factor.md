@@ -1,19 +1,28 @@
 ---
 id: "q90-avl-height-and-balance-factor"
-title: "AVL — node height and balance factor"
+title: "AVL \u2014 node height and balance factor"
 pattern: "avl tree"
 difficulty: "hard"
-visualization: "none"
+visualization: "tree"
+treeKeys: "30,20,10"
 stdin: ""
 complexity: "O(1) per node, O(n) to refresh whole tree"
 expectedOutput: "height(30)=3 bf(30)=0 bf(20)=1 bf(10)=0\n"
 ---
+## At a glance
+
+- **Goal:** AVL — node height and balance factor
+- **Pattern:** AVL tree
+- **Complexity:** O(1) per node, O(n) to refresh whole tree
+- **Expected output:** `height(30)=3 bf(30)=0 bf(20)=1 bf(10)=0`
 
 ## Description
 
-An AVL tree stores **height** in each node. **Balance factor** = height(left) − height(right). A node is balanced when BF is −1, 0, or +1.
+An AVL tree stores **height** in each node. **Balance factor (BF)** = height(left) − height(right). Balanced when BF is −1, 0, or +1.
 
-Given a small tree (30 root, left 20, left-left 10), compute heights and balance factors.
+**Walkthrough hint:**
+
+Tree: 30 / 20 / 10
 
 ## Algorithm
 

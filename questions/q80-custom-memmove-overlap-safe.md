@@ -7,10 +7,20 @@ visualization: "none"
 stdin: ""
 expectedOutput: "my_memmove(shift right 2) -> ABABCDE\nmy_memmove(shift left 3) -> 123\n"
 ---
+## At a glance
+
+- **Goal:** Custom memmove (overlap-safe)
+- **Pattern:** Memory, dma, mmap
+- **Complexity:** See algorithm
+- **Expected output:** `my_memmove(shift right 2) -> ABABCDE`
 
 ## Description
 
-Custom memmove (overlap-safe)
+Implement **Custom memmove (overlap-safe)** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+array "ABCDEF", move 6 bytes from index 0 to index 2 (dst>src)
 
 ## Algorithm
 

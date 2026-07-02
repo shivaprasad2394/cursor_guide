@@ -7,10 +7,20 @@ visualization: "none"
 stdin: ""
 expectedOutput: "digits of 5283: 3 8 2 5\n"
 ---
+## At a glance
+
+- **Goal:** Digit Extraction
+- **Pattern:** Math / number
+- **Complexity:** See algorithm
+- **Expected output:** `digits of 5283: 3 8 2 5`
 
 ## Description
 
-Digit Extraction
+Implement **Digit Extraction** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+n = 5283
 
 ## Algorithm
 

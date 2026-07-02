@@ -1,12 +1,18 @@
 ---
 id: "q77-wifi-driver-pack-unpack-extract"
-title: "WiFi Driver — Pack / Unpack / Extract"
+title: "WiFi Driver \u2014 Pack / Unpack / Extract"
 pattern: "buffers"
 difficulty: "hard"
 visualization: "none"
 stdin: ""
 expectedOutput: "PART A - EXTRACT 802.11 Frame Control = 0x0108\n  Protocol Version: 0\n  Type            : 2\n  Subtype         : 0\n  ToDS            : 1\n  FromDS          : 0\n\nPART B - PACK then UNPACK MAC header\n  packed 24 bytes: 08012C00001122334455AABBCCDDEEFF66778899AABB1000\n  unpacked FC=0x0108 dur=0x002C seq=0x0010\n  addr1 (RA) = 00:11:22:33:44:55\n  addr2 (TA) = AA:BB:CC:DD:EE:FF\n  addr3 (BSSID) = 66:77:88:99:AA:BB\n  round-trip MATCHED\n\nPART C - PACK then UNPACK TLV information elements\n  packed 12 TLV bytes\n  TLV type=0 len=4 value=\"Home\"\n  TLV type=1 len=4 value=\"\u0002\u0004\u000b\u0016\"\n"
 ---
+## At a glance
+
+- **Goal:** WiFi Driver — Pack / Unpack / Extract
+- **Pattern:** Buffers
+- **Complexity:** See algorithm
+- **Expected output:** `PART A - EXTRACT 802.11 Frame Control = 0x0108`
 
 ## Description
 

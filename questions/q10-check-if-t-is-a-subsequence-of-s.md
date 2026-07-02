@@ -3,15 +3,30 @@ id: "q10-check-if-t-is-a-subsequence-of-s"
 title: "Check If t Is a Subsequence of s"
 pattern: "two-pointer (merge walk)"
 difficulty: "easy"
-visualization: "none"
+visualization: "two-pointer"
+tape: "cgm"
+trace:
+  - {"left": 0, "right": 2, "note": "c \u2194 m"}
+  - {"left": 1, "right": 1, "note": "pointers meet \u2014 done"}
 stdin: ""
 complexity: "O(n) time, O(1) space"
 expectedOutput: "isSubsequence(capgemini,cgm)=1\n"
+- {"left": "1, \"right\": 1, \"note\": \"pointers meet \\u2014 done\"}"
 ---
+## At a glance
+
+- **Goal:** Check If t Is a Subsequence of s
+- **Pattern:** Two-pointer (merge walk)
+- **Complexity:** O(n) time, O(1) space
+- **Expected output:** `isSubsequence(capgemini,cgm)=1`
 
 ## Description
 
 A subsequence is formed by deleting zero or more characters from a string WITHOUT changing the order of remaining characters.
+
+**Walkthrough hint:**
+
+"cgm" is a subsequence of "capgemini"
 
 ## Algorithm
 

@@ -3,11 +3,19 @@ id: "q75-circular-ring-buffer"
 title: "Circular Ring Buffer"
 pattern: "buffers"
 difficulty: "hard"
-visualization: "none"
+visualization: "array-cells"
+tape: "0,1,2,3,4,5,6,7"
+arrayLabel: "ring buffer slots"
 stdin: ""
 complexity: "O(1) put and get. O(CAP) fixed memory, zero allocations after init."
 expectedOutput: "put 1 -> ok\nput 2 -> ok\nput 3 -> ok\nput 4 -> ok\nput 5 -> ok\nput 6 -> FULL (rejected)\nput 7 -> FULL (rejected)\nget -> 1\nget -> 2\nput 6 -> ok (wraps to index 0)\nput 7 -> ok\ndrain: 3 4 5 6 7\n"
 ---
+## At a glance
+
+- **Goal:** Circular Ring Buffer
+- **Pattern:** Buffers
+- **Complexity:** O(1) put and get. O(CAP) fixed memory, zero allocations after init.
+- **Expected output:** `put 1 -> ok`
 
 ## Description
 

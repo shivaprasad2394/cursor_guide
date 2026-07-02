@@ -8,10 +8,20 @@ stdin: ""
 complexity: "O(n) time, O(1) space"
 expectedOutput: "2nd largest=34\n"
 ---
+## At a glance
+
+- **Goal:** Find Second Largest Element
+- **Pattern:** Single pass (two trackers)
+- **Complexity:** O(n) time, O(1) space
+- **Expected output:** `2nd largest=34`
 
 ## Description
 
 Find the second largest distinct value in an array.
+
+**Walkthrough hint:**
+
+arr = [12, 35, 1, 10, 34, 1]
 
 ## Algorithm
 

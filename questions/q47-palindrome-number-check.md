@@ -7,10 +7,20 @@ visualization: "none"
 stdin: ""
 expectedOutput: "palin(121)=1 palin(123)=0\n"
 ---
+## At a glance
+
+- **Goal:** Palindrome Number Check
+- **Pattern:** Math / number
+- **Complexity:** See algorithm
+- **Expected output:** `palin(121)=1 palin(123)=0`
 
 ## Description
 
-Palindrome Number Check
+Implement **Palindrome Number Check** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+121 -> reversed = 121 -> equal -> palindrome
 
 ## Algorithm
 

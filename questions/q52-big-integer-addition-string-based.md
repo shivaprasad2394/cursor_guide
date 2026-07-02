@@ -7,10 +7,20 @@ visualization: "none"
 stdin: ""
 expectedOutput: "999+1=1000\n"
 ---
+## At a glance
+
+- **Goal:** Big Integer Addition (string-based)
+- **Pattern:** Math / number
+- **Complexity:** See algorithm
+- **Expected output:** `999+1=1000`
 
 ## Description
 
-Big Integer Addition (string-based)
+Implement **Big Integer Addition (string-based)** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+"999" + "1"
 
 ## Algorithm
 

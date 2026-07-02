@@ -7,10 +7,16 @@ visualization: "none"
 stdin: ""
 expectedOutput: "missing 1..5=3\n"
 ---
+## At a glance
+
+- **Goal:** Missing Number from 1..N (XOR variant)
+- **Pattern:** Bit manipulation
+- **Complexity:** See algorithm
+- **Expected output:** `missing 1..5=3`
 
 ## Description
 
-Missing Number from 1..N (XOR variant)
+Implement **Missing Number from 1..N (XOR variant)** using the pattern above. Write the helper function(s); `main()` is provided.
 
 ## Starter Code
 

@@ -1,17 +1,27 @@
 ---
 id: "q91-avl-rotate-left-and-right"
-title: "AVL — single rotations (left and right)"
+title: "AVL \u2014 single rotations (left and right)"
 pattern: "avl tree"
 difficulty: "hard"
-visualization: "none"
+visualization: "tree"
+treeKeys: "30,20,10"
 stdin: ""
-complexity: "O(1) time per rotation"
-expectedOutput: "after rotateRight root=20 left=10 right=30\n"
+complexity: "O(1) per rotation"
+expectedOutput: "after rotateRight root=20 left=10 right=30\\\\n"
 ---
+## At a glance
+
+- **Goal:** AVL — single rotations (left and right)
+- **Pattern:** AVL tree
+- **Complexity:** O(1) per rotation
 
 ## Description
 
-Implement **rotateRight** and **rotateLeft** for AVL rebalancing. Given an LL skew (30→20→10), one **rotateRight** at 30 yields a balanced tree with root 20.
+Perform **single rotations** to rebalance an AVL subtree. **Right rotation** fixes left-heavy (LL); **left rotation** fixes right-heavy (RR).
+
+**Walkthrough hint:**
+
+LL: rotate right at unbalanced node
 
 ## Algorithm
 

@@ -7,10 +7,20 @@ visualization: "none"
 stdin: ""
 expectedOutput: "matched=3 -> 10,20,30\n"
 ---
+## At a glance
+
+- **Goal:** Parse three integers from a string (sscanf basics)
+- **Pattern:** Parsing
+- **Complexity:** See algorithm
+- **Expected output:** `matched=3 -> 10,20,30`
 
 ## Description
 
 Extract structured numbers out of a text line into variables.
+
+**Walkthrough hint:**
+
+str = "10 20 30"
 
 ## Algorithm
 

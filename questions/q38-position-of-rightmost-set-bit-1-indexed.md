@@ -8,10 +8,20 @@ stdin: ""
 complexity: "O(position) time, O(1) space"
 expectedOutput: "rightmostSetBit(12)=3\n"
 ---
+## At a glance
+
+- **Goal:** Position of Rightmost Set Bit (1-indexed)
+- **Pattern:** Bit manipulation
+- **Complexity:** O(position) time, O(1) space
+- **Expected output:** `rightmostSetBit(12)=3`
 
 ## Description
 
-Position of Rightmost Set Bit (1-indexed)
+Implement **Position of Rightmost Set Bit (1-indexed)** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+n = 12 = 1100
 
 ## Algorithm
 

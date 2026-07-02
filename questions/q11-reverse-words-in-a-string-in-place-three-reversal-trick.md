@@ -8,10 +8,16 @@ stdin: ""
 complexity: "O(n) time, O(1) space (in-place!)"
 expectedOutput: "reverseWords=blue is sky the\n"
 ---
+## At a glance
+
+- **Goal:** Reverse Words in a String (in-place, three-reversal trick)
+- **Pattern:** Reversal trick (three reverses)
+- **Complexity:** O(n) time, O(1) space (in-place!)
+- **Expected output:** `reverseWords=blue is sky the`
 
 ## Description
 
-Reverse Words in a String (in-place, three-reversal trick)
+Implement **Reverse Words in a String (in-place, three-reversal trick)** using the pattern above. Write the helper function(s); `main()` is provided.
 
 ## Algorithm
 

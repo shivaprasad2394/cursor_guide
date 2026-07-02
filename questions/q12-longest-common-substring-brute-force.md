@@ -8,10 +8,20 @@ stdin: ""
 complexity: "O(m * n * min(m,n)) time, O(result) space"
 expectedOutput: "LCS substr=cd\n"
 ---
+## At a glance
+
+- **Goal:** Longest Common Substring (brute force)
+- **Pattern:** Strings
+- **Complexity:** O(m * n * min(m,n)) time, O(result) space
+- **Expected output:** `LCS substr=cd`
 
 ## Description
 
-Longest Common Substring (brute force)
+Implement **Longest Common Substring (brute force)** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+a="abcdfgh", b="zcdemgh"
 
 ## Algorithm
 

@@ -7,10 +7,20 @@ visualization: "none"
 stdin: ""
 expectedOutput: "isPrime(29)=1 isPrime(15)=0\n"
 ---
+## At a glance
+
+- **Goal:** Prime Number Check (6k +/- 1 optimization)
+- **Pattern:** Math / number
+- **Complexity:** See algorithm
+- **Expected output:** `isPrime(29)=1 isPrime(15)=0`
 
 ## Description
 
-Prime Number Check (6k +/- 1 optimization)
+Implement **Prime Number Check (6k +/- 1 optimization)** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+n = 29
 
 ## Example Trace
 

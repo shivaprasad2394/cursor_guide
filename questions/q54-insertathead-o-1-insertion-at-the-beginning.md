@@ -3,14 +3,26 @@ id: "q54-insertathead-o-1-insertion-at-the-beginning"
 title: "insertAtHead - O(1) insertion at the beginning"
 pattern: "linked list"
 difficulty: "medium"
-visualization: "none"
+visualization: "linked-list"
+listNodes: "1,2,3,4,5"
+listHighlight: "2"
 stdin: ""
 expectedOutput: "5 -> 10 -> NULL\n"
 ---
+## At a glance
+
+- **Goal:** insertAtHead - O(1) insertion at the beginning
+- **Pattern:** Linked list
+- **Complexity:** See algorithm
+- **Expected output:** `5 -> 10 -> NULL`
 
 ## Description
 
-insertAtHead - O(1) insertion at the beginning
+Implement **insertAtHead - O(1) insertion at the beginning** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+head -> [10] -> [20] -> NULL
 
 ## Algorithm
 

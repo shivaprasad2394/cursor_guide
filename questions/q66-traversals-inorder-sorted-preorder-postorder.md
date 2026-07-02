@@ -7,10 +7,16 @@ visualization: "none"
 stdin: ""
 expectedOutput: "inorder: 20 30 40 50 70 \npreorder: 50 30 20 40 70 \npostorder: 20 40 30 70 50\n"
 ---
+## At a glance
+
+- **Goal:** Traversals: inorder (sorted!), preorder, postorder
+- **Pattern:** Binary search tree
+- **Complexity:** See algorithm
+- **Expected output:** `inorder: 20 30 40 50 70 `
 
 ## Description
 
-Traversals: inorder (sorted!), preorder, postorder
+Implement **Traversals: inorder (sorted!), preorder, postorder** using the pattern above. Write the helper function(s); `main()` is provided.
 
 ## Starter Code
 

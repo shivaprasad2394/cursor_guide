@@ -294,6 +294,17 @@ a:hover {
   margin-bottom: 1.5rem;
 }
 
+.spec-section-glance {
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(240, 180, 41, 0.35);
+  background: rgba(240, 180, 41, 0.06);
+  border-radius: 2px;
+}
+
+.spec-section-glance h3 {
+  color: var(--green);
+}
+
 .spec-section h3 {
   font-size: 0.85rem;
   text-transform: uppercase;
@@ -305,6 +316,86 @@ a:hover {
 .spec-section p {
   margin: 0 0 0.75rem;
   color: var(--text);
+  line-height: 1.65;
+}
+
+.spec-list {
+  margin: 0 0 0.85rem;
+  padding-left: 1.1rem;
+  color: var(--text);
+}
+
+.spec-list li {
+  margin-bottom: 0.45rem;
+  line-height: 1.55;
+}
+
+.spec-list li::marker {
+  color: var(--blue);
+}
+
+.spec-glance {
+  list-style: none;
+  padding-left: 0;
+}
+
+.spec-glance li {
+  padding: 0.35rem 0;
+  border-bottom: 1px solid rgba(48, 54, 61, 0.6);
+}
+
+.spec-glance li:last-child {
+  border-bottom: none;
+}
+
+.spec-steps {
+  margin: 0.5rem 0 0.85rem;
+  padding: 0;
+  list-style: none;
+  counter-reset: spec-step;
+}
+
+.spec-steps li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.65rem;
+  align-items: start;
+  margin-bottom: 0.55rem;
+  padding: 0.45rem 0.55rem;
+  background: rgba(91, 140, 255, 0.05);
+  border-left: 2px solid var(--blue);
+  line-height: 1.55;
+}
+
+.step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.35rem;
+  height: 1.35rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--blue);
+  border: 1px solid rgba(91, 140, 255, 0.45);
+  background: rgba(91, 140, 255, 0.1);
+}
+
+.trace-pre {
+  margin: 0.5rem 0 0.85rem;
+  padding: 0.75rem 0.85rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  overflow-x: auto;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.spec-section code {
+  font-size: 0.82em;
+  color: var(--green);
+  background: rgba(57, 217, 138, 0.08);
+  padding: 0.05rem 0.3rem;
 }
 
 .code-block {
@@ -414,6 +505,82 @@ a:hover {
   color: var(--text-muted);
   border-left: 2px solid var(--amber);
   padding-left: 0.6rem;
+}
+
+.tree-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  align-items: center;
+  padding: 0.5rem 0;
+}
+
+.tree-level {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.tree-node {
+  min-width: 2.1rem;
+  text-align: center;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid var(--border);
+  background: var(--bg-panel);
+  border-radius: 2px;
+}
+
+.tree-node.tree-new {
+  border-color: var(--amber);
+  color: var(--amber);
+  box-shadow: 0 0 0 1px var(--amber);
+}
+
+.tree-node.tree-empty {
+  opacity: 0.25;
+  border-style: dashed;
+}
+
+.list-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.list-node {
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--border);
+  background: var(--bg-panel);
+}
+
+.list-node.list-active {
+  border-color: var(--blue);
+  color: var(--blue);
+  box-shadow: 0 0 0 1px var(--blue);
+}
+
+.list-arrow {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.list-null {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+#btn-visualize {
+  border-color: rgba(240, 180, 41, 0.45);
+  color: var(--amber);
+}
+
+#btn-visualize:hover {
+  border-color: var(--amber);
+  color: var(--amber);
 }
 
 .toolbar {

@@ -3,15 +3,31 @@ id: "q01-reverse-a-string-in-place"
 title: "Reverse a String (in-place)"
 pattern: "two-pointer (opposite ends)"
 difficulty: "easy"
-visualization: "none"
+visualization: "two-pointer"
+tape: "hello"
+trace:
+  - {"left": 0, "right": 4, "note": "h \u2194 o"}
+  - {"left": 1, "right": 3, "note": "e \u2194 l"}
+  - {"left": 2, "right": 2, "note": "pointers meet \u2014 done"}
 stdin: ""
 complexity: "O(n) time, O(1) space"
 expectedOutput: "reverse(\"hello\") = olleh\n"
+- {"left": "2, \"right\": 2, \"note\": \"pointers meet \\u2014 done\"}"
 ---
+## At a glance
+
+- **Goal:** Reverse a String (in-place)
+- **Pattern:** Two-pointer (opposite ends)
+- **Complexity:** O(n) time, O(1) space
+- **Expected output:** `reverse("hello") = olleh`
 
 ## Description
 
 Reverse the characters of a string without using extra memory.
+
+**Walkthrough hint:**
+
+str = "hello"
 
 ## Algorithm
 

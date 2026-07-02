@@ -8,10 +8,20 @@ stdin: ""
 complexity: "O(n) time, O(1) space"
 expectedOutput: "findNonRepeating(aabccbde):\nFirst non-repeating: 'd'\nSecond non-repeating: 'e'\n"
 ---
+## At a glance
+
+- **Goal:** First and Second Non-Repeating Character
+- **Pattern:** Frequency table (two-pass)
+- **Complexity:** O(n) time, O(1) space
+- **Expected output:** `findNonRepeating(aabccbde):`
 
 ## Description
 
 Find the first two characters that appear exactly once in the string. Must preserve the ORDER they appear in the string (not the freq table).
+
+**Walkthrough hint:**
+
+str = "aabccbde"
 
 ## Algorithm
 

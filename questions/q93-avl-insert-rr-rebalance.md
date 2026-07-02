@@ -3,15 +3,25 @@ id: "q93-avl-insert-rr-rebalance"
 title: "AVL insert with RR rebalance"
 pattern: "avl tree"
 difficulty: "hard"
-visualization: "none"
+visualization: "tree"
+treeKeys: "10,20,30"
 stdin: ""
 complexity: "O(log n) per insert"
-expectedOutput: "insert 10,20,30 -> root=20 height=2\n"
+expectedOutput: "insert 10,20,30 -> root=20 height=2\\\\n"
 ---
+## At a glance
+
+- **Goal:** AVL insert with RR rebalance
+- **Pattern:** AVL tree
+- **Complexity:** O(log n) per insert
 
 ## Description
 
-Same **avlInsert** as the LL question, but insert **10, 20, 30** — triggers **RR** (right-right). After rebalance, root is **20**.
+Same as LL insert, but keys **10, 20, 30** trigger **RR** → **rotate left** at root. After rebalance, root is **20**.
+
+**Walkthrough hint:**
+
+After insert 30: root becomes 20
 
 ## Algorithm
 

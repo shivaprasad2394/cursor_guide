@@ -7,10 +7,20 @@ visualization: "none"
 stdin: ""
 expectedOutput: "gcd(48,18)=6 lcm(12,18)=36\n"
 ---
+## At a glance
+
+- **Goal:** GCD - Euclidean Algorithm (iterative)
+- **Pattern:** Math / number
+- **Complexity:** See algorithm
+- **Expected output:** `gcd(48,18)=6 lcm(12,18)=36`
 
 ## Description
 
-GCD - Euclidean Algorithm (iterative)
+Implement **GCD - Euclidean Algorithm (iterative)** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+gcd(48, 18)
 
 ## Algorithm
 

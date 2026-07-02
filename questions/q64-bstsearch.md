@@ -7,10 +7,16 @@ visualization: "none"
 stdin: ""
 expectedOutput: "search 40: found\nsearch 99: not found\n"
 ---
+## At a glance
+
+- **Goal:** bstSearch
+- **Pattern:** Binary search tree
+- **Complexity:** See algorithm
+- **Expected output:** `search 40: found`
 
 ## Description
 
-bstSearch
+Implement **bstSearch** using the pattern above. Write the helper function(s); `main()` is provided.
 
 ## Starter Code
 

@@ -3,14 +3,26 @@ id: "q55-insertatend-o-n-insertion-at-the-tail"
 title: "insertAtEnd - O(n) insertion at the tail"
 pattern: "linked list"
 difficulty: "medium"
-visualization: "none"
+visualization: "linked-list"
+listNodes: "1,2,3,4,5"
+listHighlight: "2"
 stdin: ""
 expectedOutput: "10 -> 20 -> 30 -> NULL\n"
 ---
+## At a glance
+
+- **Goal:** insertAtEnd - O(n) insertion at the tail
+- **Pattern:** Linked list
+- **Complexity:** See algorithm
+- **Expected output:** `10 -> 20 -> 30 -> NULL`
 
 ## Description
 
-insertAtEnd - O(n) insertion at the tail
+Implement **insertAtEnd - O(n) insertion at the tail** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+head -> [10] -> [20] -> NULL
 
 ## Algorithm
 

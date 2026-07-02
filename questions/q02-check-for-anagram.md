@@ -8,10 +8,20 @@ stdin: ""
 complexity: "O(n) time, O(1) space (256 is constant)"
 expectedOutput: "isAnagram(listen,silent)=1\nisAnagram(hello,world)=0\n"
 ---
+## At a glance
+
+- **Goal:** Check for Anagram
+- **Pattern:** Frequency table
+- **Complexity:** O(n) time, O(1) space (256 is constant)
+- **Expected output:** `isAnagram(listen,silent)=1`
 
 ## Description
 
 Two strings are anagrams if one can be formed by rearranging the letters of the other. Example: "listen" and "silent".
+
+**Walkthrough hint:**
+
+str1="listen", str2="silent"
 
 ## Algorithm
 

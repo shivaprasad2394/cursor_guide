@@ -7,10 +7,20 @@ visualization: "none"
 stdin: ""
 expectedOutput: "my_memset('*',4) -> ****\nmy_memset(arr,1) -> arr[0]=0x01010101 (NOT 1!)\n"
 ---
+## At a glance
+
+- **Goal:** Custom memset
+- **Pattern:** Memory, dma, mmap
+- **Complexity:** See algorithm
+- **Expected output:** `my_memset('*',4) -> ****`
 
 ## Description
 
-Custom memset
+Implement **Custom memset** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+my_memset(buf, '*', 4) -> buf = "****"
 
 ## Algorithm
 

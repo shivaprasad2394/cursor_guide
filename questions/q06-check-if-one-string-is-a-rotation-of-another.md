@@ -8,10 +8,20 @@ stdin: ""
 complexity: "O(n) time (assuming strstr is O(n)), O(n) space"
 expectedOutput: "isRotation(waterbottle,erbottlewat)=1\n"
 ---
+## At a glance
+
+- **Goal:** Check If One String Is a Rotation of Another
+- **Pattern:** String concatenation trick
+- **Complexity:** O(n) time (assuming strstr is O(n)), O(n) space
+- **Expected output:** `isRotation(waterbottle,erbottlewat)=1`
 
 ## Description
 
 A rotation shifts chars from one end to the other.
+
+**Walkthrough hint:**
+
+"waterbottle" rotated -> "erbottlewat"
 
 ## Algorithm
 

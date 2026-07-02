@@ -3,15 +3,27 @@ id: "q59-reverselist-the-three-pointer-classic"
 title: "reverseList - THE three-pointer classic"
 pattern: "linked list"
 difficulty: "medium"
-visualization: "none"
+visualization: "linked-list"
+listNodes: "1,2,3,4,5"
+listHighlight: "2"
 stdin: ""
 complexity: "O(n) time, O(1) space"
 expectedOutput: "3 -> 2 -> 1 -> NULL\n"
 ---
+## At a glance
+
+- **Goal:** reverseList - THE three-pointer classic
+- **Pattern:** Linked list
+- **Complexity:** O(n) time, O(1) space
+- **Expected output:** `3 -> 2 -> 1 -> NULL`
 
 ## Description
 
 Reverse a singly linked list in-place.
+
+**Walkthrough hint:**
+
+head -> [1] -> [2] -> [3] -> NULL
 
 ## Algorithm
 

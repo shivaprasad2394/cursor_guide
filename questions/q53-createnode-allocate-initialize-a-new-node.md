@@ -3,14 +3,22 @@ id: "q53-createnode-allocate-initialize-a-new-node"
 title: "createNode - allocate + initialize a new node"
 pattern: "linked list"
 difficulty: "medium"
-visualization: "none"
+visualization: "linked-list"
+listNodes: "1,2,3,4,5"
+listHighlight: "2"
 stdin: ""
 expectedOutput: "createNode(42): id=42 next=0x0\n"
 ---
+## At a glance
+
+- **Goal:** createNode - allocate + initialize a new node
+- **Pattern:** Linked list
+- **Complexity:** See algorithm
+- **Expected output:** `createNode(42): id=42 next=0x0`
 
 ## Description
 
-createNode - allocate + initialize a new node
+Implement **createNode - allocate + initialize a new node** using the pattern above. Write the helper function(s); `main()` is provided.
 
 ## Algorithm
 

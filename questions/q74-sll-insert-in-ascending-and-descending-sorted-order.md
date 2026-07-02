@@ -1,6 +1,6 @@
 ---
 id: "q74-sll-insert-in-ascending-and-descending-sorted-order"
-title: "SLL — Insert in Ascending and Descending (Sorted) Order"
+title: "SLL \u2014 Insert in Ascending and Descending (Sorted) Order"
 pattern: "buffers"
 difficulty: "hard"
 visualization: "none"
@@ -8,6 +8,12 @@ stdin: ""
 complexity: "O(n) per insert (you may walk the whole list to find the spot), O(1) extra space."
 expectedOutput: "Ascending : 10 -> 20 -> 30 -> 40 -> 50 -> NULL\nDescending: 50 -> 40 -> 30 -> 20 -> 10 -> NULL\n"
 ---
+## At a glance
+
+- **Goal:** SLL — Insert in Ascending and Descending (Sorted) Order
+- **Pattern:** Buffers
+- **Complexity:** O(n) per insert (you may walk the whole list to find the spot), O(1) extra space.
+- **Expected output:** `Ascending : 10 -> 20 -> 30 -> 40 -> 50 -> NULL`
 
 ## Description
 

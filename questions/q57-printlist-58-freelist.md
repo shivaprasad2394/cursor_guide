@@ -3,14 +3,22 @@ id: "q57-printlist-58-freelist"
 title: "printList & 58. freeList"
 pattern: "linked list"
 difficulty: "medium"
-visualization: "none"
+visualization: "linked-list"
+listNodes: "1,2,3,4,5"
+listHighlight: "2"
 stdin: ""
 expectedOutput: "1 -> 2 -> 3 -> NULL\n"
 ---
+## At a glance
+
+- **Goal:** printList & 58. freeList
+- **Pattern:** Linked list
+- **Complexity:** See algorithm
+- **Expected output:** `1 -> 2 -> 3 -> NULL`
 
 ## Description
 
-printList & 58. freeList
+Implement **printList & 58. freeList** using the pattern above. Write the helper function(s); `main()` is provided.
 
 ## Starter Code
 

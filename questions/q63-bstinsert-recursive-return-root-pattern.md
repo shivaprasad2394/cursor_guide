@@ -8,10 +8,20 @@ stdin: ""
 complexity: "O(h) where h = height. Balanced: O(log n). Worst: O(n)."
 expectedOutput: "inserted 5 keys; root=50 left=30 right=70\n"
 ---
+## At a glance
+
+- **Goal:** bstInsert - recursive, return-root pattern
+- **Pattern:** Binary search tree
+- **Complexity:** O(h) where h = height. Balanced: O(log n). Worst: O(n).
+- **Expected output:** `inserted 5 keys; root=50 left=30 right=70`
 
 ## Description
 
 Insert a value into a BST maintaining the invariant: left subtree < root < right subtree
+
+**Walkthrough hint:**
+
+Insert 5 into: [10] -> left=[3], right=[15]
 
 ## Algorithm
 

@@ -7,10 +7,20 @@ visualization: "none"
 stdin: ""
 expectedOutput: "my_memcpy(ABCDEFG) -> ABCDEFG\n"
 ---
+## At a glance
+
+- **Goal:** Custom memcpy
+- **Pattern:** Memory, dma, mmap
+- **Complexity:** See algorithm
+- **Expected output:** `my_memcpy(ABCDEFG) -> ABCDEFG`
 
 ## Description
 
-Custom memcpy
+Implement **Custom memcpy** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+copy 4 bytes of "ABCD" -> dst
 
 ## Algorithm
 

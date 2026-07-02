@@ -8,10 +8,20 @@ stdin: ""
 complexity: "O(n) time, O(1) space"
 expectedOutput: "isValidIPv4(192.168.1.10)=1\nisValidIPv4(1.2.3)=0\n"
 ---
+## At a glance
+
+- **Goal:** Validate an IPv4 Address
+- **Pattern:** State machine (single pass)
+- **Complexity:** O(n) time, O(1) space
+- **Expected output:** `isValidIPv4(192.168.1.10)=1`
 
 ## Description
 
-Validate an IPv4 Address
+Implement **Validate an IPv4 Address** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+ip = "192.168.0.1"
 
 ## Algorithm
 

@@ -7,10 +7,20 @@ visualization: "none"
 stdin: ""
 expectedOutput: "my_snprintf -> \"x=42 s=hi\" (returned 9)\ntruncated -> \"1234\" (would-be 6, TRUNCATED)\n"
 ---
+## At a glance
+
+- **Goal:** Custom snprintf (bounded, returns would-be length)
+- **Pattern:** Memory, dma, mmap
+- **Complexity:** See algorithm
+- **Expected output:** `my_snprintf -> "x=42 s=hi" (returned 9)`
 
 ## Description
 
-Custom snprintf (bounded, returns would-be length)
+Implement **Custom snprintf (bounded, returns would-be length)** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+my_snprintf(buf,8,"x=%d",42) -> buf="x=42", returns 4
 
 ## Algorithm
 

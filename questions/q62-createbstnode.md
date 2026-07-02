@@ -7,10 +7,16 @@ visualization: "none"
 stdin: ""
 expectedOutput: "createBstNode(5): id=5\n"
 ---
+## At a glance
+
+- **Goal:** createBstNode
+- **Pattern:** Binary search tree
+- **Complexity:** See algorithm
+- **Expected output:** `createBstNode(5): id=5`
 
 ## Description
 
-createBstNode
+Implement **createBstNode** using the pattern above. Write the helper function(s); `main()` is provided.
 
 ## Starter Code
 

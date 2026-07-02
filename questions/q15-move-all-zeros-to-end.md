@@ -3,15 +3,34 @@ id: "q15-move-all-zeros-to-end"
 title: "Move All Zeros to End"
 pattern: "two-pointer (read/write)"
 difficulty: "medium"
-visualization: "none"
+visualization: "two-pointer"
+tape: "moveZeros: "
+trace:
+  - {"left": 0, "right": 10, "note": "m \u2194  "}
+  - {"left": 1, "right": 9, "note": "o \u2194 :"}
+  - {"left": 2, "right": 8, "note": "v \u2194 s"}
+  - {"left": 3, "right": 7, "note": "e \u2194 o"}
+  - {"left": 4, "right": 6, "note": "Z \u2194 r"}
+  - {"left": 5, "right": 5, "note": "pointers meet \u2014 done"}
 stdin: ""
 complexity: "O(n) time, O(1) space"
 expectedOutput: "moveZeros: 1 3 12 0 0\n"
+- {"left": "5, \"right\": 5, \"note\": \"pointers meet \\u2014 done\"}"
 ---
+## At a glance
+
+- **Goal:** Move All Zeros to End
+- **Pattern:** Two-pointer (read/write)
+- **Complexity:** O(n) time, O(1) space
+- **Expected output:** `moveZeros: 1 3 12 0 0`
 
 ## Description
 
 Move all 0s to the end while maintaining relative order of non-zeros.
+
+**Walkthrough hint:**
+
+arr = [0, 1, 0, 3, 12]
 
 ## Algorithm
 

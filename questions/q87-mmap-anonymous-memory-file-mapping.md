@@ -7,10 +7,20 @@ visualization: "none"
 stdin: ""
 expectedOutput: "anonymous map -> \"anonymous mmap memory works like an array\"\nfile map (before) -> \"hello mmap file\"\nfile map (after)  -> \"Hello mmap file\"\n"
 ---
+## At a glance
+
+- **Goal:** mmap (anonymous memory + file mapping)
+- **Pattern:** Memory, dma, mmap
+- **Complexity:** See algorithm
+- **Expected output:** `anonymous map -> "anonymous mmap memory works like an array"`
 
 ## Description
 
-mmap (anonymous memory + file mapping)
+Implement **mmap (anonymous memory + file mapping)** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+map a small file, flip its first char to uppercase via a pointer.
 
 ## Algorithm
 

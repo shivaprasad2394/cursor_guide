@@ -7,10 +7,16 @@ visualization: "none"
 stdin: ""
 expectedOutput: "memset 'A' x5 -> AAAAA\nmemcpy HELLO -> HELLO\nmemmove overlap (shift right 2): ABABCDE.\n"
 ---
+## At a glance
+
+- **Goal:** memset / memcpy / memmove (standard functions)
+- **Pattern:** Memory, dma, mmap
+- **Complexity:** See algorithm
+- **Expected output:** `memset 'A' x5 -> AAAAA`
 
 ## Description
 
-memset / memcpy / memmove (standard functions)
+Implement **memset / memcpy / memmove (standard functions)** using the pattern above. Write the helper function(s); `main()` is provided.
 
 ## Starter Code
 

@@ -3,15 +3,34 @@ id: "q18-remove-duplicates-from-sorted-array"
 title: "Remove Duplicates from Sorted Array"
 pattern: "two-pointer (slow/fast)"
 difficulty: "medium"
-visualization: "none"
+visualization: "two-pointer"
+tape: "removeDups: "
+trace:
+  - {"left": 0, "right": 11, "note": "r \u2194  "}
+  - {"left": 1, "right": 10, "note": "e \u2194 :"}
+  - {"left": 2, "right": 9, "note": "m \u2194 s"}
+  - {"left": 3, "right": 8, "note": "o \u2194 p"}
+  - {"left": 4, "right": 7, "note": "v \u2194 u"}
+  - {"left": 5, "right": 6, "note": "e \u2194 D"}
 stdin: ""
 complexity: "O(n) time, O(1) space"
 expectedOutput: "removeDups: 1 2 3 4\n"
+- {"left": "5, \"right\": 6, \"note\": \"e \\u2194 D\"}"
 ---
+## At a glance
+
+- **Goal:** Remove Duplicates from Sorted Array
+- **Pattern:** Two-pointer (slow/fast)
+- **Complexity:** O(n) time, O(1) space
+- **Expected output:** `removeDups: 1 2 3 4`
 
 ## Description
 
 Given a SORTED array, remove duplicates in-place. Return new length.
+
+**Walkthrough hint:**
+
+arr = [1, 1, 2, 2, 3, 4, 4]
 
 ## Algorithm
 

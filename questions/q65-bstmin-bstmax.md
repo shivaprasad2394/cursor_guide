@@ -7,10 +7,16 @@ visualization: "none"
 stdin: ""
 expectedOutput: "min=20 max=80\n"
 ---
+## At a glance
+
+- **Goal:** bstMin / bstMax
+- **Pattern:** Binary search tree
+- **Complexity:** See algorithm
+- **Expected output:** `min=20 max=80`
 
 ## Description
 
-bstMin / bstMax
+Implement **bstMin / bstMax** using the pattern above. Write the helper function(s); `main()` is provided.
 
 ## Starter Code
 

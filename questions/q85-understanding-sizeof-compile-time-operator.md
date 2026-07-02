@@ -7,10 +7,20 @@ visualization: "none"
 stdin: ""
 expectedOutput: "MY_SIZEOF(int)    = 4 (real sizeof = 4)\nMY_SIZEOF(double) = 8 (real sizeof = 8)\nMY_SIZEOF(arr)    = 40 (real sizeof = 40)\narray length = sizeof(arr)/sizeof(arr[0]) = 10\n"
 ---
+## At a glance
+
+- **Goal:** Understanding sizeof (compile-time operator)
+- **Pattern:** Memory, dma, mmap
+- **Complexity:** See algorithm
+- **Expected output:** `MY_SIZEOF(int)    = 4 (real sizeof = 4)`
 
 ## Description
 
-Understanding sizeof (compile-time operator)
+Implement **Understanding sizeof (compile-time operator)** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+int x; MY_SIZEOF(x) -> 4 on a 32-bit-int machine.
 
 ## Example Trace
 

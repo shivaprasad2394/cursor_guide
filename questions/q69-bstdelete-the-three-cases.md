@@ -7,10 +7,20 @@ visualization: "none"
 stdin: ""
 expectedOutput: "after delete 50, inorder: 20 30 40 60 70 80\n"
 ---
+## At a glance
+
+- **Goal:** bstDelete - the three cases
+- **Pattern:** Binary search tree
+- **Complexity:** See algorithm
+- **Expected output:** `after delete 50, inorder: 20 30 40 60 70 80`
 
 ## Description
 
-bstDelete - the three cases
+Implement **bstDelete - the three cases** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+Delete 10 from:      [10]
 
 ## Example Trace
 

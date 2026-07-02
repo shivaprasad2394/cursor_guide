@@ -8,10 +8,20 @@ stdin: ""
 complexity: "O(n^2) time, O(1) space"
 expectedOutput: "LPS(babad)=\"bab\" len 3\n"
 ---
+## At a glance
+
+- **Goal:** Longest Palindromic Substring (expand around center)
+- **Pattern:** Expand from center
+- **Complexity:** O(n^2) time, O(1) space
+- **Expected output:** `LPS(babad)="bab" len 3`
 
 ## Description
 
 Find the longest substring that reads the same forwards and backwards.
+
+**Walkthrough hint:**
+
+"babad" -> "bab" or "aba" (length 3).
 
 ## Algorithm
 

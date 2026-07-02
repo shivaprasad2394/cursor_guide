@@ -8,6 +8,12 @@ stdin: ""
 complexity: "O(1) enqueue, dequeue, and peek."
 expectedOutput: "dequeue=10\npeek=20\n"
 ---
+## At a glance
+
+- **Goal:** Linked Queue
+- **Pattern:** Queues
+- **Complexity:** O(1) enqueue, dequeue, and peek.
+- **Expected output:** `dequeue=10`
 
 ## Description
 

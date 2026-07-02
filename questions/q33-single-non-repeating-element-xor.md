@@ -8,10 +8,20 @@ stdin: ""
 complexity: "O(n) time, O(1) space"
 expectedOutput: "single=4\n"
 ---
+## At a glance
+
+- **Goal:** Single Non-Repeating Element (XOR)
+- **Pattern:** Xor cancel
+- **Complexity:** O(n) time, O(1) space
+- **Expected output:** `single=4`
 
 ## Description
 
 Every element appears exactly twice except one. Find the unique one.
+
+**Walkthrough hint:**
+
+arr = [4, 1, 2, 1, 2]
 
 ## Algorithm
 

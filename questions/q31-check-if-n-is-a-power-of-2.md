@@ -8,10 +8,20 @@ stdin: ""
 complexity: "O(1) time, O(1) space"
 expectedOutput: "isPow2(8)=1 isPow2(6)=0\n"
 ---
+## At a glance
+
+- **Goal:** Check if n is a Power of 2
+- **Pattern:** Bit manipulation
+- **Complexity:** O(1) time, O(1) space
+- **Expected output:** `isPow2(8)=1 isPow2(6)=0`
 
 ## Description
 
 Powers of 2 have exactly ONE set bit: 1, 2, 4, 8, 16, ...
+
+**Walkthrough hint:**
+
+n=8 -> 1000, n-1=7 -> 0111, 8 & 7 = 0 -> YES
 
 ## Algorithm
 

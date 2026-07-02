@@ -7,10 +7,16 @@ visualization: "none"
 stdin: ""
 expectedOutput: "after swap a=10 b=5\n"
 ---
+## At a glance
+
+- **Goal:** Swap Two Numbers Without Temp (XOR)
+- **Pattern:** Bit manipulation
+- **Complexity:** See algorithm
+- **Expected output:** `after swap a=10 b=5`
 
 ## Description
 
-Swap Two Numbers Without Temp (XOR)
+Implement **Swap Two Numbers Without Temp (XOR)** using the pattern above. Write the helper function(s); `main()` is provided.
 
 ## Algorithm
 

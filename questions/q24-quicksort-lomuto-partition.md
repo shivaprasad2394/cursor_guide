@@ -8,10 +8,16 @@ stdin: ""
 complexity: "O(n log n) average, O(n^2) worst (sorted input)"
 expectedOutput: "quickSort: 1 5 7 8 9 10\n"
 ---
+## At a glance
+
+- **Goal:** Quicksort (Lomuto partition)
+- **Pattern:** Arrays
+- **Complexity:** O(n log n) average, O(n^2) worst (sorted input)
+- **Expected output:** `quickSort: 1 5 7 8 9 10`
 
 ## Description
 
-Quicksort (Lomuto partition)
+Implement **Quicksort (Lomuto partition)** using the pattern above. Write the helper function(s); `main()` is provided.
 
 ## Algorithm
 

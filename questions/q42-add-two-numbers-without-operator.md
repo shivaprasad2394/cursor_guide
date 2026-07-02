@@ -8,10 +8,20 @@ stdin: ""
 complexity: "O(32) worst case = O(1)"
 expectedOutput: "addNoPlus(15,32)=47\n"
 ---
+## At a glance
+
+- **Goal:** Add Two Numbers Without + Operator
+- **Pattern:** Bit manipulation
+- **Complexity:** O(32) worst case = O(1)
+- **Expected output:** `addNoPlus(15,32)=47`
 
 ## Description
 
-Add Two Numbers Without + Operator
+Implement **Add Two Numbers Without + Operator** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+a=15 (1111), b=32 (100000)
 
 ## Algorithm
 

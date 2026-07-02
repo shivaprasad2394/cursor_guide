@@ -8,10 +8,20 @@ stdin: ""
 complexity: "O(n) time, O(1) space"
 expectedOutput: "revGroups3: 3 2 1 6 5 4 9 8 7\n"
 ---
+## At a glance
+
+- **Goal:** Reverse Array in Groups of k
+- **Pattern:** Arrays
+- **Complexity:** O(n) time, O(1) space
+- **Expected output:** `revGroups3: 3 2 1 6 5 4 9 8 7`
 
 ## Description
 
-Reverse Array in Groups of k
+Implement **Reverse Array in Groups of k** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+arr = [1,2,3,4,5,6,7,8,9], k=3
 
 ## Algorithm
 

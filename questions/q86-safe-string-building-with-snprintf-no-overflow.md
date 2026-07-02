@@ -7,10 +7,20 @@ visualization: "none"
 stdin: ""
 expectedOutput: "rc=0 buf=User: Alice (age 30)\n"
 ---
+## At a glance
+
+- **Goal:** Safe string building with snprintf (no overflow)
+- **Pattern:** Parsing
+- **Complexity:** See algorithm
+- **Expected output:** `rc=0 buf=User: Alice (age 30)`
 
 ## Description
 
 Build a formatted string into a fixed buffer WITHOUT ever overflowing it.
+
+**Walkthrough hint:**
+
+buffer size 20, formatting "User: Alice (age 30)"
 
 ## Algorithm
 

@@ -8,10 +8,20 @@ stdin: ""
 complexity: "O(n) time, O(1) space (256 is constant)"
 expectedOutput: "removeDup(programming)=progamin\n"
 ---
+## At a glance
+
+- **Goal:** Remove All Duplicate Characters from a String
+- **Pattern:** Frequency table (boolean variant)
+- **Complexity:** O(n) time, O(1) space (256 is constant)
+- **Expected output:** `removeDup(programming)=progamin`
 
 ## Description
 
 Keep only the FIRST occurrence of each character, remove all repeats.
+
+**Walkthrough hint:**
+
+"programming" -> "progamin"
 
 ## Algorithm
 

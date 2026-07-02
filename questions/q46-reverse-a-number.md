@@ -7,10 +7,20 @@ visualization: "none"
 stdin: ""
 expectedOutput: "reverse(1234)=4321\n"
 ---
+## At a glance
+
+- **Goal:** Reverse a Number
+- **Pattern:** Math / number
+- **Complexity:** See algorithm
+- **Expected output:** `reverse(1234)=4321`
 
 ## Description
 
-Reverse a Number
+Implement **Reverse a Number** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+n = 1234
 
 ## Algorithm
 

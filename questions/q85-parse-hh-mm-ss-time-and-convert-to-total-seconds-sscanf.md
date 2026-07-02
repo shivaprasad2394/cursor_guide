@@ -1,16 +1,26 @@
 ---
 id: "q85-parse-hh-mm-ss-time-and-convert-to-total-seconds-sscanf"
-title: "Parse "HH:MM:SS" time and convert to total seconds (sscanf)"
+title: "Parse \"HH:MM:SS\" time and convert to total seconds (sscanf)"
 pattern: "parsing"
 difficulty: "medium"
 visualization: "none"
 stdin: ""
 expectedOutput: "01:30:45 -> 5445 sec\n"
 ---
+## At a glance
+
+- **Goal:** Parse "HH:MM:SS" time and convert to total seconds (sscanf)
+- **Pattern:** Parsing
+- **Complexity:** See algorithm
+- **Expected output:** `01:30:45 -> 5445 sec`
 
 ## Description
 
-Parse "HH:MM:SS" time and convert to total seconds (sscanf)
+Implement **Parse "HH:MM:SS" time and convert to total seconds (sscanf)** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+"01:30:45" -> 1*3600 + 30*60 + 45 = 5445 seconds
 
 ## Algorithm
 

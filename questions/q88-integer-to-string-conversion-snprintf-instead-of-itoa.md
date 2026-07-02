@@ -7,10 +7,20 @@ visualization: "none"
 stdin: ""
 expectedOutput: "intToStr(-42)=-42\n"
 ---
+## At a glance
+
+- **Goal:** Integer to string conversion (snprintf instead of itoa)
+- **Pattern:** Parsing
+- **Complexity:** See algorithm
+- **Expected output:** `intToStr(-42)=-42`
 
 ## Description
 
 C has no standard itoa(). snprintf is the portable, safe way to convert a number to its string form.
+
+**Walkthrough hint:**
+
+42 -> "42",  -7 -> "-7"
 
 ## Algorithm
 

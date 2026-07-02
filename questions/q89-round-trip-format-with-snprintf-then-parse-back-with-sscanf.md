@@ -7,10 +7,20 @@ visualization: "none"
 stdin: ""
 expectedOutput: "roundTrip(1,2,3)=MATCHED\n"
 ---
+## At a glance
+
+- **Goal:** Round-trip: format with snprintf, then parse back with sscanf
+- **Pattern:** Parsing
+- **Complexity:** See algorithm
+- **Expected output:** `roundTrip(1,2,3)=MATCHED`
 
 ## Description
 
 Demonstrate serialization (snprintf) and deserialization (sscanf) as inverse operations -- the core of any text protocol or config file.
+
+**Walkthrough hint:**
+
+(1,2,3) -> "1,2,3" -> (1,2,3)  [matches]
 
 ## Algorithm
 

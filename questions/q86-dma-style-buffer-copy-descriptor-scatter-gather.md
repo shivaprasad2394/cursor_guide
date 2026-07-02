@@ -7,10 +7,20 @@ visualization: "none"
 stdin: ""
 expectedOutput: "single transfer -> \"DMA_PAYLOAD_DATA\" (17 bytes)\nscatter-gather -> \"GET /index HTTP/1.1\" (19 bytes in 3 descriptors)\n"
 ---
+## At a glance
+
+- **Goal:** DMA-style buffer copy (descriptor + scatter-gather)
+- **Pattern:** Memory, dma, mmap
+- **Complexity:** See algorithm
+- **Expected output:** `single transfer -> "DMA_PAYLOAD_DATA" (17 bytes)`
 
 ## Description
 
-DMA-style buffer copy (descriptor + scatter-gather)
+Implement **DMA-style buffer copy (descriptor + scatter-gather)** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+gather "GET ", "/index ", "HTTP/1.1" into one contiguous buffer.
 
 ## Algorithm
 

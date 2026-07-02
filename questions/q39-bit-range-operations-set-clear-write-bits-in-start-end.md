@@ -7,10 +7,16 @@ visualization: "none"
 stdin: ""
 expectedOutput: "setRange[1..3] of 0=0xE\nclearRange[1..3] of 0xFF=0xF1\nwrite 5 into [1..3] of 0=0xA\n"
 ---
+## At a glance
+
+- **Goal:** Bit Range Operations (Set / Clear / Write bits in [start..end])
+- **Pattern:** Bit manipulation
+- **Complexity:** See algorithm
+- **Expected output:** `setRange[1..3] of 0=0xE`
 
 ## Description
 
-Bit Range Operations (Set / Clear / Write bits in [start..end])
+Implement **Bit Range Operations (Set / Clear / Write bits in [start..end])** using the pattern above. Write the helper function(s); `main()` is provided.
 
 ## Starter Code
 

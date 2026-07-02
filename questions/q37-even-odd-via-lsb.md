@@ -7,10 +7,16 @@ visualization: "none"
 stdin: ""
 expectedOutput: "isEven(4)=1 isEven(7)=0\n"
 ---
+## At a glance
+
+- **Goal:** Even / Odd via LSB
+- **Pattern:** Bit manipulation
+- **Complexity:** See algorithm
+- **Expected output:** `isEven(4)=1 isEven(7)=0`
 
 ## Description
 
-Even / Odd via LSB
+Implement **Even / Odd via LSB** using the pattern above. Write the helper function(s); `main()` is provided.
 
 ## Starter Code
 

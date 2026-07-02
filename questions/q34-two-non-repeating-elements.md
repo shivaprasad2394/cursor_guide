@@ -8,10 +8,20 @@ stdin: ""
 complexity: "O(n) time, O(1) space"
 expectedOutput: "two uniques=7,9\n"
 ---
+## At a glance
+
+- **Goal:** Two Non-Repeating Elements
+- **Pattern:** Bit manipulation
+- **Complexity:** O(n) time, O(1) space
+- **Expected output:** `two uniques=7,9`
 
 ## Description
 
 Every element appears twice except TWO distinct elements a and b. Find both.
+
+**Walkthrough hint:**
+
+arr = [2, 3, 7, 9, 11, 2, 3, 11]
 
 ## Algorithm
 

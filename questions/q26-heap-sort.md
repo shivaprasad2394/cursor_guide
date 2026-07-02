@@ -8,10 +8,16 @@ stdin: ""
 complexity: "O(n log n) time, O(1) space"
 expectedOutput: "heapSort: 5 6 7 11 12 13\n"
 ---
+## At a glance
+
+- **Goal:** Heap Sort
+- **Pattern:** Arrays
+- **Complexity:** O(n log n) time, O(1) space
+- **Expected output:** `heapSort: 5 6 7 11 12 13`
 
 ## Description
 
-Heap Sort
+Implement **Heap Sort** using the pattern above. Write the helper function(s); `main()` is provided.
 
 ## Algorithm
 

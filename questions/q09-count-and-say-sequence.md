@@ -8,10 +8,20 @@ stdin: ""
 complexity: "O(n * L) where L is the length of each term"
 expectedOutput: "Term 5: 111221\n"
 ---
+## At a glance
+
+- **Goal:** Count and Say Sequence
+- **Pattern:** Strings
+- **Complexity:** O(n * L) where L is the length of each term
+- **Expected output:** `Term 5: 111221`
 
 ## Description
 
-Count and Say Sequence
+Implement **Count and Say Sequence** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+Building term 4 from term 3 ("21"):
 
 ## Algorithm
 

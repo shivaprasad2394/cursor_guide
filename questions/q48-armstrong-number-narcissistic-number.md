@@ -7,10 +7,16 @@ visualization: "none"
 stdin: ""
 expectedOutput: "armstrong(153)=1 armstrong(123)=0\n"
 ---
+## At a glance
+
+- **Goal:** Armstrong Number (Narcissistic Number)
+- **Pattern:** Math / number
+- **Complexity:** See algorithm
+- **Expected output:** `armstrong(153)=1 armstrong(123)=0`
 
 ## Description
 
-Armstrong Number (Narcissistic Number)
+Implement **Armstrong Number (Narcissistic Number)** using the pattern above. Write the helper function(s); `main()` is provided.
 
 ## Algorithm
 

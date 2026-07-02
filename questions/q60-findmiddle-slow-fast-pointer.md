@@ -3,15 +3,27 @@ id: "q60-findmiddle-slow-fast-pointer"
 title: "findMiddle - slow & fast pointer"
 pattern: "linked list"
 difficulty: "medium"
-visualization: "none"
+visualization: "linked-list"
+listNodes: "1,2,3,4,5"
+listHighlight: "2"
 stdin: ""
 complexity: "O(n) time, O(1) space"
 expectedOutput: "middle=3\n"
 ---
+## At a glance
+
+- **Goal:** findMiddle - slow & fast pointer
+- **Pattern:** Linked list
+- **Complexity:** O(n) time, O(1) space
+- **Expected output:** `middle=3`
 
 ## Description
 
-findMiddle - slow & fast pointer
+Implement **findMiddle - slow & fast pointer** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+[1] -> [2] -> [3] -> [4] -> [5]
 
 ## Algorithm
 

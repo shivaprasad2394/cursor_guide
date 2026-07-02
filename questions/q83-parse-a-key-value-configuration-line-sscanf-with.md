@@ -1,16 +1,26 @@
 ---
 id: "q83-parse-a-key-value-configuration-line-sscanf-with"
-title: "Parse a "key=value" configuration line (sscanf with %[ ])"
+title: "Parse a \"key=value\" configuration line (sscanf with %[ ])"
 pattern: "parsing"
 difficulty: "medium"
 visualization: "none"
 stdin: ""
 expectedOutput: "key=timeout value=30\n"
 ---
+## At a glance
+
+- **Goal:** Parse a "key=value" configuration line (sscanf with %[ ])
+- **Pattern:** Parsing
+- **Complexity:** See algorithm
+- **Expected output:** `key=timeout value=30`
 
 ## Description
 
 Split a line like "timeout=30" into key string and value string.
+
+**Walkthrough hint:**
+
+line = "timeout=30"
 
 ## Algorithm
 

@@ -7,10 +7,16 @@ visualization: "none"
 stdin: ""
 expectedOutput: "5*8=40 40/4=10\n"
 ---
+## At a glance
+
+- **Goal:** Multiply / Divide by Powers of 2
+- **Pattern:** Bit manipulation
+- **Complexity:** See algorithm
+- **Expected output:** `5*8=40 40/4=10`
 
 ## Description
 
-Multiply / Divide by Powers of 2
+Implement **Multiply / Divide by Powers of 2** using the pattern above. Write the helper function(s); `main()` is provided.
 
 ## Starter Code
 

@@ -8,10 +8,16 @@ stdin: ""
 complexity: "O(m+n) time, O(m+n) space"
 expectedOutput: "merge: 1 2 3 4 5 6\n"
 ---
+## At a glance
+
+- **Goal:** Merge Two Sorted Arrays
+- **Pattern:** Arrays
+- **Complexity:** O(m+n) time, O(m+n) space
+- **Expected output:** `merge: 1 2 3 4 5 6`
 
 ## Description
 
-Merge Two Sorted Arrays
+Implement **Merge Two Sorted Arrays** using the pattern above. Write the helper function(s); `main()` is provided.
 
 ## Algorithm
 

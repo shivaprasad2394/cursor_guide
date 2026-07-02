@@ -8,10 +8,20 @@ stdin: ""
 complexity: "O(n) time, O(1) space"
 expectedOutput: "kadane=7\n"
 ---
+## At a glance
+
+- **Goal:** Kadane's Algorithm (Maximum Subarray Sum)
+- **Pattern:** Single pass greedy (extend or restart)
+- **Complexity:** O(n) time, O(1) space
+- **Expected output:** `kadane=7`
 
 ## Description
 
 Find the contiguous subarray with the largest sum.
+
+**Walkthrough hint:**
+
+arr = [-2, -3, 4, -1, -2, 1, 5, -3]
 
 ## Algorithm
 

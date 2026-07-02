@@ -8,10 +8,20 @@ stdin: ""
 complexity: "O(n) time, O(1) space"
 expectedOutput: "rotateLeft2: 3 4 5 6 7 1 2\n"
 ---
+## At a glance
+
+- **Goal:** Rotate Array Left by d Positions (reversal trick)
+- **Pattern:** Reversal trick (three reverses)
+- **Complexity:** O(n) time, O(1) space
+- **Expected output:** `rotateLeft2: 3 4 5 6 7 1 2`
 
 ## Description
 
 Shift all elements left by d positions. Elements that fall off the left end wrap around to the right.
+
+**Walkthrough hint:**
+
+[1,2,3,4,5,6,7] d=2 -> [3,4,5,6,7,1,2]
 
 ## Algorithm
 

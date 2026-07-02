@@ -8,10 +8,20 @@ stdin: ""
 complexity: "O(n) time, O(n) space for output"
 expectedOutput: "compress=a2b1c5a3\n"
 ---
+## At a glance
+
+- **Goal:** String Compression (Run-Length Encoding)
+- **Pattern:** Count runs
+- **Complexity:** O(n) time, O(n) space for output
+- **Expected output:** `compress=a2b1c5a3`
 
 ## Description
 
 Replace consecutive identical chars with char + count.
+
+**Walkthrough hint:**
+
+"aabcccccaaa" -> "a2b1c5a3"
 
 ## Algorithm
 

@@ -8,10 +8,16 @@ stdin: ""
 complexity: "O(32) = O(1) time"
 expectedOutput: "reverseBits(5)=2684354560\n"
 ---
+## At a glance
+
+- **Goal:** Reverse Bits of a 32-bit Number
+- **Pattern:** Bit manipulation
+- **Complexity:** O(32) = O(1) time
+- **Expected output:** `reverseBits(5)=2684354560`
 
 ## Description
 
-Reverse Bits of a 32-bit Number
+Implement **Reverse Bits of a 32-bit Number** using the pattern above. Write the helper function(s); `main()` is provided.
 
 ## Algorithm
 

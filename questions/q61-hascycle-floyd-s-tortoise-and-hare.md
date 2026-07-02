@@ -3,15 +3,23 @@ id: "q61-hascycle-floyd-s-tortoise-and-hare"
 title: "hasCycle - Floyd's Tortoise and Hare"
 pattern: "linked list"
 difficulty: "medium"
-visualization: "none"
+visualization: "linked-list"
+listNodes: "1,2,3,4,5"
+listHighlight: "2"
 stdin: ""
 complexity: "O(n) time, O(1) space"
 expectedOutput: "hasCycle(linear)=0\n"
 ---
+## At a glance
+
+- **Goal:** hasCycle - Floyd's Tortoise and Hare
+- **Pattern:** Linked list
+- **Complexity:** O(n) time, O(1) space
+- **Expected output:** `hasCycle(linear)=0`
 
 ## Description
 
-hasCycle - Floyd's Tortoise and Hare
+Implement **hasCycle - Floyd's Tortoise and Hare** using the pattern above. Write the helper function(s); `main()` is provided.
 
 ## Algorithm
 

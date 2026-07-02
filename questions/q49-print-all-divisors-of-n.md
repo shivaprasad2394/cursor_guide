@@ -7,10 +7,20 @@ visualization: "none"
 stdin: ""
 expectedOutput: "divisors of 36: 1 36 2 18 3 12 4 9 6\n"
 ---
+## At a glance
+
+- **Goal:** Print All Divisors of N
+- **Pattern:** Math / number
+- **Complexity:** See algorithm
+- **Expected output:** `divisors of 36: 1 36 2 18 3 12 4 9 6`
 
 ## Description
 
-Print All Divisors of N
+Implement **Print All Divisors of N** using the pattern above. Write the helper function(s); `main()` is provided.
+
+**Walkthrough hint:**
+
+n = 36
 
 ## Algorithm
 

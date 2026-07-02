@@ -136,6 +136,92 @@
       .replace(/"/g, "&quot;");
   }
 
+  function renderInlineMarkdown(text) {
+    return escapeHtml(text)
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/`([^`]+)`/g, "<code>$1</code>");
+  }
+
+  function isStepLine(line) {
+    return /^step\d+:/i.test(line.trim()) || /^\d+\.\s+/.test(line.trim());
+  }
+
+  function stripStepPrefix(line) {
+    return line.trim().replace(/^step\d+:\s*/i, "").replace(/^\d+\.\s+/, "");
+  }
+
+  function renderTextBlock(text) {
+    const trimmed = text.trim();
+    if (!trimmed) return "";
+
+    const lines = trimmed.split("\n");
+    if (lines.every((l) => !l.trim() || isStepLine(l))) {
+      const steps = lines.filter((l) => l.trim()).map(stripStepPrefix);
+      return `<ol class="spec-steps">${steps
+        .map((s, i) => `<li><span class="step-badge">${i + 1}</span><span>${renderInlineMarkdown(s)}</span></li>`)
+        .join("")}</ol>`;
+    }
+
+    return `<pre class="trace-pre"><code>${escapeHtml(trimmed)}</code></pre>`;
+  }
+
+  function renderMarkdownBlock(content) {
+    const lines = content.split("\n");
+    const parts = [];
+    let i = 0;
+
+    while (i < lines.length) {
+      const trimmed = lines[i].trim();
+      if (!trimmed) {
+        i += 1;
+        continue;
+      }
+
+      if (/^[-*]\s+/.test(trimmed)) {
+        const items = [];
+        while (i < lines.length && /^[-*]\s+/.test(lines[i].trim())) {
+          items.push(lines[i].trim().replace(/^[-*]\s+/, ""));
+          i += 1;
+        }
+        const isGlance = items.some((it) => /^\*\*Goal:\*\*/.test(it) || /^\*\*Pattern:\*\*/.test(it));
+        const cls = isGlance ? "spec-list spec-glance" : "spec-list";
+        parts.push(`<ul class="${cls}">${items.map((it) => `<li>${renderInlineMarkdown(it)}</li>`).join("")}</ul>`);
+        continue;
+      }
+
+      if (isStepLine(trimmed)) {
+        const steps = [];
+        while (i < lines.length) {
+          const t = lines[i].trim();
+          if (isStepLine(t)) {
+            steps.push(stripStepPrefix(t));
+            i += 1;
+          } else if (t.startsWith("  ") && steps.length) {
+            steps[steps.length - 1] += " " + t.trim();
+            i += 1;
+          } else break;
+        }
+        parts.push(`<ol class="spec-steps">${steps
+          .map((s, n) => `<li><span class="step-badge">${n + 1}</span><span>${renderInlineMarkdown(s)}</span></li>`)
+          .join("")}</ol>`);
+        continue;
+      }
+
+      const para = [];
+      while (i < lines.length) {
+        const t = lines[i].trim();
+        if (!t || /^[-*]\s+/.test(t) || isStepLine(t)) break;
+        para.push(t);
+        i += 1;
+      }
+      if (para.length) {
+        parts.push(`<p>${renderInlineMarkdown(para.join(" "))}</p>`);
+      }
+    }
+
+    return parts.join("\n");
+  }
+
   function renderMarkdownSections(body) {
     const html = [];
     const skip = /^starter code$|^solution$/i;
@@ -146,6 +232,9 @@
       if (skip.test(heading)) continue;
 
       let content = nl === -1 ? "" : part.slice(nl + 1).trim();
+      const sectionClass =
+        /^at a glance$/i.test(heading) ? "spec-section spec-section-glance" : "spec-section";
+
       content = content
         .replace(/```c\n([\s\S]*?)```/g, (_, code) =>
           `<pre class="code-block"><code>${escapeHtml(code.trim())}</code></pre>`
@@ -153,6 +242,7 @@
         .replace(/```json\n([\s\S]*?)```/g, (_, code) =>
           `<pre class="code-block"><code>${escapeHtml(code.trim())}</code></pre>`
         )
+        .replace(/```text\n([\s\S]*?)```/g, (_, code) => renderTextBlock(code))
         .replace(/^\|(.+)\|\s*\n\|[-| :]+\|\s*\n((?:\|.+\|\s*\n?)*)/gm, (_, header, rows) => {
           const ths = header.split("|").filter(Boolean).map((c) => `<th>${escapeHtml(c.trim())}</th>`).join("");
           const trs = rows
@@ -169,15 +259,21 @@
             .join("");
           return `<table class="trace-table"><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`;
         })
-        .replace(/^```\n([\s\S]*?)```/gm, (_, code) =>
-          `<pre class="code-block trace-pre"><code>${escapeHtml(code.trim())}</code></pre>`
-        )
-        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-        .replace(/`([^`]+)`/g, "<code>$1</code>")
-        .replace(/\n\n/g, "</p><p>")
-        .replace(/^(.+)$/s, (m) => (m.includes("<") ? m : `<p>${m}</p>`));
+        .replace(/^```\n([\s\S]*?)```/gm, (_, code) => renderTextBlock(code));
 
-      html.push(`<section class="spec-section"><h3>${escapeHtml(heading)}</h3>${content}</section>`);
+      if (!content.includes("<pre") && !content.includes("<table") && !content.includes("<ul") && !content.includes("<ol")) {
+        content = renderMarkdownBlock(content);
+      } else {
+        const chunks = content.split(/(?=<pre|<table|<ul|<ol|<p>)/);
+        content = chunks
+          .map((chunk) => {
+            if (/^<(pre|table|ul|ol|p)/.test(chunk.trim())) return chunk;
+            return renderMarkdownBlock(chunk);
+          })
+          .join("\n");
+      }
+
+      html.push(`<section class="${sectionClass}"><h3>${escapeHtml(heading)}</h3>${content}</section>`);
     }
     return html.join("");
   }
@@ -257,7 +353,7 @@
   async function runInBrowser(source, stdin, onProgress) {
     if (!runnerModule) {
       if (onProgress) onProgress("Loading in-browser C compiler (first run ~60 MB, cached after)…");
-      runnerModule = await import("./runner.js?v=7");
+      runnerModule = await import("./runner.js?v=9");
     }
     if (onProgress) onProgress("Compiling & running…");
     return runnerModule.compileAndRun(source, stdin || "");
@@ -289,6 +385,12 @@
       renderTwoPointerTape(container, meta, stepIndex);
     } else if (viz === "binary-search") {
       renderBinarySearchTape(container, meta, stepIndex);
+    } else if (viz === "tree") {
+      renderTreeTape(container, meta, stepIndex);
+    } else if (viz === "linked-list") {
+      renderLinkedListTape(container, meta, stepIndex);
+    } else if (viz === "array-cells") {
+      renderArrayCellsTape(container, meta, stepIndex);
     }
   }
 
@@ -343,6 +445,109 @@
         <span class="ptr-tag mid">mid=${mid}</span>
         <span class="ptr-tag high">high=${high}</span>
       </div>
+      ${step.note ? `<div class="tape-note">${escapeHtml(step.note)}</div>` : ""}`;
+    container.appendChild(wrap);
+  }
+
+  function insertBst(root, val) {
+    if (!root) return { id: val, left: null, right: null };
+    if (val < root.id) root.left = insertBst(root.left, val);
+    else if (val > root.id) root.right = insertBst(root.right, val);
+    return root;
+  }
+
+  function treeToLevels(root) {
+    if (!root) return [];
+    const levels = [];
+    let queue = [root];
+    while (queue.length) {
+      levels.push(queue.map((n) => (n ? n.id : null)));
+      queue = queue.flatMap((n) => (n ? [n.left, n.right] : [null, null]));
+      if (queue.every((n) => n === null)) break;
+    }
+    return levels;
+  }
+
+  function renderTreeTape(container, meta, stepIndex) {
+    const keys = String(meta.treeKeys || "50,30,70,20,40")
+      .split(",")
+      .map((s) => parseInt(s.trim(), 10))
+      .filter((n) => !isNaN(n));
+    const steps = Math.max(1, keys.length);
+    const upto = Math.min(stepIndex + 1, keys.length);
+    let root = null;
+    for (let i = 0; i < upto; i += 1) root = insertBst(root, keys[i]);
+    const levels = treeToLevels(root);
+    const label = meta.treeLabel || "BST / AVL structure (insert order)";
+    const lastKey = keys[upto - 1];
+
+    const rows = levels
+      .map((level) =>
+        `<div class="tree-level">${level
+          .map((v) => {
+            if (v === null) return `<span class="tree-node tree-empty">·</span>`;
+            const cls = v === lastKey ? "tree-new" : "";
+            return `<span class="tree-node ${cls}">${v}</span>`;
+          })
+          .join("")}</div>`
+      )
+      .join("");
+
+    const wrap = document.createElement("div");
+    wrap.className = "memory-tape tree-tape";
+    wrap.innerHTML = `
+      <div class="tape-label">TREE · ${escapeHtml(label)}</div>
+      <div class="tree-wrap">${rows}</div>
+      <div class="tape-pointers">
+        <span class="ptr-tag mid">Inserted: ${keys.slice(0, upto).join(" → ")}</span>
+        <span class="ptr-tag">Step ${Math.min(stepIndex + 1, steps)} / ${steps}</span>
+      </div>`;
+    container.appendChild(wrap);
+  }
+
+  function renderLinkedListTape(container, meta, stepIndex) {
+    const nodes = String(meta.listNodes || "1,2,3,4,5")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const hi = parseInt(meta.listHighlight, 10);
+    const trace = meta.trace || [];
+    const step = trace[stepIndex] || {};
+    const highlight = step.index ?? (isNaN(hi) ? Math.min(stepIndex, nodes.length - 1) : hi);
+
+    const wrap = document.createElement("div");
+    wrap.className = "memory-tape list-tape";
+    wrap.innerHTML = `
+      <div class="tape-label">LINKED LIST · nodes left → right</div>
+      <div class="list-row">${nodes
+        .map(
+          (v, i) =>
+            `<span class="list-node ${i === highlight ? "list-active" : ""}">${escapeHtml(v)}</span>${
+              i < nodes.length - 1 ? `<span class="list-arrow">→</span>` : ""
+            }`
+        )
+        .join("")}<span class="list-null">NULL</span></div>
+      ${step.note ? `<div class="tape-note">${escapeHtml(step.note)}</div>` : ""}`;
+    container.appendChild(wrap);
+  }
+
+  function renderArrayCellsTape(container, meta, stepIndex) {
+    const values = String(meta.tape || "0,1,2,3,4,5,6,7")
+      .split(",")
+      .map((s) => s.trim());
+    const trace = meta.trace || [];
+    const step = trace[stepIndex] || { index: stepIndex % values.length };
+    const idx = step.index ?? 0;
+    const label = meta.arrayLabel || "array / buffer";
+
+    const wrap = document.createElement("div");
+    wrap.className = "memory-tape array-tape";
+    wrap.innerHTML = `
+      <div class="tape-label">ARRAY · ${escapeHtml(label)}</div>
+      <div class="tape-row tape-chars">${values
+        .map((v, i) => `<span class="cell ${i === idx ? "ptr-mid" : ""}">${escapeHtml(v)}</span>`)
+        .join("")}</div>
+      <div class="tape-row tape-idx">${values.map((_, i) => `<span class="idx">${i}</span>`).join("")}</div>
       ${step.note ? `<div class="tape-note">${escapeHtml(step.note)}</div>` : ""}`;
     container.appendChild(wrap);
   }
@@ -477,6 +682,7 @@
     const checkBtn = document.getElementById("btn-check");
     const copyBtn = document.getElementById("btn-copy");
     const stepBtn = document.getElementById("btn-step");
+    const vizBtn = document.getElementById("btn-visualize");
     const resetBtn = document.getElementById("btn-reset");
     const algoPanel = document.getElementById("algorithm-panel");
 
@@ -493,8 +699,17 @@
 
     let traceStep = 0;
     let algoVisible = false;
+    let vizVisible = false;
+    const hasViz = meta.visualization && meta.visualization !== "none";
+    const trace = Array.isArray(meta.trace) ? meta.trace : [];
 
-    buildTape(tapeEl, meta, traceStep);
+    if (tapeEl) tapeEl.hidden = true;
+
+    const setBusy = (busy) => {
+      [runBtn, checkBtn, expectedBtn, revealAlgoBtn, revealSolBtn, copyBtn, stepBtn, vizBtn, resetBtn].forEach((btn) => {
+        if (btn) btn.disabled = busy;
+      });
+    };
 
     const setConsole = (text, kind) => {
       if (!consoleOut) return;
@@ -502,11 +717,32 @@
       consoleOut.textContent = text;
     };
 
-    if (stepBtn) {
-      const trace = meta.trace || [];
-      stepBtn.hidden = !trace.length;
+    if (vizBtn && tapeEl) {
+      vizBtn.hidden = !hasViz;
+      vizBtn.addEventListener("click", () => {
+        vizVisible = !vizVisible;
+        tapeEl.hidden = !vizVisible;
+        vizBtn.textContent = vizVisible ? "Hide visualization" : "Show visualization";
+        if (vizVisible) buildTape(tapeEl, meta, traceStep);
+      });
+    }
+
+    if (stepBtn && tapeEl) {
+      const maxSteps =
+        trace.length ||
+        (meta.visualization === "tree" && meta.treeKeys
+          ? String(meta.treeKeys).split(",").length
+          : meta.visualization === "linked-list"
+            ? String(meta.listNodes || "").split(",").filter(Boolean).length
+            : 1);
+      stepBtn.hidden = !hasViz;
       stepBtn.addEventListener("click", () => {
-        traceStep = (traceStep + 1) % trace.length;
+        if (!vizVisible) {
+          vizVisible = true;
+          tapeEl.hidden = false;
+          if (vizBtn) vizBtn.textContent = "Hide visualization";
+        }
+        traceStep = (traceStep + 1) % maxSteps;
         buildTape(tapeEl, meta, traceStep);
       });
     }
@@ -517,9 +753,7 @@
         revealAlgoBtn.textContent = algoVisible ? "Hide algorithm" : "Reveal algorithm";
         algoPanel.hidden = !algoVisible;
         if (algoVisible) {
-          algoPanel.innerHTML = `
-            <h3>Algorithm</h3>
-            <div class="algorithm-body">${algorithmText.replace(/\n/g, "<br>")}</div>`;
+          algoPanel.innerHTML = `<h3>Algorithm</h3><div class="algorithm-body">${renderTextBlock(algorithmText)}</div>`;
         }
       });
     }
@@ -559,18 +793,15 @@
         setConsole("");
         if (diffEl) diffEl.innerHTML = "";
         traceStep = 0;
+        vizVisible = false;
+        if (tapeEl) tapeEl.hidden = true;
+        if (vizBtn) vizBtn.textContent = "Show visualization";
         buildTape(tapeEl, meta, traceStep);
         if (algoPanel) algoPanel.hidden = true;
         if (revealAlgoBtn) revealAlgoBtn.textContent = "Reveal algorithm";
         algoVisible = false;
       });
     }
-
-    const setBusy = (busy) => {
-      [runBtn, checkBtn, expectedBtn, revealAlgoBtn, revealSolBtn, copyBtn, stepBtn, resetBtn].forEach((btn) => {
-        if (btn) btn.disabled = busy;
-      });
-    };
 
     if (runBtn) {
       runBtn.addEventListener("click", async () => {
