@@ -40,14 +40,17 @@ Use **Deploy from a branch** (recommended for this static site). Do **not** use 
    - **Branch:** `main` / **Folder:** `/ (root)`
    - Click **Save**
 
-3. If you previously enabled a Pages Actions workflow, **disable it** (Actions tab → workflow → ⋯ → Disable workflow).
+3. Disable any **custom** Pages workflow you added (Actions tab → your workflow → ⋯ → Disable).  
+   Do **not** worry if you see no custom workflow — branch deploy uses GitHub’s built-in **`pages-build-deployment`** job instead.
 
-4. Wait 2–3 minutes, then hard refresh the site (**Ctrl+Shift+R**).
+4. Push any commit to `main` (even a README edit). Then open **Actions** and look for a run named **`pages build and deployment`** (not your old custom deploy). It should finish in ~30 seconds.
 
-5. Confirm deploy worked:
+5. Wait 2–3 minutes after that run succeeds, then hard refresh the site (**Ctrl+Shift+R**).
+
+6. Confirm deploy worked:
    - Home page shows **91 programs** and an **avl tree** section
    - Question page shows **← Previous** / **Next →**
-   - Footer on a question page: **Site build: v7**
+   - Footer on a question page: **Site build: v8**
 
 ### If Pages is stuck on an old build
 
