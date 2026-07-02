@@ -13,9 +13,9 @@
       <span class="brand-sub">Live C · runs in your browser</span>
     </div>
     <nav class="q-nav" id="q-nav" aria-label="Question navigation">
-      <a class="btn nav-btn" id="nav-prev" href="index.html">← Prev</a>
-      <span class="nav-pos" id="nav-pos">…</span>
-      <a class="btn nav-btn" id="nav-next" href="index.html">Next →</a>
+      <a class="btn nav-btn nav-prev" href="index.html">← Prev</a>
+      <span class="nav-pos">…</span>
+      <a class="btn nav-btn nav-next" href="index.html">Next →</a>
     </nav>
   </header>
 
@@ -30,6 +30,12 @@
 
     <section class="work-pane">
       <div id="pointer-tape" hidden></div>
+
+      <div class="question-nav-bar">
+        <a class="btn nav-btn nav-prev" href="index.html">← Previous</a>
+        <span class="nav-pos">…</span>
+        <a class="btn btn-primary nav-btn nav-next" href="index.html">Next →</a>
+      </div>
 
       <div class="toolbar">
         <button type="button" class="btn btn-primary" id="btn-run">Run</button>
@@ -55,12 +61,19 @@
       </div>
 
       <p class="config-hint">
-        <strong>Run</strong> compiles C entirely in your browser (Clang via WebAssembly) — no API key, no account.
-        First run downloads ~60&nbsp;MB once; later runs use the browser cache. Use Wi‑Fi on mobile if you can.
+        <strong>Run</strong> compiles C in your browser — no API key.
+        Use <strong>Next →</strong> above to move through all 91 questions (incl. AVL tree after BST).
+        Site build: <strong id="site-version">v7</strong>
       </p>
     </section>
   </div>
 
-  <script src="js/app.js?v=6"></script>
+  <footer class="mobile-nav-footer">
+    <a class="btn nav-btn nav-prev" href="index.html">← Prev</a>
+    <span class="nav-pos">…</span>
+    <a class="btn btn-primary nav-btn nav-next" href="index.html">Next →</a>
+  </footer>
+
+  <script src="js/app.js?v=7"></script>
 </body>
 </html>

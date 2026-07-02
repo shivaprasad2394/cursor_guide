@@ -640,25 +640,47 @@ a:hover {
   color: var(--green);
 }
 
-@media (max-width: 600px) {
-  .site-header {
-    flex-wrap: wrap;
-    gap: 0.5rem;
+.question-nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: rgba(91, 140, 255, 0.08);
+}
+
+.question-nav-bar .nav-pos {
+  font-size: 0.8rem;
+  color: var(--amber);
+  font-weight: 600;
+}
+
+.mobile-nav-footer {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  padding: 0.65rem 1rem;
+  gap: 0.5rem;
+  border-top: 1px solid var(--border);
+  background: rgba(13, 17, 23, 0.96);
+  align-items: center;
+  justify-content: space-between;
+}
+
+@media (max-width: 900px) {
+  .mobile-nav-footer {
+    display: flex;
   }
 
-  .btn-settings {
-    width: 100%;
+  .work-pane {
+    padding-bottom: 4rem;
   }
 
-  .practice-layout {
-    min-height: auto;
-  }
-
-  .spec-pane {
-    max-height: none;
-  }
-
-  #editor {
-    min-height: 180px;
+  .site-header .q-nav {
+    display: none;
   }
 }

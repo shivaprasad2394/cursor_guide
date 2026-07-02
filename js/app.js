@@ -257,7 +257,7 @@
   async function runInBrowser(source, stdin, onProgress) {
     if (!runnerModule) {
       if (onProgress) onProgress("Loading in-browser C compiler (first run ~60 MB, cached after)…");
-      runnerModule = await import("./runner.js?v=6");
+      runnerModule = await import("./runner.js?v=7");
     }
     if (onProgress) onProgress("Compiling & running…");
     return runnerModule.compileAndRun(source, stdin || "");
@@ -407,37 +407,35 @@
 
   function setupQuestionNav(questions, currentId) {
     const idx = questions.findIndex((q) => q.id === currentId);
-    const navPrev = document.getElementById("nav-prev");
-    const navNext = document.getElementById("nav-next");
-    const navPos = document.getElementById("nav-pos");
+    const posText = idx >= 0 ? `${idx + 1} / ${questions.length}` : "…";
 
-    if (navPos && idx >= 0) {
-      navPos.textContent = `${idx + 1} / ${questions.length}`;
-    }
+    document.querySelectorAll(".nav-pos").forEach((el) => {
+      el.textContent = posText;
+    });
 
-    if (navPrev) {
+    document.querySelectorAll(".nav-prev").forEach((el) => {
       if (idx > 0) {
-        navPrev.href = `question.html?id=${encodeURIComponent(questions[idx - 1].id)}`;
-        navPrev.classList.remove("nav-disabled");
-        navPrev.removeAttribute("aria-disabled");
+        el.href = `question.html?id=${encodeURIComponent(questions[idx - 1].id)}`;
+        el.classList.remove("nav-disabled");
+        el.removeAttribute("aria-disabled");
       } else {
-        navPrev.href = "index.html";
-        navPrev.classList.add("nav-disabled");
-        navPrev.setAttribute("aria-disabled", "true");
+        el.href = "index.html";
+        el.classList.add("nav-disabled");
+        el.setAttribute("aria-disabled", "true");
       }
-    }
+    });
 
-    if (navNext) {
+    document.querySelectorAll(".nav-next").forEach((el) => {
       if (idx >= 0 && idx < questions.length - 1) {
-        navNext.href = `question.html?id=${encodeURIComponent(questions[idx + 1].id)}`;
-        navNext.classList.remove("nav-disabled");
-        navNext.removeAttribute("aria-disabled");
+        el.href = `question.html?id=${encodeURIComponent(questions[idx + 1].id)}`;
+        el.classList.remove("nav-disabled");
+        el.removeAttribute("aria-disabled");
       } else {
-        navNext.href = "index.html";
-        navNext.classList.add("nav-disabled");
-        navNext.setAttribute("aria-disabled", "true");
+        el.href = "index.html";
+        el.classList.add("nav-disabled");
+        el.setAttribute("aria-disabled", "true");
       }
-    }
+    });
   }
 
   async function initQuestionPage() {
