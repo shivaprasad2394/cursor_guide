@@ -257,7 +257,7 @@
   async function runInBrowser(source, stdin, onProgress) {
     if (!runnerModule) {
       if (onProgress) onProgress("Loading in-browser C compiler (first run ~60 MB, cached after)…");
-      runnerModule = await import("./runner.js?v=5");
+      runnerModule = await import("./runner.js?v=6");
     }
     if (onProgress) onProgress("Compiling & running…");
     return runnerModule.compileAndRun(source, stdin || "");
@@ -357,7 +357,7 @@
     const questions = data.questions || [];
 
     if (statsEl) {
-      statsEl.textContent = `${questions.length} programs · 10 sections · live C in browser · no API key`;
+      statsEl.textContent = `${questions.length} programs · live C in browser · no API key`;
     }
 
     const bySection = new Map();
@@ -374,6 +374,7 @@
       "math / number",
       "linked list",
       "binary search tree",
+      "avl tree",
       "queues & stacks",
       "parsing & formatting",
       "buffers & driver patterns",
@@ -404,6 +405,41 @@
       .join("");
   }
 
+  function setupQuestionNav(questions, currentId) {
+    const idx = questions.findIndex((q) => q.id === currentId);
+    const navPrev = document.getElementById("nav-prev");
+    const navNext = document.getElementById("nav-next");
+    const navPos = document.getElementById("nav-pos");
+
+    if (navPos && idx >= 0) {
+      navPos.textContent = `${idx + 1} / ${questions.length}`;
+    }
+
+    if (navPrev) {
+      if (idx > 0) {
+        navPrev.href = `question.html?id=${encodeURIComponent(questions[idx - 1].id)}`;
+        navPrev.classList.remove("nav-disabled");
+        navPrev.removeAttribute("aria-disabled");
+      } else {
+        navPrev.href = "index.html";
+        navPrev.classList.add("nav-disabled");
+        navPrev.setAttribute("aria-disabled", "true");
+      }
+    }
+
+    if (navNext) {
+      if (idx >= 0 && idx < questions.length - 1) {
+        navNext.href = `question.html?id=${encodeURIComponent(questions[idx + 1].id)}`;
+        navNext.classList.remove("nav-disabled");
+        navNext.removeAttribute("aria-disabled");
+      } else {
+        navNext.href = "index.html";
+        navNext.classList.add("nav-disabled");
+        navNext.setAttribute("aria-disabled", "true");
+      }
+    }
+  }
+
   async function initQuestionPage() {
     const id = new URLSearchParams(window.location.search).get("id");
     if (!id) {
@@ -412,11 +448,14 @@
     }
 
     const indexData = await (await fetch("questions/index.json")).json();
-    const entry = (indexData.questions || []).find((q) => q.id === id);
+    const allQuestions = indexData.questions || [];
+    const entry = allQuestions.find((q) => q.id === id);
     if (!entry) {
       document.body.innerHTML = "<p>Question not found.</p>";
       return;
     }
+
+    setupQuestionNav(allQuestions, id);
 
     const raw = await (await fetch(`questions/${entry.file}`)).text();
     const { meta, body } = parseFrontmatter(raw);

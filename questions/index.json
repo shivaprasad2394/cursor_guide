@@ -497,6 +497,38 @@
       "section": "binary search tree"
     },
     {
+      "id": "q90-avl-height-and-balance-factor",
+      "file": "q90-avl-height-and-balance-factor.md",
+      "title": "AVL — node height and balance factor",
+      "pattern": "avl tree",
+      "difficulty": "hard",
+      "section": "avl tree"
+    },
+    {
+      "id": "q91-avl-rotate-left-and-right",
+      "file": "q91-avl-rotate-left-and-right.md",
+      "title": "AVL — single rotations (left and right)",
+      "pattern": "avl tree",
+      "difficulty": "hard",
+      "section": "avl tree"
+    },
+    {
+      "id": "q92-avl-insert-ll-rebalance",
+      "file": "q92-avl-insert-ll-rebalance.md",
+      "title": "AVL insert with LL rebalance",
+      "pattern": "avl tree",
+      "difficulty": "hard",
+      "section": "avl tree"
+    },
+    {
+      "id": "q93-avl-insert-rr-rebalance",
+      "file": "q93-avl-insert-rr-rebalance.md",
+      "title": "AVL insert with RR rebalance",
+      "pattern": "avl tree",
+      "difficulty": "hard",
+      "section": "avl tree"
+    },
+    {
       "id": "q71-linked-queue",
       "file": "q71-linked-queue.md",
       "title": "Linked Queue",
