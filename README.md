@@ -53,7 +53,7 @@ Use **Deploy from a branch** (recommended for this static site). Do **not** use 
 
 - Settings → **Environments** → `github-pages` → cancel any stuck deployments
 - Settings → Pages → switch source to branch `main` / `(root)` and Save again
-- Avoid re-running Actions workflows while branch deploy is enabled
+- Avoid re-running Actions workflows while branch deploy is enabled.
 
 The Node.js 20 deprecation warning in Actions logs is harmless and **not** why deploys fail.
 
