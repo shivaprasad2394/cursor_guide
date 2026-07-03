@@ -758,7 +758,10 @@ class Interp {
   evalExpr(e) {
     switch (e.k) {
       case "num": return e.v;
-      case "str": return { arr: this.strToArray(e.v, `"${e.v.slice(0, 10)}"`), off: 0 };
+      case "str": {
+        if (!e._arr) e._arr = this.strToArray(e.v, `"${e.v.slice(0, 12)}"`);
+        return { arr: e._arr, off: 0 };
+      }
       case "id": return this.lookup(e.name).v;
       case "seq": { this.evalExpr(e.l); return this.evalExpr(e.r); }
       case "idx": {

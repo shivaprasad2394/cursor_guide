@@ -4,8 +4,9 @@
  * mini interpreter in ctracer.js and replays real execution.
  * Mode 2 "Pattern demo": falls back to the algorithm-pattern simulators.
  */
-import { traceC, CUnsupported } from "./ctracer.js?v=14";
-import { createSession, renderStudio, stepCount } from "./visualizer.js?v=14";
+import { traceC, CUnsupported } from "./ctracer.js?v=15";
+import { createSession, renderStudio, stepCount } from "./visualizer.js?v=15";
+import { renderTraceStep } from "./tracer-view.js?v=15";
 
 function escapeHtml(s) {
   return String(s)
@@ -55,98 +56,6 @@ function extractAlgorithm(body) {
   return m ? m[1].trim() : "";
 }
 
-/* ── Trace-mode rendering ─────────────────────────────────── */
-
-const PTR_COLORS = ["viz-ptr-left", "viz-ptr-right", "viz-ptr-mid", "viz-ptr-low", "viz-ptr-high"];
-
-function renderTraceStep(stage, trace, source, idx) {
-  const step = trace.steps[idx];
-  const lines = source.split("\n");
-
-  const codeHtml = lines
-    .map((text, i) => {
-      const ln = i + 1;
-      let cls = "viz-code-line";
-      if (ln === step.line) cls += " viz-line-curr";
-      return `<div class="${cls}" data-line="${ln}"><span class="viz-ln">${ln}</span>${escapeHtml(text) || " "}</div>`;
-    })
-    .join("");
-
-  const framesHtml = step.frames.length
-    ? step.frames
-        .map(
-          (fr, fi) => `<div class="viz-frame ${fi === step.frames.length - 1 ? "viz-frame-active" : ""}">
-        <div class="viz-frame-head">${escapeHtml(fr.name)}()</div>
-        ${fr.vars
-          .map(
-            (v) => `<div class="viz-var-row">
-            <span class="viz-var-name">${escapeHtml(v.name)}</span>
-            <span class="viz-var-type"></span>
-            <span class="viz-var-val ${v.ptr ? "viz-var-pointer" : ""}">${escapeHtml(v.text)}</span>
-          </div>`
-          )
-          .join("")}
-      </div>`
-        )
-        .join("")
-    : `<div class="viz-frame"><div class="viz-frame-head">(program end)</div></div>`;
-
-  const arraysHtml = step.arrays
-    .map((arr) => {
-      const cols = arr.cells
-        .map((cell, i) => {
-          const badges = arr.ptrs
-            .filter((p) => p.off === i)
-            .map((p, bi) => `<span class="viz-ptr-badge ${PTR_COLORS[bi % PTR_COLORS.length]}">↓ ${escapeHtml(p.name)}</span>`)
-            .join("");
-          const hot = arr.ptrs.some((p) => p.off === i);
-          return `<div class="viz-array-col">
-            <div class="viz-ptr-slot">${badges}</div>
-            <span class="viz-idx">${i}</span>
-            <span class="viz-cell ${hot ? "viz-cell-mid" : ""}">${escapeHtml(cell)}</span>
-          </div>`;
-        })
-        .join("");
-      return `<div class="viz-array-block">
-        <div class="viz-array-caption">${escapeHtml(arr.label)}${arr.more ? " (first 48)" : ""}</div>
-        <div class="viz-array-grid">${cols}</div>
-      </div>`;
-    })
-    .join("");
-
-  stage.innerHTML = `
-    <div class="viz-studio studio-full">
-      <div class="viz-topbar">
-        <span class="viz-brand">Live C trace</span>
-        <span class="viz-step-pill">Step ${idx + 1} / ${trace.steps.length}</span>
-        <span class="viz-phase">${escapeHtml(step.phase)}</span>
-      </div>
-      <div class="viz-body">
-        <div class="viz-split studio-split">
-          <div class="viz-code-rail studio-code-rail" id="studio-code-rail">
-            <div class="viz-code-title">your program</div>
-            <pre class="viz-code">${codeHtml}</pre>
-          </div>
-          <div class="viz-memory">
-            <div class="viz-stack-label">STACK</div>
-            ${framesHtml}
-            ${step.arrays.length ? `<div class="viz-stack-label" style="margin-top:0.6rem">MEMORY</div>${arraysHtml}` : ""}
-            <div class="viz-stack-label" style="margin-top:0.6rem">OUTPUT</div>
-            <pre class="studio-output">${escapeHtml(step.output) || "(none yet)"}</pre>
-          </div>
-        </div>
-      </div>
-      <div class="viz-narration">${escapeHtml(step.note || "")}</div>
-    </div>`;
-
-  const rail = stage.querySelector("#studio-code-rail");
-  const curr = rail && rail.querySelector(".viz-line-curr");
-  if (rail && curr) {
-    const target = curr.offsetTop - rail.clientHeight / 2;
-    rail.scrollTop = Math.max(0, target);
-  }
-}
-
 /* ── Page bootstrap ───────────────────────────────────────── */
 
 async function init() {
@@ -184,18 +93,29 @@ async function init() {
   document.title = `${meta.title || entry.title} · Execution Studio`;
 
   const userCode = localStorage.getItem(`studio-code:${id}`);
-  const codeToTrace = userCode || solution || starter;
-  const codeLabel = userCode ? "your editor code" : "the reference solution";
 
-  /* try live trace */
+  /* try the user's code first, then the reference solution */
+  const candidates = [];
+  if (userCode) candidates.push({ code: userCode, label: "your editor code" });
+  if (solution) candidates.push({ code: solution, label: "the reference solution" });
+  if (!candidates.length && starter) candidates.push({ code: starter, label: "the starter code" });
+
   let trace = null;
   let traceError = null;
-  try {
-    trace = traceC(codeToTrace);
-    if (!trace.steps.length) throw new CUnsupported("no steps produced");
-  } catch (err) {
-    traceError = err;
-    trace = null;
+  let codeToTrace = candidates.length ? candidates[0].code : "";
+  let codeLabel = candidates.length ? candidates[0].label : "";
+  for (const cand of candidates) {
+    try {
+      const t = traceC(cand.code);
+      if (!t.steps.length) throw new CUnsupported("no steps produced");
+      trace = t;
+      codeToTrace = cand.code;
+      codeLabel = cand.label;
+      traceError = null;
+      break;
+    } catch (err) {
+      if (!traceError) traceError = err;
+    }
   }
 
   /* pattern session fallback / secondary tab */

@@ -353,7 +353,7 @@
   async function runInBrowser(source, stdin, onProgress) {
     if (!runnerModule) {
       if (onProgress) onProgress("Loading in-browser C compiler (first run ~60 MB, cached after)…");
-      runnerModule = await import("./runner.js?v=14");
+      runnerModule = await import("./runner.js?v=15");
     }
     if (onProgress) onProgress("Compiling & running…");
     return runnerModule.compileAndRun(source, stdin || "");
@@ -376,7 +376,7 @@
 
   async function getVisualizer() {
     if (!visualizerModule) {
-      visualizerModule = await import("./visualizer.js?v=14");
+      visualizerModule = await import("./visualizer.js?v=15");
     }
     return visualizerModule;
   }
@@ -547,25 +547,65 @@
     let vizVisible = false;
     let vizSession = null;
     let maxVizSteps = 0;
-    const hasViz = meta.visualization && meta.visualization !== "none";
+    let liveTrace = null;
+    let liveCode = "";
+    let tracerView = null;
+    const hasViz = true; // live tracer or pattern demo covers every question
 
     if (tapeEl) tapeEl.hidden = true;
 
-    if (hasViz) {
-      getVisualizer().then((V) => {
+    /* Try to trace the current editor code (or the solution) for real.
+       Re-run on every "Show visualization" so edits are picked up. */
+    const tryLiveTrace = async () => {
+      let mods;
+      try {
+        mods = await Promise.all([
+          import("./ctracer.js?v=15"),
+          import("./tracer-view.js?v=15"),
+        ]);
+      } catch (_) {
+        return false;
+      }
+      const [ct, tv] = mods;
+      /* prefer the user's editor code; if it doesn't trace (e.g. starter
+         with an unwritten function), fall back to the reference solution */
+      const candidates = [];
+      if (editor && editor.value.trim()) candidates.push(editor.value);
+      if (solutionCode) candidates.push(solutionCode);
+      for (const code of candidates) {
+        try {
+          const t = ct.traceC(code);
+          if (!t.steps.length) continue;
+          liveTrace = t;
+          liveCode = code;
+          tracerView = tv;
+          return true;
+        } catch (_) { /* try next candidate */ }
+      }
+      liveTrace = null;
+      return false;
+    };
+
+    const ensureVizSession = async () => {
+      if (liveTrace) return;
+      if (await tryLiveTrace()) return;
+      if (!vizSession) {
+        const V = await getVisualizer();
         vizSession = V.createSession(meta, { algorithmText });
         maxVizSteps = V.stepCount(vizSession);
-        if (prevStepBtn) prevStepBtn.hidden = maxVizSteps <= 1;
-      });
-    }
+      }
+    };
+
+    const totalVizSteps = () => (liveTrace ? liveTrace.steps.length : maxVizSteps);
 
     const showVizStep = async (step) => {
       traceStep = step;
-      if (tapeEl && vizSession) {
+      if (!tapeEl) return;
+      if (liveTrace && tracerView) {
+        tracerView.renderTraceStep(tapeEl, liveTrace, liveCode, traceStep);
+      } else if (vizSession) {
         const V = await getVisualizer();
         V.renderStudio(tapeEl, vizSession, traceStep);
-      } else if (tapeEl) {
-        await buildTape(tapeEl, meta, traceStep, vizSession);
       }
     };
 
@@ -600,30 +640,29 @@
         tapeEl.hidden = !vizVisible;
         vizBtn.textContent = vizVisible ? "Hide visualization" : "Show visualization";
         if (vizVisible) {
-          if (!vizSession) {
-            const V = await getVisualizer();
-            vizSession = V.createSession(meta, { algorithmText });
-            maxVizSteps = V.stepCount(vizSession);
-          }
-          await showVizStep(traceStep);
+          liveTrace = null; // re-trace so editor edits are picked up
+          traceStep = 0;
+          await ensureVizSession();
+          await showVizStep(0);
         }
       });
     }
 
+    const revealViz = () => {
+      if (!vizVisible) {
+        vizVisible = true;
+        tapeEl.hidden = false;
+        if (vizBtn) vizBtn.textContent = "Hide visualization";
+      }
+    };
+
     if (stepBtn && tapeEl) {
       stepBtn.hidden = !hasViz;
       stepBtn.addEventListener("click", async () => {
-        if (!vizVisible) {
-          vizVisible = true;
-          tapeEl.hidden = false;
-          if (vizBtn) vizBtn.textContent = "Hide visualization";
-        }
-        if (!vizSession) {
-          const V = await getVisualizer();
-          vizSession = V.createSession(meta, { algorithmText });
-          maxVizSteps = V.stepCount(vizSession);
-        }
-        const next = maxVizSteps ? (traceStep + 1) % maxVizSteps : 0;
+        revealViz();
+        await ensureVizSession();
+        const total = totalVizSteps();
+        const next = total ? (traceStep + 1) % total : 0;
         await showVizStep(next);
       });
     }
@@ -631,17 +670,10 @@
     if (prevStepBtn && tapeEl) {
       prevStepBtn.hidden = !hasViz;
       prevStepBtn.addEventListener("click", async () => {
-        if (!vizVisible) {
-          vizVisible = true;
-          tapeEl.hidden = false;
-          if (vizBtn) vizBtn.textContent = "Hide visualization";
-        }
-        if (!vizSession) {
-          const V = await getVisualizer();
-          vizSession = V.createSession(meta, { algorithmText });
-          maxVizSteps = V.stepCount(vizSession);
-        }
-        const prev = maxVizSteps ? (traceStep - 1 + maxVizSteps) % maxVizSteps : 0;
+        revealViz();
+        await ensureVizSession();
+        const total = totalVizSteps();
+        const prev = total ? (traceStep - 1 + total) % total : 0;
         await showVizStep(prev);
       });
     }
