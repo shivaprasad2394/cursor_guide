@@ -5,12 +5,13 @@ pattern: "two-pointer (merge walk)"
 difficulty: "easy"
 visualization: "two-pointer"
 tape: "cgm"
-trace:
-  - {"left": 0, "right": 2, "note": "c \u2194 m"}
-  - {"left": 1, "right": 1, "note": "pointers meet \u2014 done"}
 stdin: ""
 complexity: "O(n) time, O(1) space"
 expectedOutput: "isSubsequence(capgemini,cgm)=1\n"
+trace:
+  - {"left": 0, "right": 2, "note": "c \u2194 m"}
+  - {"left": 1, "right": 1, "note": "pointers meet \u2014 done"}
+- {"left": "1, \"right\": 1, \"note\": \"pointers meet \\u2014 done\"}"
 ---
 ## At a glance
 

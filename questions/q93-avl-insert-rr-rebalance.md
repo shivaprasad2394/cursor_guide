@@ -7,7 +7,7 @@ visualization: "tree"
 treeKeys: "10,20,30"
 stdin: ""
 complexity: "O(log n) per insert"
-expectedOutput: "insert 10,20,30 -> root=20 height=2\\\\n"
+expectedOutput: "insert 10,20,30 -> root=20 height=2\\\\\\\\n"
 ---
 ## At a glance
 

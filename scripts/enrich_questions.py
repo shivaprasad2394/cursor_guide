@@ -190,6 +190,15 @@ def infer_viz(q: dict, body: str) -> dict:
     elif "ring buffer" in title or "circular" in title:
         viz = {"visualization": "array-cells", "tape": "0,1,2,3,4,5,6,7", "arrayLabel": "ring buffer slots"}
 
+    if viz.get("visualization") == "none":
+        s = extract_string_literal(example) or extract_string_literal(starter) or ""
+        viz = {
+            "visualization": "generic",
+            "vizCategory": section or pattern or "general",
+        }
+        if s:
+            viz["tape"] = s[:80]
+
     return viz
 
 
@@ -209,7 +218,7 @@ def rebuild_file(meta: dict, body: str, at_a_glance: str) -> str:
 
     fm = ["---"]
     order = [
-        "id", "title", "pattern", "difficulty", "visualization",
+        "id", "title", "pattern", "difficulty", "visualization", "vizCategory",
         "tape", "target", "treeKeys", "listNodes", "listHighlight", "arrayLabel",
         "stdin", "complexity", "expectedOutput", "trace",
     ]

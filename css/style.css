@@ -856,6 +856,52 @@ a:hover {
   border-color: var(--blue);
 }
 
+.viz-expected-box {
+  margin: 0.5rem 0 0;
+  padding: 0.6rem 0.75rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  font-size: 0.75rem;
+  color: var(--green);
+  white-space: pre-wrap;
+}
+
+.viz-focus-text {
+  margin: 0.5rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+.viz-bit-row {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.35rem;
+}
+
+.viz-bit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 1.5rem;
+  padding: 0.25rem;
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
+  background: var(--bg-panel);
+}
+
+.viz-bit small {
+  font-size: 0.55rem;
+  color: var(--text-muted);
+}
+
+.viz-bit-on {
+  border-color: var(--amber);
+  color: var(--amber);
+  background: rgba(240, 180, 41, 0.1);
+}
+
 .memory-tape {
   border: 1px solid var(--border);
   background: var(--bg);

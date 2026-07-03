@@ -6,13 +6,13 @@ difficulty: "medium"
 visualization: "binary-search"
 tape: "5,6,7,0,1,2"
 target: 0
-trace:
-  - {"low": 0, "high": 5, "mid": 2, "note": "arr[2]=7 > 0 \u2192 search left half"}
-  - {"low": 0, "high": 1, "mid": 0, "note": "arr[0]=5 > 0 \u2192 search left half"}
 stdin: ""
 complexity: "O(log n) time, O(1) space"
 expectedOutput: "minRotated=0\n"
-- {"low": "0, \"high\": 1, \"mid\": 0, \"note\": \"arr[0]=5 > 0 \\u2192 search left half\"}"
+trace:
+  - {"low": 0, "high": 5, "mid": 2, "note": "arr[2]=7 > 0 \u2192 search left half"}
+  - {"low": 0, "high": 1, "mid": 0, "note": "arr[0]=5 > 0 \u2192 search left half"}
+- {"low": "0, \\\"high\\\": 1, \\\"mid\\\": 0, \\\"note\\\": \\\"arr[0]=5 > 0 \\\\u2192 search left half\\\"}"
 ---
 ## At a glance
 

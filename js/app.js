@@ -353,7 +353,7 @@
   async function runInBrowser(source, stdin, onProgress) {
     if (!runnerModule) {
       if (onProgress) onProgress("Loading in-browser C compiler (first run ~60 MB, cached after)…");
-      runnerModule = await import("./runner.js?v=12");
+      runnerModule = await import("./runner.js?v=13");
     }
     if (onProgress) onProgress("Compiling & running…");
     return runnerModule.compileAndRun(source, stdin || "");
@@ -376,7 +376,7 @@
 
   async function getVisualizer() {
     if (!visualizerModule) {
-      visualizerModule = await import("./visualizer.js?v=12");
+      visualizerModule = await import("./visualizer.js?v=13");
     }
     return visualizerModule;
   }
@@ -391,7 +391,7 @@
     }
     container.hidden = false;
     const V = await getVisualizer();
-    if (!session) session = V.createSession(meta);
+    if (!session) session = V.createSession(meta, { algorithmText });
     V.renderStudio(container, session, stepIndex);
     return session;
   }
@@ -553,7 +553,7 @@
 
     if (hasViz) {
       getVisualizer().then((V) => {
-        vizSession = V.createSession(meta);
+        vizSession = V.createSession(meta, { algorithmText });
         maxVizSteps = V.stepCount(vizSession);
         if (prevStepBtn) prevStepBtn.hidden = maxVizSteps <= 1;
       });
@@ -590,7 +590,7 @@
         if (vizVisible) {
           if (!vizSession) {
             const V = await getVisualizer();
-            vizSession = V.createSession(meta);
+            vizSession = V.createSession(meta, { algorithmText });
             maxVizSteps = V.stepCount(vizSession);
           }
           await showVizStep(traceStep);
@@ -608,7 +608,7 @@
         }
         if (!vizSession) {
           const V = await getVisualizer();
-          vizSession = V.createSession(meta);
+          vizSession = V.createSession(meta, { algorithmText });
           maxVizSteps = V.stepCount(vizSession);
         }
         const next = maxVizSteps ? (traceStep + 1) % maxVizSteps : 0;
@@ -626,7 +626,7 @@
         }
         if (!vizSession) {
           const V = await getVisualizer();
-          vizSession = V.createSession(meta);
+          vizSession = V.createSession(meta, { algorithmText });
           maxVizSteps = V.stepCount(vizSession);
         }
         const prev = maxVizSteps ? (traceStep - 1 + maxVizSteps) % maxVizSteps : 0;

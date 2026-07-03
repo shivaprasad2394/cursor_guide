@@ -1,8 +1,10 @@
 /**
  * Execution Studio — step-through memory visualizer (Python Tutor inspired).
  */
-export function createSession(meta) {
+export function createSession(meta, opts = {}) {
   const viz = meta.visualization || "none";
+  const algorithmText = opts.algorithmText || meta.vizAlgorithm || "";
+
   if (viz === "two-pointer") {
     const tape = String(meta.tape || "hello");
     const title = meta.title || "";
@@ -37,7 +39,10 @@ export function createSession(meta) {
     const cells = String(meta.tape || "0,1,2,3,4,5,6,7").split(",").map((s) => s.trim());
     return { kind: "array-cells", steps: simulateRingBuffer(cells), label: meta.arrayLabel || "buffer" };
   }
-  return { kind: "none", steps: [] };
+  if (viz === "generic" || viz === "none") {
+    return createGenericSession(meta, algorithmText);
+  }
+  return createGenericSession(meta, algorithmText);
 }
 
 export function stepCount(session) {
@@ -74,6 +79,8 @@ export function renderStudio(container, session, stepIndex) {
     renderListStudio(body, step, session);
   } else if (session.kind === "array-cells") {
     renderArrayStudio(body, step, session);
+  } else if (session.kind === "generic") {
+    renderGenericStudio(body, step, session);
   }
 
   container.appendChild(studio);
@@ -137,7 +144,8 @@ function simulateReverseString(str) {
     arr: [...arr],
     left,
     right,
-    t: extra.t ?? "—",
+    t: extra.t ?? null,
+    showT: extra.showT ?? false,
     prevLine: extra.prevLine ?? null,
     currLine: extra.currLine ?? null,
     note: extra.note || "",
@@ -148,13 +156,24 @@ function simulateReverseString(str) {
     snap("init", {
       phaseLabel: "Enter function",
       currLine: 1,
-      note: `Setup: left=0, right=${right} (last index of "${str}")`,
+      note: "Enter reverseString(char *s)",
+    })
+  );
+  steps.push(
+    snap("init-vars", {
+      phaseLabel: "Init pointers",
+      prevLine: 1,
+      currLine: 2,
+      note: `int left = 0;  int right = ${right};  (strlen(s)-1)`,
     })
   );
   steps.push(
     snap("check", {
-      currLine: 2,
-      note: left < right ? `while (${left} < ${right}) → true, enter loop` : "Loop finished",
+      phaseLabel: "Loop test",
+      prevLine: 2,
+      currLine: 3,
+      showT: false,
+      note: `while (${left} < ${right})  →  true, enter loop body`,
     })
   );
 
@@ -162,44 +181,55 @@ function simulateReverseString(str) {
     const tVal = arr[left];
     steps.push(
       snap("save-t", {
+        phaseLabel: "Save temp",
         t: tVal,
-        prevLine: 2,
-        currLine: 3,
-        note: `char t = s[${left}];  →  save '${tVal}' before overwrite`,
+        showT: true,
+        prevLine: 3,
+        currLine: 4,
+        note: `char t = s[${left}];  →  t = '${tVal}'`,
       })
     );
     arr[left] = arr[right];
     steps.push(
       snap("write-left", {
+        phaseLabel: "Write left",
         t: tVal,
-        prevLine: 3,
-        currLine: 4,
-        note: `s[${left}] = s[${right}];  →  copy '${arr[left]}' to left slot`,
+        showT: true,
+        prevLine: 4,
+        currLine: 5,
+        note: `s[${left}] = s[${right}];  →  s[${left}] = '${arr[left]}'`,
       })
     );
     arr[right] = tVal;
     steps.push(
       snap("write-right", {
-        t: "—",
-        prevLine: 4,
-        currLine: 5,
-        note: `s[${right}] = t;  →  write saved '${tVal}' to right slot`,
+        phaseLabel: "Write right",
+        t: tVal,
+        showT: true,
+        prevLine: 5,
+        currLine: 6,
+        note: `s[${right}] = t;  →  s[${right}] = '${tVal}'`,
       })
     );
     left += 1;
     right -= 1;
     steps.push(
       snap("advance", {
-        prevLine: 5,
-        currLine: 6,
-        note: `left++ → ${left},  right-- → ${right}`,
+        phaseLabel: "Move pointers",
+        showT: false,
+        prevLine: 6,
+        currLine: 7,
+        note: `left++ → ${left};  right-- → ${right}`,
       })
     );
     if (left < right) {
       steps.push(
         snap("check", {
-          currLine: 2,
-          note: `while (${left} < ${right}) → true, next swap`,
+          phaseLabel: "Loop test",
+          prevLine: 7,
+          currLine: 3,
+          showT: false,
+          note: `while (${left} < ${right})  →  true, next swap`,
         })
       );
     }
@@ -208,9 +238,10 @@ function simulateReverseString(str) {
   steps.push(
     snap("done", {
       phaseLabel: "Complete",
-      prevLine: 2,
-      currLine: null,
-      note: left >= right ? "Pointers met in the middle — string reversed in-place." : "Loop exit — done.",
+      prevLine: 3,
+      currLine: 8,
+      showT: false,
+      note: `while (${left} < ${right})  →  false.  String reversed in-place.`,
     })
   );
   return steps;
@@ -469,11 +500,15 @@ function renderTwoPointerStudio(body, step, session) {
               <span class="viz-var-type">int</span>
               <span class="viz-var-val viz-val-right">${right}</span>
             </div>
-            <div class="viz-var-row">
+            ${
+              step.showT
+                ? `<div class="viz-var-row">
               <span class="viz-var-name">t</span>
               <span class="viz-var-type">char</span>
-              <span class="viz-var-val">${step.t === "—" ? "—" : `'${escapeHtml(step.t)}'`}</span>
-            </div>
+              <span class="viz-var-val">'${escapeHtml(String(step.t))}'</span>
+            </div>`
+                : ""
+            }
           </div>
         </div>
       </div>
@@ -566,4 +601,108 @@ function renderArrayStudio(body, step) {
         </div>
       </div>
     </div>`;
+}
+
+/* ── Generic visualizer (all other questions) ─────────────── */
+
+function parseAlgorithmSteps(text) {
+  if (!text) return [];
+  const steps = [];
+  for (const line of text.split("\n")) {
+    const trimmed = line.trim();
+    const m = trimmed.match(/^step\s*\d+\s*:\s*(.+)$/i);
+    if (m) steps.push(m[1].trim());
+  }
+  return steps;
+}
+
+function createGenericSession(meta, algorithmText) {
+  const algoLines = parseAlgorithmSteps(algorithmText);
+  const fallback = ["Understand the problem and inputs", "Design helper function(s)", "Implement logic step by step", "Return result to main()"];
+  const lines = algoLines.length ? algoLines : fallback;
+  const category = meta.vizCategory || meta.pattern || meta.section || "general";
+  const tape = meta.tape || "";
+  const expected = (meta.expectedOutput || "").trim().split("\n")[0];
+
+  const steps = lines.map((text, i) => ({
+    phase: "algo",
+    phaseLabel: `Step ${i + 1} of ${lines.length}`,
+    algoText: text,
+    algoIndex: i,
+    category,
+    tape,
+    expected,
+    prevLine: i > 0 ? i : null,
+    currLine: i + 1,
+    note: text,
+    func: "algorithm",
+  }));
+
+  steps.push({
+    phase: "verify",
+    phaseLabel: "Verify output",
+    category,
+    expected,
+    prevLine: lines.length,
+    currLine: lines.length + 1,
+    note: expected ? `Run Check — expected: ${expected}` : "Run your code and compare with Expected output.",
+    func: "main",
+  });
+
+  return { kind: "generic", steps, meta, algoLines: lines };
+}
+
+function renderGenericStudio(body, step, session) {
+  const lines = session.algoLines || [];
+  const codeLines = lines.map((text, i) => ({
+    text: `// ${i + 1}. ${text}`,
+    id: i + 1,
+  }));
+  if (step.phase === "verify") {
+    codeLines.push({ text: "int main() {  /* provided */  return 0; }", id: lines.length + 1 });
+  }
+
+  body.innerHTML = `
+    <div class="viz-split">
+      ${renderCodeRail(codeLines.length ? codeLines : [{ text: "// Write your helper here", id: 1 }], step)}
+      <div class="viz-memory">
+        <div class="viz-stack-label">${escapeHtml(String(step.category || "program").slice(0, 48))}</div>
+        ${renderGenericContext(step)}
+      </div>
+    </div>`;
+}
+
+function renderGenericContext(step) {
+  const cat = String(step.category || "").toLowerCase();
+
+  if (cat.includes("bit")) {
+    const bits = (step.algoIndex + 1).toString(2).padStart(8, "0");
+    return `<div class="viz-frame">
+      <div class="viz-frame-head">Bit manipulation</div>
+      <div class="viz-bit-row">${bits.split("").map((b, i) => `<span class="viz-bit ${b === "1" ? "viz-bit-on" : ""}">${b}<small>${7 - i}</small></span>`).join("")}</div>
+      <p class="viz-focus-text">${escapeHtml(step.algoText || "")}</p>
+    </div>`;
+  }
+
+  if (step.tape && step.tape.length <= 40) {
+    const chars = step.tape.split("");
+    const pos = step.algoIndex % Math.max(chars.length, 1);
+    return `<div class="viz-frame">
+      <div class="viz-frame-head">Data</div>
+      ${renderArrayColumns(chars, { left: pos, right: Math.min(pos + 1, chars.length - 1), charCells: true })}
+      <p class="viz-focus-text">${escapeHtml(step.algoText || "")}</p>
+    </div>`;
+  }
+
+  if (step.expected) {
+    return `<div class="viz-frame">
+      <div class="viz-frame-head">${step.phase === "verify" ? "Expected result" : "Current focus"}</div>
+      ${step.phase === "verify" ? `<pre class="viz-expected-box">${escapeHtml(step.expected)}</pre>` : `<p class="viz-focus-text">${escapeHtml(step.algoText || step.note || "")}</p>`}
+    </div>`;
+  }
+
+  return `<div class="viz-frame">
+    <div class="viz-frame-head">Algorithm step</div>
+    <p class="viz-focus-text">${escapeHtml(step.algoText || step.note || "")}</p>
+  </div>`;
 }

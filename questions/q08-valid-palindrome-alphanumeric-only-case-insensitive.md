@@ -5,6 +5,9 @@ pattern: "two-pointer (opposite ends) + skip"
 difficulty: "easy"
 visualization: "two-pointer"
 tape: "A man, a plan, a canal: Panama"
+stdin: ""
+complexity: "O(n) time, O(1) space"
+expectedOutput: "validPalindrome(\"A man, a plan, a canal: Panama\")=1\n"
 trace:
   - {"left": 0, "right": 29, "note": "A \u2194 a"}
   - {"left": 1, "right": 28, "note": "  \u2194 m"}
@@ -21,9 +24,7 @@ trace:
   - {"left": 12, "right": 17, "note": "n \u2194 c"}
   - {"left": 13, "right": 16, "note": ", \u2194  "}
   - {"left": 14, "right": 15, "note": "  \u2194 a"}
-stdin: ""
-complexity: "O(n) time, O(1) space"
-expectedOutput: "validPalindrome(\"A man, a plan, a canal: Panama\")=1\n"
+- {"left": "14, \"right\": 15, \"note\": \"  \\u2194 a\"}"
 ---
 ## At a glance
 

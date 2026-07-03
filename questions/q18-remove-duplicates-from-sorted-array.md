@@ -5,6 +5,9 @@ pattern: "two-pointer (slow/fast)"
 difficulty: "medium"
 visualization: "two-pointer"
 tape: "removeDups: "
+stdin: ""
+complexity: "O(n) time, O(1) space"
+expectedOutput: "removeDups: 1 2 3 4\n"
 trace:
   - {"left": 0, "right": 11, "note": "r \u2194  "}
   - {"left": 1, "right": 10, "note": "e \u2194 :"}
@@ -12,9 +15,7 @@ trace:
   - {"left": 3, "right": 8, "note": "o \u2194 p"}
   - {"left": 4, "right": 7, "note": "v \u2194 u"}
   - {"left": 5, "right": 6, "note": "e \u2194 D"}
-stdin: ""
-complexity: "O(n) time, O(1) space"
-expectedOutput: "removeDups: 1 2 3 4\n"
+- {"left": "5, \"right\": 6, \"note\": \"e \\u2194 D\"}"
 ---
 ## At a glance
 

@@ -7,7 +7,7 @@ visualization: "tree"
 treeKeys: "30,20,10"
 stdin: ""
 complexity: "O(1) per rotation"
-expectedOutput: "after rotateRight root=20 left=10 right=30\\\\n"
+expectedOutput: "after rotateRight root=20 left=10 right=30\\\\\\\\n"
 ---
 ## At a glance
 

@@ -6,12 +6,12 @@ difficulty: "medium"
 visualization: "binary-search"
 tape: "3,5,7,9,11"
 target: 7
-trace:
-  - {"low": 0, "high": 4, "mid": 2, "note": "arr[2]=7 \u2014 found target 7"}
 stdin: ""
 complexity: "O(log n) time, O(1) space Precondition: array MUST be sorted"
 expectedOutput: "binSearch(7)=3\n"
-- {"low": "0, \"high\": 4, \"mid\": 2, \"note\": \"arr[2]=7 \\u2014 found target 7\"}"
+trace:
+  - {"low": 0, "high": 4, "mid": 2, "note": "arr[2]=7 \u2014 found target 7"}
+- {"low": "0, \\\"high\\\": 4, \\\"mid\\\": 2, \\\"note\\\": \\\"arr[2]=7 \\\\u2014 found target 7\\\"}"
 ---
 ## At a glance
 

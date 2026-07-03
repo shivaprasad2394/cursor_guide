@@ -5,13 +5,14 @@ pattern: "two-pointer (opposite ends)"
 difficulty: "easy"
 visualization: "two-pointer"
 tape: "hello"
+stdin: ""
+complexity: "O(n) time, O(1) space"
+expectedOutput: "reverse(\"hello\") = olleh\n"
 trace:
   - {"left": 0, "right": 4, "note": "h \u2194 o"}
   - {"left": 1, "right": 3, "note": "e \u2194 l"}
   - {"left": 2, "right": 2, "note": "pointers meet \u2014 done"}
-stdin: ""
-complexity: "O(n) time, O(1) space"
-expectedOutput: "reverse(\"hello\") = olleh\n"
+- {"left": "2, \"right\": 2, \"note\": \"pointers meet \\u2014 done\"}"
 ---
 ## At a glance
 
