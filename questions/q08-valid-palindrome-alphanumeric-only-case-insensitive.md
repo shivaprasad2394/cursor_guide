@@ -24,7 +24,6 @@ trace:
 stdin: ""
 complexity: "O(n) time, O(1) space"
 expectedOutput: "validPalindrome(\"A man, a plan, a canal: Panama\")=1\n"
-- {"left": "14, \"right\": 15, \"note\": \"  \\u2194 a\"}"
 ---
 ## At a glance
 

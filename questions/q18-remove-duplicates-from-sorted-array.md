@@ -15,7 +15,6 @@ trace:
 stdin: ""
 complexity: "O(n) time, O(1) space"
 expectedOutput: "removeDups: 1 2 3 4\n"
-- {"left": "5, \"right\": 6, \"note\": \"e \\u2194 D\"}"
 ---
 ## At a glance
 

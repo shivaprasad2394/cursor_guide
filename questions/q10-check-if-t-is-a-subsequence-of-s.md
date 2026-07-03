@@ -11,7 +11,6 @@ trace:
 stdin: ""
 complexity: "O(n) time, O(1) space"
 expectedOutput: "isSubsequence(capgemini,cgm)=1\n"
-- {"left": "1, \"right\": 1, \"note\": \"pointers meet \\u2014 done\"}"
 ---
 ## At a glance
 

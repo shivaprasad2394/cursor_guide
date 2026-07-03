@@ -12,7 +12,6 @@ trace:
 stdin: ""
 complexity: "O(n) time, O(1) space"
 expectedOutput: "reverse(\"hello\") = olleh\n"
-- {"left": "2, \"right\": 2, \"note\": \"pointers meet \\u2014 done\"}"
 ---
 ## At a glance
 

@@ -15,7 +15,6 @@ trace:
 stdin: ""
 complexity: "O(n) time, O(1) space"
 expectedOutput: "moveZeros: 1 3 12 0 0\n"
-- {"left": "5, \"right\": 5, \"note\": \"pointers meet \\u2014 done\"}"
 ---
 ## At a glance
 

@@ -211,7 +211,7 @@ def rebuild_file(meta: dict, body: str, at_a_glance: str) -> str:
     order = [
         "id", "title", "pattern", "difficulty", "visualization",
         "tape", "target", "treeKeys", "listNodes", "listHighlight", "arrayLabel",
-        "trace", "stdin", "complexity", "expectedOutput",
+        "stdin", "complexity", "expectedOutput", "trace",
     ]
     written = set()
     for key in order:
