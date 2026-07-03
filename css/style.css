@@ -662,6 +662,73 @@ a:hover {
   justify-content: flex-start;
 }
 
+.viz-array-grid {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.viz-array-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  min-width: 2.35rem;
+}
+
+.viz-ptr-slot {
+  min-height: 1.35rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.1rem;
+}
+
+.viz-ptr-badge {
+  font-size: 0.55rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.12rem 0.28rem;
+  border-radius: 2px;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.viz-ptr-left {
+  color: var(--blue);
+  background: rgba(91, 140, 255, 0.15);
+  border: 1px solid rgba(91, 140, 255, 0.5);
+}
+
+.viz-ptr-right {
+  color: var(--green);
+  background: rgba(57, 217, 138, 0.12);
+  border: 1px solid rgba(57, 217, 138, 0.45);
+}
+
+.viz-ptr-meet {
+  color: var(--amber);
+  background: rgba(240, 180, 41, 0.12);
+  border: 1px solid rgba(240, 180, 41, 0.45);
+}
+
+.viz-ptr-low { color: var(--blue); background: rgba(91, 140, 255, 0.12); border: 1px solid rgba(91, 140, 255, 0.4); }
+.viz-ptr-mid { color: var(--amber); background: rgba(240, 180, 41, 0.12); border: 1px solid rgba(240, 180, 41, 0.4); }
+.viz-ptr-high { color: var(--green); background: rgba(57, 217, 138, 0.12); border: 1px solid rgba(57, 217, 138, 0.4); }
+
+.viz-array-col .viz-idx {
+  margin-bottom: 0.05rem;
+}
+
+.viz-array-col .viz-cell {
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .viz-array-indices {
   margin-bottom: 0.2rem;
 }
@@ -715,38 +782,6 @@ a:hover {
 .viz-locals {
   margin-top: 0.5rem;
 }
-
-.viz-arrow-layer {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  overflow: visible;
-}
-
-.viz-svg-left {
-  stroke: var(--blue);
-  stroke-width: 2;
-  fill: none;
-}
-
-.viz-svg-right {
-  stroke: var(--green);
-  stroke-width: 2;
-  fill: none;
-}
-
-.viz-svg-left polygon { fill: var(--blue); }
-.viz-svg-right polygon { fill: var(--green); }
-
-.viz-svg-label {
-  font-size: 9px;
-  font-family: var(--mono);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.viz-svg-label-left { fill: var(--blue); }
-.viz-svg-label-right { fill: var(--green); }
 
 .viz-narration {
   padding: 0.65rem 0.85rem;

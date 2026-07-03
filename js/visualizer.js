@@ -77,7 +77,42 @@ export function renderStudio(container, session, stepIndex) {
   }
 
   container.appendChild(studio);
-  requestAnimationFrame(() => drawPointerArrows(studio));
+}
+
+function renderArrayColumns(arr, opts = {}) {
+  const { left, right, low, high, mid, charCells = false } = opts;
+  return `<div class="viz-array-grid">${arr
+    .map((val, i) => {
+      const badges = [];
+      if (left !== undefined && right !== undefined) {
+        if (i === left && i === right) badges.push(`<span class="viz-ptr-badge viz-ptr-meet">● meet</span>`);
+        else {
+          if (i === left) badges.push(`<span class="viz-ptr-badge viz-ptr-left">↓ left</span>`);
+          if (i === right) badges.push(`<span class="viz-ptr-badge viz-ptr-right">↓ right</span>`);
+        }
+      }
+      if (low !== undefined && i === low) badges.push(`<span class="viz-ptr-badge viz-ptr-low">↓ low</span>`);
+      if (mid !== undefined && i === mid) badges.push(`<span class="viz-ptr-badge viz-ptr-mid">↓ mid</span>`);
+      if (high !== undefined && i === high) badges.push(`<span class="viz-ptr-badge viz-ptr-high">↓ high</span>`);
+
+      let cellCls = "viz-cell";
+      if (i === left) cellCls += " viz-cell-left";
+      if (i === right) cellCls += " viz-cell-right";
+      if (i === left && i === right) cellCls += " viz-cell-meet";
+      if (i === low) cellCls += " viz-cell-low";
+      if (i === mid) cellCls += " viz-cell-mid";
+      if (i === high) cellCls += " viz-cell-high";
+
+      const display = charCells ? `'${escapeHtml(String(val) === " " ? "␣" : val)}'` : escapeHtml(String(val));
+
+      return `<div class="viz-array-col" data-col="${i}">
+        <div class="viz-ptr-slot">${badges.join("")}</div>
+        <span class="viz-idx">${i}</span>
+        <span class="${cellCls}" data-cell="${i}">${display}</span>
+        ${charCells ? `<span class="viz-type-tag">char</span>` : ""}
+      </div>`;
+    })
+    .join("")}</div>`;
 }
 
 function escapeHtml(s) {
@@ -421,18 +456,7 @@ function renderTwoPointerStudio(body, step, session) {
           </div>
           <div class="viz-array-block" data-viz-array>
             <div class="viz-array-caption">char s[] on stack (via main)</div>
-            <div class="viz-array-indices">${arr.map((_, i) => `<span class="viz-idx" data-idx="${i}">${i}</span>`).join("")}</div>
-            <div class="viz-array-cells">${arr
-              .map((c, i) => {
-                let cls = "viz-cell";
-                if (i === left) cls += " viz-cell-left";
-                if (i === right) cls += " viz-cell-right";
-                if (i === left && i === right) cls += " viz-cell-meet";
-                return `<span class="${cls}" data-cell="${i}">'${escapeHtml(c === " " ? "␣" : c)}'</span>`;
-              })
-              .join("")}</div>
-            <div class="viz-array-types">${arr.map(() => `<span class="viz-type-tag">char</span>`).join("")}</div>
-            <svg class="viz-arrow-layer" data-arrow-layer aria-hidden="true"></svg>
+            ${renderArrayColumns(arr, { left, right, charCells: true })}
           </div>
           <div class="viz-locals">
             <div class="viz-var-row" data-var-left>
@@ -469,16 +493,7 @@ function renderBinarySearchStudio(body, step, session) {
           <div class="viz-frame-head">binarySearch()</div>
           <div class="viz-var-row"><span class="viz-var-name">target</span><span class="viz-var-type">int</span><span class="viz-var-val">${target}</span></div>
           <div class="viz-array-block" data-viz-array>
-            <div class="viz-array-indices">${arr.map((_, i) => `<span class="viz-idx">${i}</span>`).join("")}</div>
-            <div class="viz-array-cells">${arr
-              .map((v, i) => {
-                let cls = "viz-cell";
-                if (i === low) cls += " viz-cell-low";
-                if (i === high) cls += " viz-cell-high";
-                if (i === mid) cls += " viz-cell-mid";
-                return `<span class="${cls}">${v}</span>`;
-              })
-              .join("")}</div>
+            ${renderArrayColumns(arr, { low, high, mid: mid >= 0 ? mid : undefined })}
           </div>
           <div class="viz-locals">
             <div class="viz-var-row"><span class="viz-var-name">low</span><span class="viz-var-type">int</span><span class="viz-var-val viz-val-low">${low}</span></div>
@@ -547,48 +562,8 @@ function renderArrayStudio(body, step) {
       <div class="viz-memory">
         <div class="viz-stack-label">MEMORY · ${escapeHtml(step.label || "array")}</div>
         <div class="viz-array-block">
-          <div class="viz-array-indices">${cells.map((_, i) => `<span class="viz-idx">${i}</span>`).join("")}</div>
-          <div class="viz-array-cells">${cells
-            .map((v, i) => `<span class="viz-cell ${i === hi ? "viz-cell-mid" : ""}">${escapeHtml(v)}</span>`)
-            .join("")}</div>
+          ${renderArrayColumns(cells, { mid: hi })}
         </div>
       </div>
     </div>`;
-}
-
-function drawPointerArrows(studio) {
-  const layer = studio.querySelector("[data-arrow-layer]");
-  const block = studio.querySelector("[data-viz-array]");
-  if (!layer || !block) return;
-
-  const leftVal = studio.querySelector(".viz-val-left");
-  const rightVal = studio.querySelector(".viz-val-right");
-  if (!leftVal || !rightVal) return;
-
-  const leftIdx = parseInt(leftVal.textContent, 10);
-  const rightIdx = parseInt(rightVal.textContent, 10);
-  const blockRect = block.getBoundingClientRect();
-
-  layer.setAttribute("width", block.offsetWidth);
-  layer.setAttribute("height", block.offsetHeight);
-  layer.innerHTML = "";
-
-  const cellLeft = block.querySelector(`[data-cell="${leftIdx}"]`);
-  const cellRight = block.querySelector(`[data-cell="${rightIdx}"]`);
-  if (!cellLeft || !cellRight) return;
-
-  const lr = cellLeft.getBoundingClientRect();
-  const rr = cellRight.getBoundingClientRect();
-  const x1 = lr.left + lr.width / 2 - blockRect.left;
-  const x2 = rr.left + rr.width / 2 - blockRect.left;
-  const yTop = 8;
-  const yBot = block.offsetHeight - 6;
-
-  layer.innerHTML = `
-    <line x1="${x1}" y1="${yTop}" x2="${x1}" y2="${yBot - 28}" class="viz-svg-left"/>
-    <polygon points="${x1 - 4},${yBot - 28} ${x1 + 4},${yBot - 28} ${x1},${yBot - 22}" class="viz-svg-left"/>
-    <text x="${x1}" y="${yTop - 2}" class="viz-svg-label viz-svg-label-left">left</text>
-    <line x1="${x2}" y1="${yTop}" x2="${x2}" y2="${yBot - 28}" class="viz-svg-right"/>
-    <polygon points="${x2 - 4},${yBot - 28} ${x2 + 4},${yBot - 28} ${x2},${yBot - 22}" class="viz-svg-right"/>
-    <text x="${x2}" y="${yTop - 2}" class="viz-svg-label viz-svg-label-right">right</text>`;
 }
