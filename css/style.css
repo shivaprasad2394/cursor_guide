@@ -1319,3 +1319,137 @@ a:hover {
     display: none;
   }
 }
+
+/* ── Execution Studio full page ─────────────────────────── */
+
+.studio-main {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 1rem 1.25rem 2.5rem;
+}
+
+.studio-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.6rem;
+}
+
+.studio-head h1 {
+  font-size: 1.15rem;
+  margin: 0;
+}
+
+.studio-tabs {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.studio-tabs[hidden] {
+  display: none;
+}
+
+.studio-tab-active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(88, 166, 255, 0.1);
+}
+
+.studio-msg {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0 0 0.75rem;
+}
+
+.studio-msg strong,
+.studio-msg em {
+  color: var(--text);
+}
+
+.studio-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  padding: 0.55rem 0.7rem;
+  margin-bottom: 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-alt);
+  position: sticky;
+  top: 0.5rem;
+  z-index: 10;
+}
+
+.studio-controls .btn {
+  padding: 0.3rem 0.65rem;
+}
+
+#ctl-slider {
+  flex: 1;
+  min-width: 140px;
+  accent-color: var(--accent);
+}
+
+.studio-step-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  min-width: 4.2rem;
+  text-align: center;
+}
+
+.studio-speed {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.28rem 0.4rem;
+  font-size: 0.72rem;
+}
+
+.studio-full .viz-body {
+  max-height: none;
+}
+
+.studio-split {
+  grid-template-columns: minmax(320px, 1.1fr) minmax(300px, 1fr);
+}
+
+.studio-code-rail {
+  max-height: 65vh;
+  overflow: auto;
+}
+
+.studio-code-rail .viz-code {
+  font-size: 0.78rem;
+}
+
+.studio-code-rail .viz-ln {
+  width: 2rem;
+}
+
+.studio-output {
+  margin: 0;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #0a0e14;
+  color: var(--green);
+  font-size: 0.74rem;
+  white-space: pre-wrap;
+  max-height: 9rem;
+  overflow: auto;
+}
+
+@media (max-width: 900px) {
+  .studio-split {
+    grid-template-columns: 1fr;
+  }
+
+  .studio-code-rail {
+    max-height: 40vh;
+  }
+}

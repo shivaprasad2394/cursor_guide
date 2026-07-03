@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>Execution Studio · C Interview Prep</title>
+  <link rel="stylesheet" href="css/style.css?v=14">
+</head>
+<body data-page="visualize">
+  <header class="site-header">
+    <div class="brand">
+      <a href="index.html" class="brand-title">← C Interview Prep</a>
+      <span class="brand-sub">Execution Studio · step-through visualizer</span>
+    </div>
+    <nav class="q-nav">
+      <a class="btn nav-btn" id="back-to-question" href="index.html">← Back to question</a>
+    </nav>
+  </header>
+
+  <main class="studio-main">
+    <div class="studio-head">
+      <h1 id="studio-title">Loading…</h1>
+      <div class="studio-tabs" id="studio-tabs" hidden>
+        <button type="button" class="btn studio-tab" id="tab-trace">Code trace</button>
+        <button type="button" class="btn studio-tab" id="tab-pattern">Pattern demo</button>
+      </div>
+    </div>
+
+    <p class="studio-msg" id="studio-msg" hidden></p>
+
+    <div class="studio-controls">
+      <button type="button" class="btn" id="ctl-first" title="First step">⏮</button>
+      <button type="button" class="btn" id="ctl-prev" title="Previous step">◀</button>
+      <button type="button" class="btn btn-primary" id="ctl-play" title="Auto-play">▶ Play</button>
+      <button type="button" class="btn" id="ctl-next" title="Next step">▶</button>
+      <button type="button" class="btn" id="ctl-last" title="Last step">⏭</button>
+      <input type="range" id="ctl-slider" min="0" max="0" value="0" aria-label="Step slider">
+      <span class="studio-step-label" id="ctl-label">0 / 0</span>
+      <select id="ctl-speed" class="studio-speed" aria-label="Playback speed">
+        <option value="1200">Slow</option>
+        <option value="700" selected>Normal</option>
+        <option value="350">Fast</option>
+      </select>
+    </div>
+
+    <div id="studio-stage"></div>
+  </main>
+
+  <script type="module" src="js/visualize-page.js?v=14"></script>
+</body>
+</html>

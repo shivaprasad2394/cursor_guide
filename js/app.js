@@ -353,7 +353,7 @@
   async function runInBrowser(source, stdin, onProgress) {
     if (!runnerModule) {
       if (onProgress) onProgress("Loading in-browser C compiler (first run ~60 MB, cached after)…");
-      runnerModule = await import("./runner.js?v=13");
+      runnerModule = await import("./runner.js?v=14");
     }
     if (onProgress) onProgress("Compiling & running…");
     return runnerModule.compileAndRun(source, stdin || "");
@@ -376,7 +376,7 @@
 
   async function getVisualizer() {
     if (!visualizerModule) {
-      visualizerModule = await import("./visualizer.js?v=13");
+      visualizerModule = await import("./visualizer.js?v=14");
     }
     return visualizerModule;
   }
@@ -580,6 +580,18 @@
       consoleOut.className = `console-out ${kind || ""}`;
       consoleOut.textContent = text;
     };
+
+    const studioBtn = document.getElementById("btn-open-studio");
+    if (studioBtn) {
+      studioBtn.addEventListener("click", () => {
+        try {
+          const code = editor && editor.value.trim() && editor.value !== starterCode ? editor.value : "";
+          if (code) localStorage.setItem(`studio-code:${id}`, code);
+          else localStorage.removeItem(`studio-code:${id}`);
+        } catch (_) { /* storage unavailable */ }
+        window.open(`visualize.html?id=${encodeURIComponent(id)}`, "_blank");
+      });
+    }
 
     if (vizBtn && tapeEl) {
       vizBtn.hidden = !hasViz;
