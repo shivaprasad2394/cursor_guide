@@ -353,7 +353,7 @@
   async function runInBrowser(source, stdin, onProgress) {
     if (!runnerModule) {
       if (onProgress) onProgress("Loading in-browser C compiler (first run ~60 MB, cached after)…");
-      runnerModule = await import("./runner.js?v=10");
+      runnerModule = await import("./runner.js?v=11");
     }
     if (onProgress) onProgress("Compiling & running…");
     return runnerModule.compileAndRun(source, stdin || "");
@@ -372,7 +372,17 @@
     return out.trim();
   }
 
-  function buildTape(container, meta, stepIndex) {
+  let visualizerModule = null;
+
+  async function getVisualizer() {
+    if (!visualizerModule) {
+      visualizerModule = await import("./visualizer.js?v=11");
+    }
+    return visualizerModule;
+  }
+
+  async function buildTape(container, meta, stepIndex, session) {
+    if (!container) return;
     container.innerHTML = "";
     const viz = meta.visualization;
     if (!viz || viz === "none") {
@@ -380,176 +390,10 @@
       return;
     }
     container.hidden = false;
-
-    if (viz === "two-pointer") {
-      renderTwoPointerTape(container, meta, stepIndex);
-    } else if (viz === "binary-search") {
-      renderBinarySearchTape(container, meta, stepIndex);
-    } else if (viz === "tree") {
-      renderTreeTape(container, meta, stepIndex);
-    } else if (viz === "linked-list") {
-      renderLinkedListTape(container, meta, stepIndex);
-    } else if (viz === "array-cells") {
-      renderArrayCellsTape(container, meta, stepIndex);
-    }
-  }
-
-  function renderTwoPointerTape(container, meta, stepIndex) {
-    const tape = String(meta.tape || "");
-    const chars = tape.split("");
-    const trace = meta.trace || [];
-    const step = trace[stepIndex] || trace[trace.length - 1] || { left: 0, right: Math.max(0, chars.length - 1) };
-    const left = step.left ?? 0;
-    const right = step.right ?? chars.length - 1;
-
-    const wrap = document.createElement("div");
-    wrap.className = "memory-tape";
-    wrap.innerHTML = `
-      <div class="tape-label">MEMORY TAPE · two-pointer</div>
-      <div class="tape-row tape-chars">${chars
-        .map((c, i) => `<span class="cell ${i === left ? "ptr-left" : ""} ${i === right ? "ptr-right" : ""}">${escapeHtml(c)}</span>`)
-        .join("")}</div>
-      <div class="tape-row tape-idx">${chars.map((_, i) => `<span class="idx">${i}</span>`).join("")}</div>
-      <div class="tape-pointers">
-        <span class="ptr-tag left">left=${left}</span>
-        <span class="ptr-tag right">right=${right}</span>
-      </div>
-      ${step.note ? `<div class="tape-note">${escapeHtml(step.note)}</div>` : ""}`;
-    container.appendChild(wrap);
-  }
-
-  function renderBinarySearchTape(container, meta, stepIndex) {
-    const values = String(meta.tape || "")
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean);
-    const trace = meta.trace || [];
-    const step = trace[stepIndex] || trace[0] || { low: 0, high: values.length - 1, mid: 0 };
-    const low = step.low ?? 0;
-    const high = step.high ?? values.length - 1;
-    const mid = step.mid ?? Math.floor((low + high) / 2);
-
-    const wrap = document.createElement("div");
-    wrap.className = "memory-tape binary-search-tape";
-    wrap.innerHTML = `
-      <div class="tape-label">INDEX TAPE · binary search · target=${meta.target ?? "?"}</div>
-      <div class="tape-row tape-chars">${values
-        .map(
-          (v, i) =>
-            `<span class="cell ${i === low ? "ptr-low" : ""} ${i === high ? "ptr-high" : ""} ${i === mid ? "ptr-mid" : ""}">${escapeHtml(v)}</span>`
-        )
-        .join("")}</div>
-      <div class="tape-row tape-idx">${values.map((_, i) => `<span class="idx">${i}</span>`).join("")}</div>
-      <div class="tape-pointers">
-        <span class="ptr-tag low">low=${low}</span>
-        <span class="ptr-tag mid">mid=${mid}</span>
-        <span class="ptr-tag high">high=${high}</span>
-      </div>
-      ${step.note ? `<div class="tape-note">${escapeHtml(step.note)}</div>` : ""}`;
-    container.appendChild(wrap);
-  }
-
-  function insertBst(root, val) {
-    if (!root) return { id: val, left: null, right: null };
-    if (val < root.id) root.left = insertBst(root.left, val);
-    else if (val > root.id) root.right = insertBst(root.right, val);
-    return root;
-  }
-
-  function treeToLevels(root) {
-    if (!root) return [];
-    const levels = [];
-    let queue = [root];
-    while (queue.length) {
-      levels.push(queue.map((n) => (n ? n.id : null)));
-      queue = queue.flatMap((n) => (n ? [n.left, n.right] : [null, null]));
-      if (queue.every((n) => n === null)) break;
-    }
-    return levels;
-  }
-
-  function renderTreeTape(container, meta, stepIndex) {
-    const keys = String(meta.treeKeys || "50,30,70,20,40")
-      .split(",")
-      .map((s) => parseInt(s.trim(), 10))
-      .filter((n) => !isNaN(n));
-    const steps = Math.max(1, keys.length);
-    const upto = Math.min(stepIndex + 1, keys.length);
-    let root = null;
-    for (let i = 0; i < upto; i += 1) root = insertBst(root, keys[i]);
-    const levels = treeToLevels(root);
-    const label = meta.treeLabel || "BST / AVL structure (insert order)";
-    const lastKey = keys[upto - 1];
-
-    const rows = levels
-      .map((level) =>
-        `<div class="tree-level">${level
-          .map((v) => {
-            if (v === null) return `<span class="tree-node tree-empty">·</span>`;
-            const cls = v === lastKey ? "tree-new" : "";
-            return `<span class="tree-node ${cls}">${v}</span>`;
-          })
-          .join("")}</div>`
-      )
-      .join("");
-
-    const wrap = document.createElement("div");
-    wrap.className = "memory-tape tree-tape";
-    wrap.innerHTML = `
-      <div class="tape-label">TREE · ${escapeHtml(label)}</div>
-      <div class="tree-wrap">${rows}</div>
-      <div class="tape-pointers">
-        <span class="ptr-tag mid">Inserted: ${keys.slice(0, upto).join(" → ")}</span>
-        <span class="ptr-tag">Step ${Math.min(stepIndex + 1, steps)} / ${steps}</span>
-      </div>`;
-    container.appendChild(wrap);
-  }
-
-  function renderLinkedListTape(container, meta, stepIndex) {
-    const nodes = String(meta.listNodes || "1,2,3,4,5")
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean);
-    const hi = parseInt(meta.listHighlight, 10);
-    const trace = meta.trace || [];
-    const step = trace[stepIndex] || {};
-    const highlight = step.index ?? (isNaN(hi) ? Math.min(stepIndex, nodes.length - 1) : hi);
-
-    const wrap = document.createElement("div");
-    wrap.className = "memory-tape list-tape";
-    wrap.innerHTML = `
-      <div class="tape-label">LINKED LIST · nodes left → right</div>
-      <div class="list-row">${nodes
-        .map(
-          (v, i) =>
-            `<span class="list-node ${i === highlight ? "list-active" : ""}">${escapeHtml(v)}</span>${
-              i < nodes.length - 1 ? `<span class="list-arrow">→</span>` : ""
-            }`
-        )
-        .join("")}<span class="list-null">NULL</span></div>
-      ${step.note ? `<div class="tape-note">${escapeHtml(step.note)}</div>` : ""}`;
-    container.appendChild(wrap);
-  }
-
-  function renderArrayCellsTape(container, meta, stepIndex) {
-    const values = String(meta.tape || "0,1,2,3,4,5,6,7")
-      .split(",")
-      .map((s) => s.trim());
-    const trace = meta.trace || [];
-    const step = trace[stepIndex] || { index: stepIndex % values.length };
-    const idx = step.index ?? 0;
-    const label = meta.arrayLabel || "array / buffer";
-
-    const wrap = document.createElement("div");
-    wrap.className = "memory-tape array-tape";
-    wrap.innerHTML = `
-      <div class="tape-label">ARRAY · ${escapeHtml(label)}</div>
-      <div class="tape-row tape-chars">${values
-        .map((v, i) => `<span class="cell ${i === idx ? "ptr-mid" : ""}">${escapeHtml(v)}</span>`)
-        .join("")}</div>
-      <div class="tape-row tape-idx">${values.map((_, i) => `<span class="idx">${i}</span>`).join("")}</div>
-      ${step.note ? `<div class="tape-note">${escapeHtml(step.note)}</div>` : ""}`;
-    container.appendChild(wrap);
+    const V = await getVisualizer();
+    if (!session) session = V.createSession(meta);
+    V.renderStudio(container, session, stepIndex);
+    return session;
   }
 
   async function initIndexPage() {
@@ -682,6 +526,7 @@
     const checkBtn = document.getElementById("btn-check");
     const copyBtn = document.getElementById("btn-copy");
     const stepBtn = document.getElementById("btn-step");
+    const prevStepBtn = document.getElementById("btn-prev-step");
     const vizBtn = document.getElementById("btn-visualize");
     const resetBtn = document.getElementById("btn-reset");
     const algoPanel = document.getElementById("algorithm-panel");
@@ -700,13 +545,32 @@
     let traceStep = 0;
     let algoVisible = false;
     let vizVisible = false;
+    let vizSession = null;
+    let maxVizSteps = 0;
     const hasViz = meta.visualization && meta.visualization !== "none";
-    const trace = Array.isArray(meta.trace) ? meta.trace : [];
 
     if (tapeEl) tapeEl.hidden = true;
 
+    if (hasViz) {
+      getVisualizer().then((V) => {
+        vizSession = V.createSession(meta);
+        maxVizSteps = V.stepCount(vizSession);
+        if (prevStepBtn) prevStepBtn.hidden = maxVizSteps <= 1;
+      });
+    }
+
+    const showVizStep = async (step) => {
+      traceStep = step;
+      if (tapeEl && vizSession) {
+        const V = await getVisualizer();
+        V.renderStudio(tapeEl, vizSession, traceStep);
+      } else if (tapeEl) {
+        await buildTape(tapeEl, meta, traceStep, vizSession);
+      }
+    };
+
     const setBusy = (busy) => {
-      [runBtn, checkBtn, expectedBtn, revealAlgoBtn, revealSolBtn, copyBtn, stepBtn, vizBtn, resetBtn].forEach((btn) => {
+      [runBtn, checkBtn, expectedBtn, revealAlgoBtn, revealSolBtn, copyBtn, stepBtn, prevStepBtn, vizBtn, resetBtn].forEach((btn) => {
         if (btn) btn.disabled = busy;
       });
     };
@@ -719,31 +583,54 @@
 
     if (vizBtn && tapeEl) {
       vizBtn.hidden = !hasViz;
-      vizBtn.addEventListener("click", () => {
+      vizBtn.addEventListener("click", async () => {
         vizVisible = !vizVisible;
         tapeEl.hidden = !vizVisible;
         vizBtn.textContent = vizVisible ? "Hide visualization" : "Show visualization";
-        if (vizVisible) buildTape(tapeEl, meta, traceStep);
+        if (vizVisible) {
+          if (!vizSession) {
+            const V = await getVisualizer();
+            vizSession = V.createSession(meta);
+            maxVizSteps = V.stepCount(vizSession);
+          }
+          await showVizStep(traceStep);
+        }
       });
     }
 
     if (stepBtn && tapeEl) {
-      const maxSteps =
-        trace.length ||
-        (meta.visualization === "tree" && meta.treeKeys
-          ? String(meta.treeKeys).split(",").length
-          : meta.visualization === "linked-list"
-            ? String(meta.listNodes || "").split(",").filter(Boolean).length
-            : 1);
       stepBtn.hidden = !hasViz;
-      stepBtn.addEventListener("click", () => {
+      stepBtn.addEventListener("click", async () => {
         if (!vizVisible) {
           vizVisible = true;
           tapeEl.hidden = false;
           if (vizBtn) vizBtn.textContent = "Hide visualization";
         }
-        traceStep = (traceStep + 1) % maxSteps;
-        buildTape(tapeEl, meta, traceStep);
+        if (!vizSession) {
+          const V = await getVisualizer();
+          vizSession = V.createSession(meta);
+          maxVizSteps = V.stepCount(vizSession);
+        }
+        const next = maxVizSteps ? (traceStep + 1) % maxVizSteps : 0;
+        await showVizStep(next);
+      });
+    }
+
+    if (prevStepBtn && tapeEl) {
+      prevStepBtn.hidden = !hasViz;
+      prevStepBtn.addEventListener("click", async () => {
+        if (!vizVisible) {
+          vizVisible = true;
+          tapeEl.hidden = false;
+          if (vizBtn) vizBtn.textContent = "Hide visualization";
+        }
+        if (!vizSession) {
+          const V = await getVisualizer();
+          vizSession = V.createSession(meta);
+          maxVizSteps = V.stepCount(vizSession);
+        }
+        const prev = maxVizSteps ? (traceStep - 1 + maxVizSteps) % maxVizSteps : 0;
+        await showVizStep(prev);
       });
     }
 
@@ -794,9 +681,12 @@
         if (diffEl) diffEl.innerHTML = "";
         traceStep = 0;
         vizVisible = false;
-        if (tapeEl) tapeEl.hidden = true;
+        vizSession = null;
+        if (tapeEl) {
+          tapeEl.hidden = true;
+          tapeEl.innerHTML = "";
+        }
         if (vizBtn) vizBtn.textContent = "Show visualization";
-        buildTape(tapeEl, meta, traceStep);
         if (algoPanel) algoPanel.hidden = true;
         if (revealAlgoBtn) revealAlgoBtn.textContent = "Reveal algorithm";
         algoVisible = false;
