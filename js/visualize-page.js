@@ -4,9 +4,9 @@
  * mini interpreter in ctracer.js and replays real execution.
  * Mode 2 "Pattern demo": falls back to the algorithm-pattern simulators.
  */
-import { traceC, CUnsupported } from "./ctracer.js?v=17";
-import { createSession, renderStudio, stepCount } from "./visualizer.js?v=17";
-import { renderTraceStep } from "./tracer-view.js?v=17";
+import { traceC, CUnsupported } from "./ctracer.js?v=18";
+import { createSession, renderStudio, stepCount } from "./visualizer.js?v=18";
+import { renderTraceStep } from "./tracer-view.js?v=18";
 
 function escapeHtml(s) {
   return String(s)

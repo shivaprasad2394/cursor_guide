@@ -953,6 +953,108 @@ a:hover {
 .viz-list-link { color: var(--text-muted); font-size: 0.72rem; }
 .viz-list-null { font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; }
 
+/* ── Linked-list heap nodes ─────────────────────────────── */
+
+.viz-ll-canvas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.35rem;
+  padding: 0.35rem 0;
+}
+
+.viz-ll-row-label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--amber);
+  margin: 0.35rem 0 0.15rem;
+}
+
+.viz-ll-node {
+  position: relative;
+  border: 1px solid rgba(91, 140, 255, 0.35);
+  background: rgba(13, 17, 23, 0.95);
+  border-radius: 4px;
+  min-width: 5.5rem;
+  padding: 0.35rem 0.45rem 0.4rem;
+}
+
+.viz-ll-dummy {
+  border-style: dashed;
+  border-color: rgba(240, 180, 41, 0.45);
+}
+
+.viz-ll-hot {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 2px rgba(240, 180, 41, 0.25);
+}
+
+.viz-ll-removed {
+  opacity: 0.45;
+  border-color: #ff5f56;
+  text-decoration: line-through;
+}
+
+.viz-ll-ptr-slot {
+  min-height: 1.1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem;
+  margin-bottom: 0.15rem;
+}
+
+.viz-ll-ptr-badge {
+  font-size: 0.55rem;
+  padding: 0.05rem 0.3rem;
+  border-radius: 3px;
+  font-weight: 600;
+  text-transform: lowercase;
+}
+
+.viz-ll-node-head {
+  font-size: 0.62rem;
+  color: var(--blue);
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  padding-bottom: 0.2rem;
+  border-bottom: 1px dashed rgba(91, 140, 255, 0.25);
+}
+
+.viz-ll-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.68rem;
+  padding: 0.12rem 0;
+}
+
+.viz-ll-row span:first-child {
+  color: var(--text-muted);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+}
+
+.viz-ll-val {
+  color: var(--green);
+  font-weight: 600;
+  font-family: var(--mono);
+}
+
+.viz-ll-edge {
+  color: var(--text-muted);
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 0 0.1rem;
+}
+
+.viz-ll-merge-out {
+  margin: 0.5rem 0 0;
+  font-size: 0.72rem;
+  color: var(--green);
+  font-family: var(--mono);
+}
+
 #btn-prev-step {
   border-color: rgba(91, 140, 255, 0.35);
   color: var(--blue);

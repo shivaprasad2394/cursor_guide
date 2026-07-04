@@ -1,6 +1,8 @@
 /**
  * Execution Studio — step-through memory visualizer (Python Tutor inspired).
  */
+import { createListSession, renderListStudioRich } from "./list-viz.js?v=18";
+
 export function createSession(meta, opts = {}) {
   const viz = meta.visualization || "none";
   const algorithmText = opts.algorithmText || meta.vizAlgorithm || "";
@@ -29,11 +31,7 @@ export function createSession(meta, opts = {}) {
     return { kind: "tree", steps: simulateTreeInsert(keys) };
   }
   if (viz === "linked-list") {
-    const nodes = String(meta.listNodes || "1,2,3,4,5")
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean);
-    return { kind: "linked-list", steps: simulateListWalk(nodes) };
+    return createListSession(meta);
   }
   if (viz === "array-cells") {
     const cells = String(meta.tape || "0,1,2,3,4,5,6,7").split(",").map((s) => s.trim());
@@ -76,7 +74,7 @@ export function renderStudio(container, session, stepIndex) {
   } else if (session.kind === "tree") {
     renderTreeStudio(body, step, session);
   } else if (session.kind === "linked-list") {
-    renderListStudio(body, step, session);
+    renderListStudioRich(body, step, session);
   } else if (session.kind === "array-cells") {
     renderArrayStudio(body, step, session);
   } else if (session.kind === "generic") {
@@ -381,19 +379,6 @@ function simulateTreeInsert(keys) {
   return steps;
 }
 
-function simulateListWalk(nodes) {
-  return nodes.map((val, i) => ({
-    phase: "walk",
-    phaseLabel: `Node ${i}`,
-    nodes: [...nodes],
-    head: 0,
-    curr: i,
-    note: i === 0 ? "head points to first node" : `Advance to node ${i} (value ${val})`,
-    func: "traverse",
-    currLine: 2,
-  }));
-}
-
 function simulateRingBuffer(cells) {
   return cells.map((_, i) => ({
     phase: "slot",
@@ -565,26 +550,6 @@ function renderTreeStudio(body, step) {
           <div class="viz-frame-head">${escapeHtml(step.func || "bstInsert")}(${step.key ?? "?"})</div>
           <div class="viz-tree-canvas">${rows}</div>
         </div>
-      </div>
-    </div>`;
-}
-
-function renderListStudio(body, step) {
-  const nodes = step.nodes || [];
-  const curr = step.curr ?? 0;
-  body.innerHTML = `
-    <div class="viz-split viz-split-single">
-      <div class="viz-memory">
-        <div class="viz-stack-label">HEAP · linked nodes</div>
-        <div class="viz-list-canvas">${nodes
-          .map(
-            (v, i) =>
-              `<span class="viz-list-box ${i === curr ? "viz-list-curr" : ""}">${escapeHtml(v)}</span>${
-                i < nodes.length - 1 ? `<span class="viz-list-link">next →</span>` : `<span class="viz-list-null">NULL</span>`
-              }`
-          )
-          .join("")}</div>
-        <div class="viz-var-row"><span class="viz-var-name">curr</span><span class="viz-var-type">Node*</span><span class="viz-var-val">node ${curr}</span></div>
       </div>
     </div>`;
 }
