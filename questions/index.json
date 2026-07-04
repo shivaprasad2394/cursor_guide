@@ -499,7 +499,7 @@
     {
       "id": "q90-avl-height-and-balance-factor",
       "file": "q90-avl-height-and-balance-factor.md",
-      "title": "AVL — node height and balance factor",
+      "title": "AVL \u2014 node height and balance factor",
       "pattern": "avl tree",
       "difficulty": "hard",
       "section": "avl tree"
@@ -507,7 +507,7 @@
     {
       "id": "q91-avl-rotate-left-and-right",
       "file": "q91-avl-rotate-left-and-right.md",
-      "title": "AVL — single rotations (left and right)",
+      "title": "AVL \u2014 single rotations (left and right)",
       "pattern": "avl tree",
       "difficulty": "hard",
       "section": "avl tree"
@@ -727,6 +727,78 @@
       "pattern": "memory, dma, mmap",
       "difficulty": "hard",
       "section": "memory, dma, mmap & reimplementing libc"
+    },
+    {
+      "id": "q94-two-sum-sorted-array",
+      "file": "q94-two-sum-sorted-array.md",
+      "title": "Two Sum (sorted array, two-pointer)",
+      "pattern": "two-pointer (opposite ends)",
+      "difficulty": "medium",
+      "section": "arrays"
+    },
+    {
+      "id": "q95-contains-duplicate",
+      "file": "q95-contains-duplicate.md",
+      "title": "Contains Duplicate",
+      "pattern": "frequency table (boolean variant)",
+      "difficulty": "easy",
+      "section": "arrays"
+    },
+    {
+      "id": "q96-best-time-to-buy-and-sell-stock",
+      "file": "q96-best-time-to-buy-and-sell-stock.md",
+      "title": "Best Time to Buy and Sell Stock",
+      "pattern": "single pass (track min, max profit)",
+      "difficulty": "easy",
+      "section": "arrays"
+    },
+    {
+      "id": "q97-implement-atoi-string-to-integer",
+      "file": "q97-implement-atoi-string-to-integer.md",
+      "title": "Implement atoi (String to Integer)",
+      "pattern": "state machine (single pass)",
+      "difficulty": "medium",
+      "section": "strings"
+    },
+    {
+      "id": "q98-longest-substring-without-repeating-characters",
+      "file": "q98-longest-substring-without-repeating-characters.md",
+      "title": "Longest Substring Without Repeating Characters",
+      "pattern": "sliding window + frequency table",
+      "difficulty": "medium",
+      "section": "strings"
+    },
+    {
+      "id": "q99-merge-two-sorted-linked-lists",
+      "file": "q99-merge-two-sorted-linked-lists.md",
+      "title": "Merge Two Sorted Linked Lists",
+      "pattern": "linked list",
+      "difficulty": "medium",
+      "section": "linked list"
+    },
+    {
+      "id": "q100-remove-nth-node-from-end",
+      "file": "q100-remove-nth-node-from-end.md",
+      "title": "Remove Nth Node From End of List",
+      "pattern": "linked list (two-pointer / dummy head)",
+      "difficulty": "medium",
+      "section": "linked list"
+    },
+    {
+      "id": "q101-valid-parentheses",
+      "file": "q101-valid-parentheses.md",
+      "title": "Valid Parentheses",
+      "pattern": "stack (array-backed)",
+      "difficulty": "easy",
+      "section": "queues & stacks"
+    },
+    {
+      "id": "q102-fibonacci-number-iterative",
+      "file": "q102-fibonacci-number-iterative.md",
+      "title": "Fibonacci Number (iterative)",
+      "pattern": "math / number",
+      "difficulty": "easy",
+      "section": "math / number"
     }
   ]
 }

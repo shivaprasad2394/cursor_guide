@@ -157,6 +157,73 @@ a:hover {
   letter-spacing: 0.08em;
 }
 
+.category-nav {
+  margin-bottom: 1rem;
+}
+
+.category-back {
+  font-size: 0.78rem;
+  padding: 0.35rem 0.75rem;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.category-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1.25rem 1.1rem;
+  border: 1px solid var(--border);
+  background: var(--bg-panel);
+  color: inherit;
+  text-decoration: none;
+  min-height: 8.5rem;
+  transition: border-color 0.15s, background 0.15s, transform 0.12s;
+}
+
+.category-card:hover {
+  border-color: var(--blue);
+  background: var(--bg-elevated);
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+.category-icon {
+  font-family: var(--mono);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--blue);
+  letter-spacing: 0.05em;
+}
+
+.category-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.category-count {
+  font-size: 0.72rem;
+  color: var(--amber);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.category-blurb {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-top: auto;
+}
+
+.section-group-single {
+  margin-top: 0.25rem;
+}
+
 #question-list {
   display: flex;
   flex-direction: column;

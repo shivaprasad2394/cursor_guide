@@ -353,7 +353,7 @@
   async function runInBrowser(source, stdin, onProgress) {
     if (!runnerModule) {
       if (onProgress) onProgress("Loading in-browser C compiler (first run ~60 MB, cached after)…");
-      runnerModule = await import("./runner.js?v=15");
+      runnerModule = await import("./runner.js?v=16");
     }
     if (onProgress) onProgress("Compiling & running…");
     return runnerModule.compileAndRun(source, stdin || "");
@@ -376,7 +376,7 @@
 
   async function getVisualizer() {
     if (!visualizerModule) {
-      visualizerModule = await import("./visualizer.js?v=15");
+      visualizerModule = await import("./visualizer.js?v=16");
     }
     return visualizerModule;
   }
@@ -396,18 +396,76 @@
     return session;
   }
 
+  const SECTION_ORDER = [
+    "strings",
+    "arrays",
+    "bit manipulation",
+    "math / number",
+    "linked list",
+    "binary search tree",
+    "avl tree",
+    "queues & stacks",
+    "parsing & formatting",
+    "buffers & driver patterns",
+    "memory, dma, mmap & reimplementing libc",
+  ];
+
+  const SECTION_META = {
+    strings: { label: "Strings", icon: "Aa", blurb: "Two-pointer, frequency, sliding window" },
+    arrays: { label: "Arrays", icon: "[]", blurb: "Search, sort, Kadane, two-sum" },
+    "bit manipulation": { label: "Bit Manipulation", icon: "01", blurb: "XOR tricks, masks, shifts" },
+    "math / number": { label: "Math & Numbers", icon: "π", blurb: "Primes, GCD, Fibonacci, digits" },
+    "linked list": { label: "Linked Lists", icon: "→", blurb: "Reverse, merge, cycle detection" },
+    "binary search tree": { label: "Binary Search Tree", icon: "BST", blurb: "Insert, search, delete, traverse" },
+    "avl tree": { label: "AVL Tree", icon: "AVL", blurb: "Rotations and rebalancing" },
+    "queues & stacks": { label: "Queues & Stacks", icon: "⊟", blurb: "Ring buffer, valid parentheses" },
+    "parsing & formatting": { label: "Parsing & Formatting", icon: "%s", blurb: "sscanf, snprintf, CSV" },
+    "buffers & driver patterns": { label: "Buffers & Drivers", icon: "DMA", blurb: "Ring buffers, descriptors" },
+    "memory, dma, mmap & reimplementing libc": {
+      label: "Memory & libc",
+      icon: "mem",
+      blurb: "memcpy, memset, mmap, snprintf",
+    },
+  };
+
+  function sectionLabel(key) {
+    return SECTION_META[key]?.label || key;
+  }
+
+  function sortSections(keys) {
+    return [...keys].sort((a, b) => {
+      const ia = SECTION_ORDER.indexOf(a);
+      const ib = SECTION_ORDER.indexOf(b);
+      return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+    });
+  }
+
+  function renderQuestionCards(items) {
+    return items
+      .map(
+        (q) => `
+        <a class="question-card" href="question.html?id=${encodeURIComponent(q.id)}">
+          <span class="card-pattern">${escapeHtml(q.pattern)}</span>
+          <span class="card-title">${escapeHtml(q.title)}</span>
+          <span class="card-difficulty diff-${escapeHtml(q.difficulty)}">${escapeHtml(q.difficulty)}</span>
+        </a>`
+      )
+      .join("");
+  }
+
   async function initIndexPage() {
+    const gridEl = document.getElementById("category-grid");
     const listEl = document.getElementById("question-list");
+    const navEl = document.getElementById("category-nav");
     const statsEl = document.getElementById("stats");
-    if (!listEl) return;
+    if (!gridEl && !listEl) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const activeSection = params.get("section");
 
     const res = await fetch("questions/index.json");
     const data = await res.json();
     const questions = data.questions || [];
-
-    if (statsEl) {
-      statsEl.textContent = `${questions.length} programs · live C in browser · no API key`;
-    }
 
     const bySection = new Map();
     for (const q of questions) {
@@ -416,42 +474,47 @@
       bySection.get(sec).push(q);
     }
 
-    const sectionOrder = [
-      "strings",
-      "arrays",
-      "bit manipulation",
-      "math / number",
-      "linked list",
-      "binary search tree",
-      "avl tree",
-      "queues & stacks",
-      "parsing & formatting",
-      "buffers & driver patterns",
-      "memory, dma, mmap & reimplementing libc",
-    ];
+    if (statsEl) {
+      statsEl.textContent = activeSection
+        ? `${bySection.get(activeSection)?.length || 0} in ${sectionLabel(activeSection)} · ${questions.length} total`
+        : `${questions.length} programs · ${bySection.size} categories · live C in browser`;
+    }
 
-    const sections = [...bySection.keys()].sort((a, b) => {
-      const ia = sectionOrder.indexOf(a);
-      const ib = sectionOrder.indexOf(b);
-      return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
-    });
-
-    listEl.innerHTML = sections
-      .map((sec) => {
-        const items = bySection.get(sec);
-        const cards = items
-          .map(
-            (q) => `
-        <a class="question-card" href="question.html?id=${encodeURIComponent(q.id)}">
-          <span class="card-pattern">${escapeHtml(q.pattern)}</span>
-          <span class="card-title">${escapeHtml(q.title)}</span>
-          <span class="card-difficulty diff-${escapeHtml(q.difficulty)}">${escapeHtml(q.difficulty)}</span>
-        </a>`
-          )
+    if (activeSection && bySection.has(activeSection)) {
+      if (gridEl) gridEl.hidden = true;
+      if (navEl) navEl.hidden = false;
+      if (listEl) {
+        listEl.hidden = false;
+        const items = bySection.get(activeSection);
+        listEl.innerHTML = `
+          <section class="section-group section-group-single">
+            <h2 class="section-heading">${escapeHtml(sectionLabel(activeSection))}</h2>
+            <div class="section-cards">${renderQuestionCards(items)}</div>
+          </section>`;
+      }
+      document.title = `${sectionLabel(activeSection)} · C Interview Prep`;
+    } else {
+      if (navEl) navEl.hidden = true;
+      if (listEl) listEl.hidden = true;
+      if (gridEl) {
+        gridEl.hidden = false;
+        const cards = sortSections([...bySection.keys()])
+          .map((sec) => {
+            const meta = SECTION_META[sec] || { label: sec, icon: "•", blurb: "" };
+            const count = bySection.get(sec).length;
+            return `
+            <a class="category-card" href="index.html?section=${encodeURIComponent(sec)}">
+              <span class="category-icon">${escapeHtml(meta.icon)}</span>
+              <span class="category-title">${escapeHtml(meta.label)}</span>
+              <span class="category-count">${count} question${count === 1 ? "" : "s"}</span>
+              <span class="category-blurb">${escapeHtml(meta.blurb)}</span>
+            </a>`;
+          })
           .join("");
-        return `<section class="section-group"><h2 class="section-heading">${escapeHtml(sec)}</h2><div class="section-cards">${cards}</div></section>`;
-      })
-      .join("");
+        gridEl.innerHTML = `<div class="category-grid">${cards}</div>`;
+      }
+      document.title = "C Interview Prep";
+    }
   }
 
   function setupQuestionNav(questions, currentId) {
@@ -560,8 +623,8 @@
       let mods;
       try {
         mods = await Promise.all([
-          import("./ctracer.js?v=15"),
-          import("./tracer-view.js?v=15"),
+          import("./ctracer.js?v=16"),
+          import("./tracer-view.js?v=16"),
         ]);
       } catch (_) {
         return false;
