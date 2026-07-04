@@ -108,9 +108,10 @@ function tokenize(src) {
 /* ── Parser ───────────────────────────────────────────────── */
 
 class Parser {
-  constructor(toks) {
+  constructor(toks, structNames = null) {
     this.toks = toks;
     this.p = 0;
+    this.structNames = structNames;
   }
 
   peek(k = 0) { return this.toks[this.p + k]; }
@@ -121,7 +122,7 @@ class Parser {
 
   isTypeStart() {
     const t = this.peek();
-    return t.t === "id" && TYPES.has(t.v);
+    return t.t === "id" && (TYPES.has(t.v) || (this.structNames && this.structNames.has(t.v)));
   }
 
   parseProgram() {
@@ -153,9 +154,13 @@ class Parser {
   parseType() {
     const words = [];
     while (this.isTypeStart()) words.push(this.next().v);
+    let structName = null;
+    if (words.length === 1 && this.structNames && this.structNames.has(words[0])) {
+      structName = words[0];
+    }
     let stars = 0;
     while (this.at("*")) { this.next(); stars += 1; }
-    return { words, stars, isChar: words.includes("char") };
+    return { words, stars, isChar: words.includes("char"), structName };
   }
 
   parseName() {
@@ -174,7 +179,13 @@ class Parser {
         const pname = this.parseName();
         let isArr = false;
         if (this.at("[")) { this.next(); if (!this.at("]")) this.next(); this.eat("]"); isArr = true; }
-        params.push({ name: pname, isChar: ptype.isChar, isPtr: ptype.stars > 0 || isArr });
+        params.push({
+          name: pname,
+          isChar: ptype.isChar,
+          isPtr: ptype.stars > 0 || isArr,
+          ptrStars: ptype.stars,
+          structName: ptype.structName,
+        });
         if (this.at(",")) { this.next(); continue; }
         break;
       }
@@ -301,7 +312,16 @@ class Parser {
           init = this.parseAssign();
         }
       }
-      decls.push({ name, isArray, size, init, isChar: base.isChar, isPtr: stars > 0 });
+      decls.push({
+        name,
+        isArray,
+        size,
+        init,
+        isChar: base.isChar,
+        isPtr: stars > 0,
+        ptrStars: stars,
+        structName: base.structName,
+      });
       if (this.at(",")) { this.next(); continue; }
       break;
     }
@@ -370,7 +390,11 @@ class Parser {
     let sawType = false;
     while (true) {
       const t = this.peek(k);
-      if (t.t === "id" && TYPES.has(t.v)) { sawType = true; k += 1; continue; }
+      if (t.t === "id" && (TYPES.has(t.v) || (this.structNames && this.structNames.has(t.v)))) {
+        sawType = true;
+        k += 1;
+        continue;
+      }
       if (t.t === "op" && t.v === "*") { k += 1; continue; }
       return sawType && t.t === "op" && t.v === ")";
     }
@@ -440,7 +464,13 @@ class Parser {
         e = { k: "un", op, e, post: true };
         continue;
       }
-      if (this.at("->") || this.at(".")) throw new CUnsupported("struct member access");
+      if (this.at("->")) {
+        this.next();
+        const field = this.parseName();
+        e = { k: "member", op: "->", base: e, field };
+        continue;
+      }
+      if (this.at(".")) throw new CUnsupported("struct dot access");
       break;
     }
     return e;
@@ -465,22 +495,32 @@ class Parser {
 /* ── Interpreter ──────────────────────────────────────────── */
 
 const isPtr = (v) => v !== null && typeof v === "object";
+const isStructPtr = (v) => isPtr(v) && v.stIdx !== undefined;
+
+function structPtrEq(a, b) {
+  const na = a === 0 || a === null || a === undefined ? -1 : a.stIdx;
+  const nb = b === 0 || b === null || b === undefined ? -1 : b.stIdx;
+  return na === nb;
+}
 
 function toNum(v) {
   if (v === null || v === undefined) return 0;
   if (typeof v === "number") return v;
+  if (isStructPtr(v)) return 1;
   if (isPtr(v)) return 1; // non-null pointer is truthy
   return 0;
 }
 
 class Interp {
-  constructor(prog, source, maxSteps) {
+  constructor(prog, source, maxSteps, structDefs = null) {
     this.fns = new Map(prog.fns.map((f) => [f.name, f]));
     this.globals = new Map();
     this.frames = [];
     this.steps = [];
     this.output = "";
     this.arrays = [];
+    this.structDefs = structDefs;
+    this.structHeap = [];
     this.maxSteps = maxSteps;
     this.truncated = false;
     this.stopNote = "";
@@ -506,6 +546,27 @@ class Interp {
     for (const ch of s) data.push(ch.charCodeAt(0));
     data.push(0);
     return this.makeArray(data, true, label);
+  }
+
+  allocStruct(name) {
+    const def = this.structDefs?.get(name);
+    if (!def) throw new CUnsupported(`unknown struct '${name}'`);
+    const idx = this.structHeap.length;
+    const fields = {};
+    for (const f of def.fields) fields[f.name] = 0;
+    this.structHeap.push({ name, idx, fields });
+    return { stIdx: idx, structName: name };
+  }
+
+  structFieldText(stIdx) {
+    const node = this.structHeap[stIdx];
+    if (!node) return `Node@${stIdx}`;
+    const parts = Object.entries(node.fields).map(([k, v]) => {
+      if (isStructPtr(v)) return `${k}:→@${v.stIdx}`;
+      if (v === 0) return `${k}:NULL`;
+      return `${k}:${v}`;
+    });
+    return `${node.name}@${stIdx}{${parts.join(", ")}}`;
   }
 
   readCStr(v) {
@@ -544,6 +605,9 @@ class Interp {
           const ai = this.arrays.indexOf(v.arr);
           text = `→ ${v.arr.label}[${v.off}]`;
           ptr = { arrIdx: ai, off: v.off, name };
+        } else if (isStructPtr(v)) {
+          text = this.structFieldText(v.stIdx);
+          ptr = { structIdx: v.stIdx, name };
         } else if (isPtr(v) && v.box) {
           text = "→ (ref)";
         } else if (box.isChar && typeof v === "number" && v > 0) {
@@ -664,6 +728,7 @@ class Interp {
       }
       case "decl": {
         if (!quiet) this.snap(stmt.line, "declare");
+        const target = this.frames.length ? this.frame().vars : this.globals;
         for (const d of stmt.decls) {
           let box;
           if (d.isArray) {
@@ -681,17 +746,22 @@ class Interp {
             }
             box = { v: { arr, off: 0 }, isChar: false };
           } else if (d.isPtr) {
-            let v = 0;
+            box = { v: 0, isChar: false };
+            target.set(d.name, box);
             if (d.init) {
-              if (d.init.k === "str") v = { arr: this.strToArray(d.init.v, d.name), off: 0 };
-              else v = this.evalExpr(d.init);
+              if (d.init.k === "str") box.v = { arr: this.strToArray(d.init.v, d.name), off: 0 };
+              else box.v = this.evalExpr(d.init);
             }
-            box = { v, isChar: false };
+            continue;
           } else {
-            const v = d.init ? this.evalExpr(d.init) : 0;
-            box = { v: typeof v === "number" ? v : v, isChar: d.isChar };
+            box = { v: 0, isChar: d.isChar };
+            target.set(d.name, box);
+            if (d.init) {
+              const v = this.evalExpr(d.init);
+              box.v = typeof v === "number" ? v : v;
+            }
+            continue;
           }
-          const target = this.frames.length ? this.frame().vars : this.globals;
           target.set(d.name, box);
         }
         return null;
@@ -761,6 +831,16 @@ class Interp {
 
   readLvalue(e) {
     if (e.k === "id") return { box: this.lookup(e.name) };
+    if (e.k === "member" && e.op === "->") {
+      const base = this.evalExpr(e.base);
+      if (base === 0) {
+        this.stopNote = "null pointer dereference — trace stopped";
+        this.truncated = true;
+        throw new StopTrace();
+      }
+      if (!isStructPtr(base)) throw new CUnsupported("member access on non-struct pointer");
+      return { stField: { stIdx: base.stIdx, field: e.field } };
+    }
     if (e.k === "idx") {
       const base = this.evalExpr(e.base);
       const i = toNum(this.evalExpr(e.i));
@@ -768,7 +848,10 @@ class Interp {
       return { arr: base.arr, at: base.off + i };
     }
     if (e.k === "un" && e.op === "*") {
-      const p = this.evalExpr(e.e);
+      const inner = this.readLvalue(e.e);
+      const val = this.readLoc(inner);
+      if (isPtr(val) && val.box && !val.arr) return { box: val.box };
+      const p = val;
       if (isPtr(p) && p.arr) return { arr: p.arr, at: p.off };
       if (isPtr(p) && p.box) return { box: p.box };
       this.stopNote = "null pointer dereference — trace stopped";
@@ -779,11 +862,20 @@ class Interp {
   }
 
   readLoc(loc) {
+    if (loc.stField) {
+      const node = this.structHeap[loc.stField.stIdx];
+      return node ? node.fields[loc.stField.field] : 0;
+    }
     if (loc.box) return loc.box.v;
     return loc.arr.data[loc.at] !== undefined ? loc.arr.data[loc.at] : 0;
   }
 
   writeLoc(loc, v) {
+    if (loc.stField) {
+      const node = this.structHeap[loc.stField.stIdx];
+      if (node) node.fields[loc.stField.field] = v;
+      return;
+    }
     if (loc.box) { loc.box.v = v; return; }
     loc.arr.data[loc.at] = v;
   }
@@ -796,6 +888,18 @@ class Interp {
         return { arr: e._arr, off: 0 };
       }
       case "id": return this.lookup(e.name).v;
+      case "member": {
+        const base = this.evalExpr(e.base);
+        if (base === 0) {
+          this.stopNote = "null pointer dereference — trace stopped";
+          this.truncated = true;
+          throw new StopTrace();
+        }
+        if (!isStructPtr(base)) throw new CUnsupported("member access on non-struct pointer");
+        const node = this.structHeap[base.stIdx];
+        const val = node ? node.fields[e.field] : 0;
+        return val !== undefined ? val : 0;
+      }
       case "seq": { this.evalExpr(e.l); return this.evalExpr(e.r); }
       case "idx": {
         const base = this.evalExpr(e.base);
@@ -843,8 +947,10 @@ class Interp {
       throw new CUnsupported("address-of expression");
     }
     if (op === "*") {
-      const loc = this.readLvalue(e);
-      return this.readLoc(loc);
+      const loc = this.readLvalue(e.e);
+      let val = this.readLoc(loc);
+      if (isPtr(val) && val.box && !val.arr && !isStructPtr(val)) return val.box.v;
+      return val;
     }
     if (op === "++" || op === "--") {
       const loc = this.readLvalue(e.e);
@@ -885,6 +991,10 @@ class Interp {
       if (e.op === ">") return l.off > r.off ? 1 : 0;
       if (e.op === "<=") return l.off <= r.off ? 1 : 0;
       if (e.op === ">=") return l.off >= r.off ? 1 : 0;
+    }
+    if ((e.op === "==" || e.op === "!=") && (isStructPtr(l) || isStructPtr(r))) {
+      const eq = structPtrEq(l, r);
+      return e.op === "==" ? (eq ? 1 : 0) : (eq ? 0 : 1);
     }
 
     const a = toNum(l);
@@ -1157,6 +1267,10 @@ class Interp {
       }
       case "malloc": case "calloc": {
         const bytes = name === "calloc" ? toNum(args[0]) * toNum(args[1]) : toNum(args[0]);
+        if (this.structDefs && this.structDefs.size > 0) {
+          const structName = this.structDefs.keys().next().value;
+          return this.allocStruct(structName);
+        }
         const arr = this.makeArray(new Array(Math.max(1, Math.min(Math.trunc(bytes / 4) || bytes, 64))).fill(0), false, "heap");
         return { arr, off: 0 };
       }
@@ -1200,8 +1314,11 @@ class Interp {
 }
 
 export function traceC(source, opts = {}) {
-  const toks = tokenize(source);
-  const prog = new Parser(toks).parseProgram();
-  const interp = new Interp(prog, source, opts.maxSteps || 1500);
+  const src = opts.preprocessedSource || source;
+  const structDefs = opts.structDefs || null;
+  const toks = tokenize(src);
+  const structNames = structDefs ? new Set(structDefs.keys()) : null;
+  const prog = new Parser(toks, structNames).parseProgram();
+  const interp = new Interp(prog, src, opts.maxSteps || 1500, structDefs);
   return interp.run();
 }

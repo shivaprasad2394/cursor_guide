@@ -45,6 +45,8 @@ function inferOp(meta) {
   if (/insertatend|insert.*tail|insert.*end/i.test(t)) return "insert-tail";
   if (/delete|deletenode/i.test(t)) return "delete";
   if (/createnode|create.*node/i.test(t)) return "create";
+  if (/freelist/i.test(t)) return "free";
+  if (/printlist/i.test(t)) return "print";
   return "traverse";
 }
 
@@ -117,6 +119,52 @@ const SNIPPETS = {
     { id: 3, text: "        printf(\"%d -> \", cur->id);" },
     { id: 4, text: "    printf(\"NULL\\n\");" },
     { id: 5, text: "}" },
+  ],
+  delete: [
+    { id: 1, text: "void deleteNode(Node **head, int key) {" },
+    { id: 2, text: "    if (*head == NULL) return;" },
+    { id: 3, text: "    if ((*head)->id == key) {" },
+    { id: 4, text: "        Node *dead = *head;" },
+    { id: 5, text: "        *head = (*head)->next;" },
+    { id: 6, text: "        free(dead); return;" },
+    { id: 7, text: "    }" },
+    { id: 8, text: "    Node *prev = *head, *cur = (*head)->next;" },
+    { id: 9, text: "    while (cur && cur->id != key) { prev = cur; cur = cur->next; }" },
+    { id: 10, text: "    if (cur == NULL) return;" },
+    { id: 11, text: "    prev->next = cur->next; free(cur);" },
+    { id: 12, text: "}" },
+  ],
+  create: [
+    { id: 1, text: "Node *createNode(int id) {" },
+    { id: 2, text: "    Node *n = (Node *)malloc(sizeof(*n));" },
+    { id: 3, text: "    if (n == NULL) return NULL;" },
+    { id: 4, text: "    n->id = id; n->next = NULL;" },
+    { id: 5, text: "    return n;" },
+    { id: 6, text: "}" },
+  ],
+  "insert-tail": [
+    { id: 1, text: "int insertAtEnd(Node **head, int id) {" },
+    { id: 2, text: "    Node *n = createNode(id);" },
+    { id: 3, text: "    if (*head == NULL) { *head = n; return 0; }" },
+    { id: 4, text: "    Node *cur = *head;" },
+    { id: 5, text: "    while (cur->next) cur = cur->next;" },
+    { id: 6, text: "    cur->next = n; return 0;" },
+    { id: 7, text: "}" },
+  ],
+  print: [
+    { id: 1, text: "void printList(const Node *head) {" },
+    { id: 2, text: "    for (const Node *cur = head; cur; cur = cur->next)" },
+    { id: 3, text: "        printf(\"%d -> \", cur->id);" },
+    { id: 4, text: "    printf(\"NULL\\n\");" },
+    { id: 5, text: "}" },
+  ],
+  free: [
+    { id: 1, text: "void freeList(Node *head) {" },
+    { id: 2, text: "    while (head) {" },
+    { id: 3, text: "        Node *t = head->next;" },
+    { id: 4, text: "        free(head); head = t;" },
+    { id: 5, text: "    }" },
+    { id: 6, text: "}" },
   ],
 };
 
@@ -472,6 +520,336 @@ function simulateRemoveNth(values, n) {
   return steps;
 }
 
+function simulateDelete(values, key) {
+  const heap = buildLinear(values);
+  const snippet = SNIPPETS.delete;
+  const steps = [];
+  let head = 0;
+  let prev = null;
+  let cur = head;
+  let removed = null;
+
+  const push = (patch) =>
+    steps.push(
+      snap({
+        func: "deleteNode",
+        snippet,
+        heap: cloneHeap(heap),
+        vars: {
+          head,
+          key,
+          prev: patch.prev !== undefined ? patch.prev : prev,
+          cur: patch.cur !== undefined ? patch.cur : cur,
+          dead: patch.dead !== undefined ? patch.dead : null,
+        },
+        hot: patch.hot || [],
+        prevLine: patch.prevLine,
+        currLine: patch.currLine,
+        note: patch.note,
+        phaseLabel: patch.phaseLabel,
+        removed: patch.removed !== undefined ? patch.removed : removed,
+      })
+    );
+
+  push({
+    prevLine: 1,
+    currLine: 2,
+    note: `List ${values.join(" → ")} → NULL — delete key ${key}`,
+    phaseLabel: "Enter",
+    hot: [head],
+  });
+
+  if (heap[head]?.val === String(key)) {
+    removed = head;
+    const next = heap[head].next;
+    push({
+      prevLine: 2,
+      currLine: 3,
+      note: `Head node id=${key} matches — remove from front`,
+      phaseLabel: "Head match",
+      hot: [head],
+    });
+    head = next;
+    push({
+      prevLine: 4,
+      currLine: 5,
+      note: "*head = head->next — advance head past deleted node",
+      phaseLabel: "Advance head",
+      cur: head,
+      hot: [head].filter((x) => x !== null),
+      removed,
+    });
+    return steps;
+  }
+
+  prev = head;
+  cur = heap[head].next;
+  push({
+    prevLine: 7,
+    currLine: 8,
+    note: "Head does not match — walk with prev and cur",
+    phaseLabel: "Scan",
+    prev,
+    cur,
+    hot: [prev, cur].filter((x) => x !== null),
+  });
+
+  while (cur !== null && heap[cur].val !== String(key)) {
+    prev = cur;
+    cur = heap[cur].next;
+    push({
+      prevLine: 8,
+      currLine: 9,
+      note: `cur->id=${heap[prev]?.val} ≠ ${key} — advance`,
+      phaseLabel: "Advance",
+      prev,
+      cur,
+      hot: [prev, cur].filter((x) => x !== null),
+    });
+  }
+
+  if (cur === null) {
+    push({
+      prevLine: 9,
+      currLine: 10,
+      note: `Key ${key} not found`,
+      phaseLabel: "Not found",
+      prev,
+      cur: null,
+      hot: [prev],
+    });
+    return steps;
+  }
+
+  removed = cur;
+  const after = heap[cur].next;
+  heap[prev].next = after;
+  push({
+    prevLine: 10,
+    currLine: 11,
+    note: `Unlink node@${cur} (id=${key}): prev->next = cur->next`,
+    phaseLabel: "Unlink",
+    prev,
+    cur,
+    hot: [prev, cur, after].filter((x) => x !== null),
+    removed,
+  });
+  push({
+    prevLine: 11,
+    currLine: 12,
+    note: "free(cur) — node removed from heap",
+    phaseLabel: "Done",
+    prev,
+    cur: null,
+    hot: [prev, head],
+    removed,
+  });
+  return steps;
+}
+
+function simulateCreate(id) {
+  const heap = [];
+  const snippet = SNIPPETS.create;
+  const steps = [];
+  const nodeId = 0;
+
+  steps.push(
+    snap({
+      func: "createNode",
+      snippet,
+      heap: [{ id: nodeId, val: String(id), next: null }],
+      vars: { id, n: nodeId },
+      hot: [nodeId],
+      prevLine: 1,
+      currLine: 2,
+      note: "malloc(sizeof(Node)) — allocate on heap",
+      phaseLabel: "Allocate",
+    })
+  );
+  steps.push(
+    snap({
+      func: "createNode",
+      snippet,
+      heap: [{ id: nodeId, val: String(id), next: null }],
+      vars: { id, n: nodeId },
+      hot: [nodeId],
+      prevLine: 3,
+      currLine: 4,
+      note: `n->id = ${id}; n->next = NULL`,
+      phaseLabel: "Init fields",
+    })
+  );
+  steps.push(
+    snap({
+      func: "createNode",
+      snippet,
+      heap: [{ id: nodeId, val: String(id), next: null }],
+      vars: { id, n: nodeId },
+      hot: [nodeId],
+      prevLine: 4,
+      currLine: 5,
+      note: "Return pointer to new node",
+      phaseLabel: "Return",
+    })
+  );
+  return steps;
+}
+
+function simulateInsertTail(values, newVal) {
+  const heap = buildLinear(values);
+  const snippet = SNIPPETS["insert-tail"];
+  const steps = [];
+  let head = 0;
+  const newId = heap.length;
+
+  const push = (patch) =>
+    steps.push(
+      snap({
+        func: "insertAtEnd",
+        snippet,
+        heap: cloneHeap(heap),
+        vars: { head, cur: patch.cur ?? null, n: newId },
+        hot: patch.hot || [],
+        prevLine: patch.prevLine,
+        currLine: patch.currLine,
+        note: patch.note,
+        phaseLabel: patch.phaseLabel,
+      })
+    );
+
+  push({ prevLine: 1, currLine: 2, note: `Create node(${newVal}) with createNode`, phaseLabel: "New node", hot: [] });
+  heap.push({ id: newId, val: String(newVal), next: null });
+
+  let cur = head;
+  push({ prevLine: 3, currLine: 4, note: "Start at head", phaseLabel: "Find tail", cur, hot: [cur] });
+
+  while (heap[cur].next !== null) {
+    cur = heap[cur].next;
+    push({
+      prevLine: 4,
+      currLine: 5,
+      note: "Walk cur until cur->next == NULL",
+      phaseLabel: "Walk",
+      cur,
+      hot: [cur],
+    });
+  }
+
+  heap[cur].next = newId;
+  push({
+    prevLine: 5,
+    currLine: 6,
+    note: `cur->next = new node — append ${newVal}`,
+    phaseLabel: "Link",
+    cur,
+    hot: [cur, newId],
+  });
+  return steps;
+}
+
+function simulatePrint(values) {
+  const heap = buildLinear(values);
+  const snippet = SNIPPETS.print;
+  const steps = [];
+  let cur = 0;
+
+  const push = (patch) =>
+    steps.push(
+      snap({
+        func: "printList",
+        snippet,
+        heap: cloneHeap(heap),
+        vars: { head: 0, cur: patch.cur ?? cur },
+        hot: patch.hot || [],
+        prevLine: patch.prevLine,
+        currLine: patch.currLine,
+        note: patch.note,
+        phaseLabel: patch.phaseLabel,
+      })
+    );
+
+  push({ prevLine: 1, currLine: 2, note: "Enter for-loop: cur = head", phaseLabel: "Init", cur: 0, hot: [0] });
+
+  while (cur !== null) {
+    push({
+      prevLine: 2,
+      currLine: 3,
+      note: `printf("%d -> ", ${heap[cur].val})`,
+      phaseLabel: "Print",
+      cur,
+      hot: [cur],
+    });
+    cur = heap[cur].next;
+    if (cur !== null) {
+      push({
+        prevLine: 2,
+        currLine: 2,
+        note: "cur = cur->next",
+        phaseLabel: "Advance",
+        cur,
+        hot: [cur],
+      });
+    }
+  }
+
+  push({ prevLine: 3, currLine: 4, note: 'printf("NULL\\n")', phaseLabel: "Done", cur: null, hot: [] });
+  return steps;
+}
+
+function simulateFree(values) {
+  const heap = buildLinear(values);
+  const snippet = SNIPPETS.free;
+  const steps = [];
+  let head = 0;
+  let freed = [];
+
+  const push = (patch) =>
+    steps.push(
+      snap({
+        func: "freeList",
+        snippet,
+        heap: cloneHeap(heap),
+        vars: { head: patch.head ?? head, t: patch.t ?? null },
+        hot: patch.hot || [],
+        prevLine: patch.prevLine,
+        currLine: patch.currLine,
+        note: patch.note,
+        phaseLabel: patch.phaseLabel,
+        removed: patch.removed,
+      })
+    );
+
+  push({ prevLine: 1, currLine: 2, note: "while (head) — free every node", phaseLabel: "Loop", hot: [head] });
+
+  while (head !== null) {
+    const t = heap[head].next;
+    const victim = head;
+    freed.push(victim);
+    push({
+      prevLine: 2,
+      currLine: 3,
+      note: `t = head->next — save link before free`,
+      phaseLabel: "Save next",
+      t,
+      hot: [head, t].filter((x) => x !== null),
+    });
+    head = t;
+    push({
+      prevLine: 3,
+      currLine: 4,
+      note: `free node@${victim} (id=${heap[victim].val}); head = t`,
+      phaseLabel: "Free",
+      head,
+      t,
+      hot: [head].filter((x) => x !== null),
+      removed: victim,
+    });
+  }
+
+  push({ prevLine: 4, currLine: 5, note: "head is NULL — list fully freed", phaseLabel: "Done", head: null, hot: [] });
+  return steps;
+}
+
 export function createListSession(meta) {
   const values = parseValues(meta);
   const op = inferOp(meta);
@@ -499,8 +877,26 @@ export function createListSession(meta) {
       steps = simulateInsertHead();
       break;
     case "insert-tail":
+      steps = simulateInsertTail(values.length >= 3 ? values : ["1", "2", "3"], 4);
+      snippet = SNIPPETS["insert-tail"];
+      break;
     case "delete":
+      steps = simulateDelete(["30", "20", "10"], Number(meta.listHighlight) || 20);
+      snippet = SNIPPETS.delete;
+      break;
     case "create":
+      steps = simulateCreate(10);
+      snippet = SNIPPETS.create;
+      break;
+    case "print":
+      steps = simulatePrint(values);
+      snippet = SNIPPETS.print;
+      break;
+    case "free":
+      steps = simulatePrint(values);
+      steps = steps.concat(simulateFree(values));
+      snippet = SNIPPETS.free;
+      break;
     default:
       steps = simulateTraverse(values);
       snippet = SNIPPETS.traverse;

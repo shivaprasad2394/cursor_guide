@@ -1,7 +1,7 @@
 /**
  * Execution Studio — step-through memory visualizer (Python Tutor inspired).
  */
-import { createListSession, renderListStudioRich } from "./list-viz.js?v=18";
+import { createListSession, renderListStudioRich } from "./list-viz.js?v=19";
 
 export function createSession(meta, opts = {}) {
   const viz = meta.visualization || "none";

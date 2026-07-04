@@ -4,9 +4,10 @@
  * mini interpreter in ctracer.js and replays real execution.
  * Mode 2 "Pattern demo": falls back to the algorithm-pattern simulators.
  */
-import { traceC, CUnsupported } from "./ctracer.js?v=18";
-import { createSession, renderStudio, stepCount } from "./visualizer.js?v=18";
-import { renderTraceStep } from "./tracer-view.js?v=18";
+import { traceC, CUnsupported } from "./ctracer.js?v=19";
+import { createSession, renderStudio, stepCount } from "./visualizer.js?v=19";
+import { renderTraceStep } from "./tracer-view.js?v=19";
+import { preprocessVizSource } from "./viz-preprocess.js?v=19";
 
 function escapeHtml(s) {
   return String(s)
@@ -49,6 +50,14 @@ function extractSection(body, heading) {
   const re = new RegExp(`## ${heading}\\s*\\n+\`\`\`c\\n([\\s\\S]*?)\`\`\``, "i");
   const m = body.match(re);
   return m ? m[1].trim() : "";
+}
+
+function traceForVizPage(code) {
+  const { source, structDefs } = preprocessVizSource(code);
+  if (structDefs.size > 0) {
+    return traceC(code, { vizStructs: true, structDefs, preprocessedSource: source });
+  }
+  return traceC(code);
 }
 
 function extractAlgorithm(body) {
@@ -106,7 +115,7 @@ async function init() {
   let codeLabel = candidates.length ? candidates[0].label : "";
   for (const cand of candidates) {
     try {
-      const t = traceC(cand.code);
+      const t = traceForVizPage(cand.code);
       if (!t.steps.length) throw new CUnsupported("no steps produced");
       trace = t;
       codeToTrace = cand.code;
