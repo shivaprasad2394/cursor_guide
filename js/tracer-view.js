@@ -33,9 +33,17 @@ export function renderTraceStep(container, trace, source, idx) {
     const key = `${fi}:${frName}:${v.name}`;
     return !prevVarText.has(key) || prevVarText.get(key) !== v.text;
   };
-  const cellChanged = (ai, ci) => {
-    if (!prev || !prev.arrays[ai]) return false;
-    return prev.arrays[ai].cells[ci] !== undefined && prev.arrays[ai].cells[ci] !== step.arrays[ai].cells[ci];
+  const prevCellVals = new Map();
+  if (prev) {
+    prev.arrays.forEach((arr, ai) => {
+      arr.cells.forEach((c) => {
+        if (typeof c === "object") prevCellVals.set(`${ai}:${c.idx}`, c.val);
+      });
+    });
+  }
+  const cellChanged = (ai, idx, val) => {
+    const key = `${ai}:${idx}`;
+    return prevCellVals.has(key) && prevCellVals.get(key) !== val;
   };
   const outputGrew = prev ? step.output.length > prev.output.length : step.output.length > 0;
 
@@ -78,17 +86,19 @@ export function renderTraceStep(container, trace, source, idx) {
     .map((arr, ai) => {
       if (arr.label.startsWith('"') && !arr.ptrs.length) return "";
       const cols = arr.cells
-        .map((cell, ci) => {
+        .map((cell) => {
+          const idx = typeof cell === "object" ? cell.idx : arr.cells.indexOf(cell);
+          const val = typeof cell === "object" ? cell.val : cell;
           const badges = arr.ptrs
-            .filter((p) => p.off === ci)
+            .filter((p) => p.off === idx)
             .map((p, bi) => `<span class="viz-ptr-badge ${PTR_COLORS[bi % PTR_COLORS.length]}">↓ ${escapeHtml(p.name)}</span>`)
             .join("");
-          const hot = arr.ptrs.some((p) => p.off === ci);
-          const chg = cellChanged(ai, ci);
+          const hot = arr.ptrs.some((p) => p.off === idx);
+          const chg = cellChanged(ai, idx, val);
           return `<div class="viz-array-col">
             <div class="viz-ptr-slot">${badges}</div>
-            <span class="viz-idx">${ci}</span>
-            <span class="viz-cell ${hot ? "viz-cell-mid" : ""} ${chg ? "viz-cell-changed" : ""}">${escapeHtml(cell)}</span>
+            <span class="viz-idx">${idx}</span>
+            <span class="viz-cell ${hot ? "viz-cell-mid" : ""} ${chg ? "viz-cell-changed" : ""}">${escapeHtml(val)}</span>
           </div>`;
         })
         .join("");
@@ -129,11 +139,20 @@ export function renderTraceStep(container, trace, source, idx) {
             </div>
           </div>
           <div class="viz-memory">
-            <div class="viz-stack-label">STACK</div>
-            ${framesHtml}
-            ${arraysHtml ? `<div class="viz-stack-label" style="margin-top:0.6rem">MEMORY</div>${arraysHtml}` : ""}
-            <div class="viz-stack-label" style="margin-top:0.6rem">OUTPUT</div>
-            <pre class="studio-output ${outputGrew ? "studio-output-new" : ""}">${escapeHtml(step.output) || "(none yet)"}</pre>
+            <div class="viz-state-split">
+              <div class="viz-stack-pane">
+                <div class="viz-stack-label">STACK</div>
+                ${framesHtml}
+              </div>
+              <div class="viz-mem-pane">
+                <div class="viz-stack-label">MEMORY</div>
+                ${arraysHtml || '<p class="viz-mem-empty">(no arrays yet)</p>'}
+              </div>
+            </div>
+            <div class="viz-output-pane">
+              <div class="viz-stack-label">OUTPUT</div>
+              <pre class="studio-output ${outputGrew ? "studio-output-new" : ""}">${escapeHtml(step.output) || "(none yet)"}</pre>
+            </div>
           </div>
         </div>
       </div>

@@ -649,6 +649,45 @@ a:hover {
   border: 1px solid var(--border);
   background: rgba(10, 14, 20, 0.85);
   padding: 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.viz-state-split {
+  display: grid;
+  grid-template-columns: minmax(160px, 0.95fr) minmax(200px, 1.05fr);
+  gap: 0.65rem;
+  align-items: start;
+}
+
+.viz-stack-pane,
+.viz-mem-pane {
+  min-width: 0;
+  border: 1px solid rgba(48, 54, 61, 0.6);
+  border-radius: 4px;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.15);
+  max-height: 52vh;
+  overflow: auto;
+}
+
+.viz-mem-pane .viz-array-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.viz-mem-empty {
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.viz-output-pane {
+  border-top: 1px solid var(--border);
+  padding-top: 0.5rem;
 }
 
 .viz-stack-label {
@@ -1518,6 +1557,15 @@ a:hover {
 
   .studio-code-rail {
     max-height: 40vh;
+  }
+
+  .viz-state-split {
+    grid-template-columns: 1fr;
+  }
+
+  .viz-stack-pane,
+  .viz-mem-pane {
+    max-height: 35vh;
   }
 }
 

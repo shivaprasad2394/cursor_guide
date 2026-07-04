@@ -556,18 +556,51 @@ class Interp {
     }));
 
     const arrays = this.arrays.map((arr, ai) => {
-      const cells = arr.data.slice(0, 48).map((x) =>
-        arr.isChar ? (x === 0 ? "\\0" : `'${String.fromCharCode(x)}'`) : String(x)
-      );
       const ptrs = [];
+      const hot = new Set();
       for (const fr of frames) {
         for (const v of fr.vars) {
-          if (v.ptr && v.ptr.arrIdx === ai && v.ptr.off >= 0 && v.ptr.off < 48) {
-            ptrs.push({ name: v.ptr.name, off: v.ptr.off });
+          if (v.ptr && v.ptr.arrIdx === ai && v.ptr.off >= 0) {
+            hot.add(v.ptr.off);
+            if (v.ptr.off < 512) ptrs.push({ name: v.ptr.name, off: v.ptr.off });
           }
         }
       }
-      return { label: arr.label, isChar: arr.isChar, cells, more: arr.data.length > 48, ptrs };
+      for (let i = 0; i < arr.data.length; i += 1) {
+        if (arr.data[i] !== 0) hot.add(i);
+      }
+
+      const fmt = (x) =>
+        arr.isChar ? (x === 0 ? "\\0" : `'${String.fromCharCode(x)}'`) : String(x);
+
+      const MAX = 32;
+      let viewLabel = arr.label;
+      let cells;
+
+      if (arr.data.length <= MAX) {
+        cells = arr.data.map((x, i) => ({ idx: i, val: fmt(x) }));
+      } else if (hot.size > 0) {
+        const indices = [...hot].sort((a, b) => a - b);
+        if (indices.length <= MAX) {
+          viewLabel = `${arr.label} (active)`;
+          cells = indices.map((i) => ({ idx: i, val: fmt(arr.data[i]) }));
+        } else {
+          const start = Math.max(0, Math.min(...indices) - 2);
+          const end = Math.min(arr.data.length, start + MAX);
+          viewLabel = `${arr.label} [${start}…${end - 1}]`;
+          cells = arr.data.slice(start, end).map((x, j) => ({ idx: start + j, val: fmt(x) }));
+        }
+      } else {
+        cells = arr.data.slice(0, MAX).map((x, i) => ({ idx: i, val: fmt(x) }));
+      }
+
+      return {
+        label: viewLabel,
+        isChar: arr.isChar,
+        cells,
+        more: arr.data.length > MAX && hot.size === 0,
+        ptrs,
+      };
     });
 
     this.steps.push({

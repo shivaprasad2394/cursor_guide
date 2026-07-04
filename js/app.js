@@ -353,7 +353,7 @@
   async function runInBrowser(source, stdin, onProgress) {
     if (!runnerModule) {
       if (onProgress) onProgress("Loading in-browser C compiler (first run ~60 MB, cached after)…");
-      runnerModule = await import("./runner.js?v=16");
+      runnerModule = await import("./runner.js?v=17");
     }
     if (onProgress) onProgress("Compiling & running…");
     return runnerModule.compileAndRun(source, stdin || "");
@@ -376,7 +376,7 @@
 
   async function getVisualizer() {
     if (!visualizerModule) {
-      visualizerModule = await import("./visualizer.js?v=16");
+      visualizerModule = await import("./visualizer.js?v=17");
     }
     return visualizerModule;
   }
@@ -623,8 +623,8 @@
       let mods;
       try {
         mods = await Promise.all([
-          import("./ctracer.js?v=16"),
-          import("./tracer-view.js?v=16"),
+          import("./ctracer.js?v=17"),
+          import("./tracer-view.js?v=17"),
         ]);
       } catch (_) {
         return false;
