@@ -569,6 +569,21 @@ class Interp {
     return `${node.name}@${stIdx}{${parts.join(", ")}}`;
   }
 
+  buildHeapSnapshot() {
+    if (!this.structHeap.length) return [];
+    return this.structHeap.map((node) => {
+      const def = this.structDefs?.get(node.name);
+      const ptrFields = new Set((def?.fields || []).filter((f) => f.type === "ptr").map((f) => f.name));
+      const fields = {};
+      for (const [k, val] of Object.entries(node.fields)) {
+        if (isStructPtr(val)) fields[k] = { type: "ptr", stIdx: val.stIdx };
+        else if (ptrFields.has(k) && val === 0) fields[k] = { type: "ptr", stIdx: null };
+        else fields[k] = { type: "scalar", val };
+      }
+      return { idx: node.idx, name: node.name, fields };
+    });
+  }
+
   readCStr(v) {
     if (!isPtr(v) || !v.arr) return String(toNum(v));
     const { arr, off } = v;
@@ -667,12 +682,15 @@ class Interp {
       };
     });
 
+    const heap = this.buildHeapSnapshot();
+
     this.steps.push({
       line: line || 0,
       phase: phase || "run",
       note,
       frames,
       arrays,
+      heap,
       output: this.output,
     });
   }
@@ -691,6 +709,7 @@ class Interp {
           note: this.stopNote || `trace capped at ${this.maxSteps} steps`,
           frames: [],
           arrays: this.steps.length ? this.steps[this.steps.length - 1].arrays : [],
+          heap: this.steps.length ? this.steps[this.steps.length - 1].heap : [],
           output: this.output,
         });
       } else {

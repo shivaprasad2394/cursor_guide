@@ -7,6 +7,113 @@
 
 const PTR_COLORS = ["viz-ptr-left", "viz-ptr-right", "viz-ptr-mid", "viz-ptr-low", "viz-ptr-high"];
 
+function fieldNextIdx(fields) {
+  const f = fields.next;
+  if (!f || f.type !== "ptr" || f.stIdx === null || f.stIdx === undefined) return null;
+  return f.stIdx;
+}
+
+function renderStructNode(node, hot, ptrOn, changed) {
+  const badges = (ptrOn[node.idx] || [])
+    .map(
+      (name, i) =>
+        `<span class="viz-ll-ptr-badge ${PTR_COLORS[i % PTR_COLORS.length]}">${escapeHtml(name)}</span>`
+    )
+    .join("");
+  const rows = Object.entries(node.fields)
+    .map(([fname, fval]) => {
+      let text = "—";
+      if (fval.type === "scalar") text = String(fval.val);
+      else if (fval.type === "ptr") text = fval.stIdx === null || fval.stIdx === undefined ? "NULL" : `→ @${fval.stIdx}`;
+      return `<div class="viz-ll-row"><span>${escapeHtml(fname)}</span><span class="viz-ll-val">${escapeHtml(text)}</span></div>`;
+    })
+    .join("");
+  return `<div class="viz-ll-node ${hot.has(node.idx) ? "viz-ll-hot" : ""} ${changed ? "viz-cell-changed" : ""}">
+    <div class="viz-ll-ptr-slot">${badges}</div>
+    <div class="viz-ll-node-head">${escapeHtml(node.name)}@${node.idx}</div>
+    ${rows}
+  </div>`;
+}
+
+function renderStructHeap(step, prev) {
+  const heap = step.heap || [];
+  if (!heap.length) return "";
+
+  const byIdx = new Map(heap.map((n) => [n.idx, n]));
+  const hot = new Set();
+  const ptrOn = {};
+  step.frames.forEach((fr) => {
+    fr.vars.forEach((v) => {
+      if (v.ptr && v.ptr.structIdx !== undefined) {
+        hot.add(v.ptr.structIdx);
+        if (!ptrOn[v.ptr.structIdx]) ptrOn[v.ptr.structIdx] = [];
+        ptrOn[v.ptr.structIdx].push(v.name);
+      }
+    });
+  });
+
+  const prevNodes = new Map();
+  if (prev && prev.heap) {
+    prev.heap.forEach((n) => prevNodes.set(n.idx, JSON.stringify(n.fields)));
+  }
+  const nodeChanged = (node) => {
+    const key = node.idx;
+    return prevNodes.has(key) && prevNodes.get(key) !== JSON.stringify(node.fields);
+  };
+
+  const pointedTo = new Set();
+  heap.forEach((n) => {
+    const next = fieldNextIdx(n.fields);
+    if (next !== null) pointedTo.add(next);
+  });
+  const heads = heap.filter((n) => !pointedTo.has(n.idx));
+
+  const inChain = new Set();
+  const renderChain = (startIdx) => {
+    let html = "";
+    let cur = startIdx;
+    const seen = new Set();
+    while (cur !== null && !seen.has(cur)) {
+      seen.add(cur);
+      inChain.add(cur);
+      const node = byIdx.get(cur);
+      if (!node) break;
+      html += renderStructNode(node, hot, ptrOn, nodeChanged(node));
+      const next = fieldNextIdx(node.fields);
+      if (next !== null) html += '<div class="viz-ll-edge">→</div>';
+      cur = next;
+    }
+    html += '<div class="viz-ll-null">NULL</div>';
+    return html;
+  };
+
+  let chainsHtml = "";
+  if (heads.length) {
+    chainsHtml = heads
+      .map((h) => `<div class="viz-ll-canvas">${renderChain(h.idx)}</div>`)
+      .join("");
+  }
+
+  const orphans = heap.filter((n) => !inChain.has(n.idx));
+  let orphanHtml = "";
+  if (orphans.length) {
+    orphanHtml = `<div class="viz-ll-row-label">allocated (not linked yet)</div><div class="viz-ll-canvas">${orphans
+      .map((n) => renderStructNode(n, hot, ptrOn, nodeChanged(n)))
+      .join("")}</div>`;
+  }
+
+  if (!chainsHtml && !orphanHtml) {
+    orphanHtml = `<div class="viz-ll-canvas">${heap
+      .map((n) => renderStructNode(n, hot, ptrOn, nodeChanged(n)))
+      .join("")}</div>`;
+  }
+
+  return `<div class="viz-array-block">
+    <div class="viz-array-caption">heap · linked nodes</div>
+    ${chainsHtml}${orphanHtml}
+  </div>`;
+}
+
 function escapeHtml(s) {
   return String(s)
     .replace(/&/g, "&amp;")
@@ -109,6 +216,9 @@ export function renderTraceStep(container, trace, source, idx) {
     })
     .join("");
 
+  const heapHtml = renderStructHeap(step, prev);
+  const memoryHtml = [heapHtml, arraysHtml].filter(Boolean).join("");
+
   /* narration: what just ran, what runs next */
   const srcLine = (n) => (n >= 1 && n <= lines.length ? lines[n - 1].trim().slice(0, 90) : "");
   let narration = "";
@@ -146,7 +256,7 @@ export function renderTraceStep(container, trace, source, idx) {
               </div>
               <div class="viz-mem-pane">
                 <div class="viz-stack-label">MEMORY</div>
-                ${arraysHtml || '<p class="viz-mem-empty">(no arrays yet)</p>'}
+                ${memoryHtml || '<p class="viz-mem-empty">(empty)</p>'}
               </div>
             </div>
             <div class="viz-output-pane">
