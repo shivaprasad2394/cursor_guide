@@ -1,1 +1,1 @@
-v24 — register view with binary bits for bitwise code trace
+v25 — compile user C as C11 (-x c) so malloc void* works
