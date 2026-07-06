@@ -5,6 +5,7 @@ pattern: "binary search tree"
 difficulty: "hard"
 visualization: "generic"
 vizCategory: "binary search tree"
+complexity: "O(n) time per traversal"
 tape: "inorder: "
 stdin: ""
 expectedOutput: "inorder: 20 30 40 50 70 \npreorder: 50 30 20 40 70 \npostorder: 20 40 30 70 50\n"
@@ -13,12 +14,58 @@ expectedOutput: "inorder: 20 30 40 50 70 \npreorder: 50 30 20 40 70 \npostorder:
 
 - **Goal:** Traversals: inorder (sorted!), preorder, postorder
 - **Pattern:** Binary search tree
-- **Complexity:** See algorithm
+- **Complexity:** O(n) time per traversal, O(h) recursion stack
 - **Expected output:** `inorder: 20 30 40 50 70 `
 
 ## Description
 
-Implement **Traversals: inorder (sorted!), preorder, postorder** using the pattern above. Write the helper function(s); `main()` is provided.
+A **depth-first traversal** visits every node once by recursively exploring subtrees. The only difference is **when you print the root**:
+
+| Order | Visit pattern | On a BST |
+|-------|---------------|----------|
+| **Inorder** | left → root → right | keys in **sorted ascending order** |
+| **Preorder** | root → left → right | root-first; useful for copying/serializing |
+| **Postorder** | left → right → root | children before parent; used when **freeing** a tree |
+
+The classic interview line: **inorder on a BST prints sorted keys** — because every left subtree is smaller and every right subtree is larger.
+
+`main()` builds a tree from `{50, 30, 70, 20, 40}` and prints all three traversals.
+
+## Algorithm
+
+```text
+inorder(r):
+  if r == NULL return
+  inorder(r->left)
+  print r->id
+  inorder(r->right)
+
+preorder(r):
+  if r == NULL return
+  print r->id
+  preorder(r->left)
+  preorder(r->right)
+
+postorder(r):
+  if r == NULL return
+  postorder(r->left)
+  postorder(r->right)
+  print r->id
+```
+
+## Example Trace
+
+```text
+        [50]
+       /    \
+    [30]    [70]
+    /  \
+ [20] [40]
+
+inorder:   20  30  40  50  70   ← sorted!
+preorder:  50  30  20  40  70   ← root before its subtrees
+postorder: 20  40  30  70  50   ← children before root
+```
 
 ## Starter Code
 

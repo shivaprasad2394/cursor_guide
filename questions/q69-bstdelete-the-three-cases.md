@@ -5,6 +5,7 @@ pattern: "binary search tree"
 difficulty: "hard"
 visualization: "generic"
 vizCategory: "binary search tree"
+complexity: "O(h) find + O(h) relink — O(log n) balanced"
 tape: "after delete 50, inorder: "
 stdin: ""
 expectedOutput: "after delete 50, inorder: 20 30 40 60 70 80\n"
@@ -13,30 +14,57 @@ expectedOutput: "after delete 50, inorder: 20 30 40 60 70 80\n"
 
 - **Goal:** bstDelete - the three cases
 - **Pattern:** Binary search tree
-- **Complexity:** See algorithm
+- **Complexity:** O(h) to find node + O(h) to fix links — O(log n) balanced, O(n) worst
 - **Expected output:** `after delete 50, inorder: 20 30 40 60 70 80`
 
 ## Description
 
-Implement **bstDelete - the three cases** using the pattern above. Write the helper function(s); `main()` is provided.
+Remove a key from a BST and keep the ordering rule intact. First **find** the node (same comparisons as search). Then handle **three cases**:
 
-**Walkthrough hint:**
+| Case | Node to delete | Action |
+|------|----------------|--------|
+| **1** | No left child | Return right child as new subtree root (may be `NULL`) |
+| **2** | No right child | Return left child as new subtree root |
+| **3** | Two children | Copy **successor** key into this node, then delete the successor from the right subtree |
 
-Delete 10 from:      [10]
+For case 3, the **in-order successor** is the smallest key in the right subtree — `bstMin(root->right)`. Copy its id up, then recursively delete that duplicate key from the right side (which becomes case 1 or 2).
+
+Use the same **return-root pattern** as insert: `root = bstDelete(root, id)`.
+
+`main()` inserts `{50, 30, 70, 20, 40, 60, 80}`, deletes **50** (the root, two children), and prints inorder to prove the tree is still valid.
+
+## Algorithm
+
+```text
+step1: If root == NULL → return NULL
+step2: If id < root->id  → root->left  = bstDelete(root->left,  id); return root
+step3: If id > root->id  → root->right = bstDelete(root->right, id); return root
+step4: Else id == root->id (found — delete this node):
+  Case 1 — no left child:  save r = root->right; free(root); return r
+  Case 2 — no right child: save l = root->left;  free(root); return l
+  Case 3 — two children:
+    succ = bstMin(root->right)
+    root->id = succ->id
+    root->right = bstDelete(root->right, succ->id)
+    return root
+```
 
 ## Example Trace
 
 ```text
-Delete 10 from:      [10]
-                            /      \
-                         [5]       [15]
-                                  /
-                               [12]
-  Case 3: two children. Successor = bstMin(right) = 12
-  Copy: root->id = 12. Delete 12 from right subtree (Case 1: leaf)
-  Result:     [12]
-            /      \
-         [5]       [15]
+Before delete 50:
+
+        [50]
+       /    \
+    [30]    [70]
+    /  \    /  \
+ [20][40][60][80]
+
+Case 3 at root: successor = bstMin([70]) = 60
+  copy: root id becomes 60
+  delete 60 from right subtree (leaf → Case 1)
+
+After delete 50, inorder: 20 30 40 60 70 80  ← still sorted
 ```
 
 ## Starter Code

@@ -5,6 +5,7 @@ pattern: "binary search tree"
 difficulty: "hard"
 visualization: "generic"
 vizCategory: "binary search tree"
+complexity: "O(1) time, O(1) space"
 tape: "createBstNode(5): id=%d\\n"
 stdin: ""
 expectedOutput: "createBstNode(5): id=5\n"
@@ -13,12 +14,38 @@ expectedOutput: "createBstNode(5): id=5\n"
 
 - **Goal:** createBstNode
 - **Pattern:** Binary search tree
-- **Complexity:** See algorithm
+- **Complexity:** O(1) time, O(1) space
 - **Expected output:** `createBstNode(5): id=5`
 
 ## Description
 
-Implement **createBstNode** using the pattern above. Write the helper function(s); `main()` is provided.
+Write a small factory for BST nodes. Every other BST operation (`bstInsert`, `bstSearch`, …) assumes nodes look like this: an **`id`** (the key) plus **`left`** and **`right`** child pointers, both starting as `NULL`.
+
+Your job: allocate one node, set its fields, and return the pointer. `main()` calls `createBstNode(5)`, prints the id, and frees the node.
+
+**BST node shape:**
+
+```text
+BstNode { id, left → NULL, right → NULL }
+```
+
+## Algorithm
+
+```text
+step1: n = malloc(sizeof(BstNode)); if n == NULL return NULL
+step2: n->id = id
+step3: n->left = n->right = NULL
+step4: return n
+```
+
+## Example Trace
+
+```text
+createBstNode(5)
+  malloc → node at 0x1000
+  id=5, left=NULL, right=NULL
+  print: createBstNode(5): id=5
+```
 
 ## Starter Code
 

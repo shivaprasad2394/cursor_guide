@@ -18,36 +18,40 @@ expectedOutput: "inserted 5 keys; root=50 left=30 right=70\n"
 
 ## Description
 
-Insert a value into a BST maintaining the invariant: left subtree < root < right subtree
+Insert a key into a **binary search tree (BST)** while keeping the ordering rule:
 
-**Walkthrough hint:**
+> every node in the **left** subtree has a **smaller** id; every node in the **right** subtree has a **larger** id.
 
-Insert 5 into: [10] -> left=[3], right=[15]
+Walk down from the root comparing the new key: go **left** if smaller, **right** if larger. When you hit `NULL`, that empty spot is where the new node belongs.
+
+This question uses the **return-root pattern**: `bstInsert` always returns the (possibly new) root, so the caller writes `root = bstInsert(root, key)`. That cleanly handles the first insert into an empty tree (`root` was `NULL`, now it points at the new node) without a separate `if (root == NULL)` in `main`.
+
+`main()` inserts `{50, 30, 70, 20, 40}` and prints the root and its immediate children.
+
+**Walkthrough hint:** inserting 5 into a tree whose root is 10 (left child 3, right child 15) sends you left, then right, then into an empty slot.
 
 ## Algorithm
 
 ```text
-step1: If root == NULL, this is the insertion point. Create & return node.
-  step2: If id < root->id: recurse LEFT, assign result to root->left
-  step3: If id > root->id: recurse RIGHT, assign result to root->right
-  step4: If id == root->id: duplicate, do nothing
-  step5: Return root (unchanged or with updated child pointer)
-
-Why "return-root" pattern?
-  The caller writes: root = bstInsert(root, 42);
-  This handles the empty-tree case (root was NULL, now it's the new node)
-  without needing a special check.
+step1: If root == NULL → insertion point. return createBstNode(id)
+step2: If id < root->id  → root->left  = bstInsert(root->left,  id)
+step3: If id > root->id  → root->right = bstInsert(root->right, id)
+step4: If id == root->id → duplicate key; leave tree unchanged
+step5: return root   ← caller always gets back the root pointer
 ```
+
+**Why return the root?** On the first insert, step 1 replaces `NULL` with a brand-new node. The caller must assign that pointer back: `r = bstInsert(r, 50)`.
 
 ## Example Trace
 
 ```text
-Insert 5 into: [10] -> left=[3], right=[15]
-  5 < 10 -> recurse left with root=[3]
-  5 > 3  -> recurse right with root=NULL
-  root==NULL -> create [5], return it
-  [3]->right = [5]
-  Result: [10] -> left=[3 -> right=[5]], right=[15]
+Insert 5 into:        [10]
+                     /    \
+                   [3]    [15]
+
+  5 < 10  → go left to [3]
+  5 > 3   → go right to NULL  → create [5], link as [3]->right
+  Result: [10] with left subtree [3] → [5]
 ```
 
 ## Starter Code

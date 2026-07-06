@@ -5,6 +5,7 @@ pattern: "binary search tree"
 difficulty: "hard"
 visualization: "generic"
 vizCategory: "binary search tree"
+complexity: "O(n) time — must visit every node"
 tape: "tree freed (postorder)\\n"
 stdin: ""
 expectedOutput: "tree freed (postorder)\n"
@@ -13,12 +14,44 @@ expectedOutput: "tree freed (postorder)\n"
 
 - **Goal:** freeTree - MUST use postorder (children before parent!)
 - **Pattern:** Binary search tree
-- **Complexity:** See algorithm
+- **Complexity:** O(n) time — visit every node once; O(h) recursion stack
 - **Expected output:** `tree freed (postorder)`
 
 ## Description
 
-Implement **freeTree - MUST use postorder (children before parent!)** using the pattern above. Write the helper function(s); `main()` is provided.
+Release every node in a BST back to the heap. The rule: **never `free` a node before its children** — once you free the parent, its `left`/`right` pointers are gone and you cannot reach the subtrees.
+
+That is exactly **postorder** traversal: free left subtree, free right subtree, then free the root.
+
+```text
+WRONG (preorder):  free(root) first → lose access to children → memory leak
+RIGHT (postorder): free children first, then free root
+```
+
+`main()` builds a small tree, calls `freeTree`, and prints a confirmation line.
+
+## Algorithm
+
+```text
+step1: If root == NULL → nothing to do; return
+step2: freeTree(root->left)    ← free entire left subtree first
+step3: freeTree(root->right)   ← then entire right subtree
+step4: free(root)              ← finally free this node
+```
+
+## Example Trace
+
+```text
+        [50]
+       /    \
+    [30]    [70]
+
+Postorder visit: 30, 70, 50
+  free [30] (leaf — children already NULL)
+  free [70] (leaf)
+  free [50]
+All nodes released; root pointer in main is now dangling — do not use it after freeTree
+```
 
 ## Starter Code
 

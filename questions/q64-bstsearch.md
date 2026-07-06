@@ -5,6 +5,7 @@ pattern: "binary search tree"
 difficulty: "hard"
 visualization: "generic"
 vizCategory: "binary search tree"
+complexity: "O(h) time — O(log n) balanced, O(n) skewed"
 tape: "search 40: %s\\n"
 stdin: ""
 expectedOutput: "search 40: found\nsearch 99: not found\n"
@@ -13,12 +14,47 @@ expectedOutput: "search 40: found\nsearch 99: not found\n"
 
 - **Goal:** bstSearch
 - **Pattern:** Binary search tree
-- **Complexity:** See algorithm
+- **Complexity:** O(h) time, O(h) recursion stack — O(log n) balanced, O(n) skewed
 - **Expected output:** `search 40: found`
 
 ## Description
 
-Implement **bstSearch** using the pattern above. Write the helper function(s); `main()` is provided.
+**Search** for a key in a BST — the mirror image of insert. At each node, compare the key to `root->id`:
+
+- **Equal** → found; return this node.
+- **Smaller** → search the left subtree only.
+- **Larger** → search the right subtree only.
+- **`NULL`** → key is not in the tree.
+
+Because the tree is ordered, you never need to scan both subtrees. That is why BST search is fast when the tree is balanced.
+
+`main()` builds a tree from `{50, 30, 70, 20, 40}`, then searches for **40** (present) and **99** (absent).
+
+## Algorithm
+
+```text
+step1: If root == NULL        → not found; return NULL
+step2: If key == root->id     → found; return root
+step3: If key <  root->id     → return bstSearch(root->left,  key)
+step4: Else                   → return bstSearch(root->right, key)
+```
+
+**Return value:** non-`NULL` pointer means found; `NULL` means missing. `main()` uses `bstSearch(r, 40) ? "found" : "not found"`.
+
+## Example Trace
+
+```text
+Tree after inserting 50, 30, 70, 20, 40:
+
+        [50]
+       /    \
+    [30]    [70]
+    /  \
+ [20] [40]
+
+Search 40: 40 < 50 → left to [30] → 40 > 30 → right to [40] → match → found
+Search 99: 99 > 50 → right to [70] → 99 > 70 → right to NULL → not found
+```
 
 ## Starter Code
 
