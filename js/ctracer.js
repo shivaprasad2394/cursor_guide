@@ -498,17 +498,22 @@ const isPtr = (v) => v !== null && typeof v === "object";
 const isStructPtr = (v) => isPtr(v) && v.stIdx !== undefined;
 
 const INDEX_VAR_NAMES = new Set([
-  "i", "j", "k", "idx", "mid", "low", "high", "left", "right", "pos", "start", "end",
+  "i", "j", "k", "fast", "slow", "l", "r", "idx", "mid", "low", "high", "left", "right", "pos", "start", "end",
 ]);
 const INDEX_VAR_ORDER = [
-  "i", "j", "k", "idx", "mid", "low", "high", "left", "right", "pos", "start", "end",
+  "i", "j", "k", "fast", "slow", "l", "r", "idx", "mid", "low", "high", "left", "right", "pos", "start", "end",
 ];
 
+function indexVarsInOrder(indices) {
+  return INDEX_VAR_ORDER.filter((name) => indices[name] !== undefined).map((name) => ({
+    name,
+    val: indices[name],
+  }));
+}
+
 function pickIndexVar(indices) {
-  for (const name of INDEX_VAR_ORDER) {
-    if (indices[name] !== undefined) return { name, val: indices[name] };
-  }
-  return null;
+  const list = indexVarsInOrder(indices);
+  return list.length ? list[0] : null;
 }
 
 function structPtrEq(a, b) {
@@ -652,9 +657,17 @@ class Interp {
           let ptr = null;
           if (isPtr(v) && v.arr) {
             const ai = this.arrays.indexOf(v.arr);
-            const idx = pickIndexVar(indices);
+            const idxList = indexVarsInOrder(indices);
+            let text;
+            if (idxList.length > 1) {
+              text = `→ ${v.arr.label}`;
+            } else if (idxList.length === 1) {
+              text = `→ ${v.arr.label}[${v.off + idxList[0].val}]`;
+            } else {
+              text = `→ ${v.arr.label}[${v.off}]`;
+            }
+            const idx = idxList[0] || null;
             const effOff = idx ? v.off + idx.val : v.off;
-            text = `→ ${v.arr.label}[${effOff}]`;
             ptr = { arrIdx: ai, off: effOff, name: idx ? idx.name : name };
           } else if (isStructPtr(v)) {
             text = this.structFieldText(v.stIdx);
@@ -675,29 +688,66 @@ class Interp {
       const ptrs = [];
       const hot = new Set();
       let activeOff = null;
+      const seenPtr = new Set();
+      const addPtr = (name, off) => {
+        const key = `${name}@${off}`;
+        if (seenPtr.has(key)) return;
+        seenPtr.add(key);
+        ptrs.push({ name, off });
+      };
 
+      let indexedFrame = false;
       for (let fi = this.frames.length - 1; fi >= 0; fi -= 1) {
         const fr = this.frames[fi];
         const indices = this.frameIndexVars(fr);
-        const idx = pickIndexVar(indices);
+        const idxList = indexVarsInOrder(indices);
+        const arrBases = [];
         for (const [name, box] of fr.vars) {
           const v = box.v;
-          if (!isPtr(v) || !v.arr || this.arrays.indexOf(v.arr) !== ai) continue;
-          if (idx) {
-            const off = v.off + idx.val;
-            if (activeOff === null) activeOff = off;
-            ptrs.push({ name: idx.name, off });
-          } else {
-            ptrs.push({ name, off: v.off });
+          if (isPtr(v) && v.arr && this.arrays.indexOf(v.arr) === ai) {
+            arrBases.push({ name, off: v.off });
           }
         }
-        if (activeOff !== null) break;
+        if (idxList.length && arrBases.length) {
+          indexedFrame = true;
+          const base = arrBases[0];
+          for (const idx of idxList) addPtr(idx.name, base.off + idx.val);
+          break;
+        }
       }
 
-      if (activeOff === null && this.lastIdxAccess && this.lastIdxAccess.arrIdx === ai) {
+      if (!indexedFrame) {
+        for (const fr of this.frames) {
+          for (const [name, box] of fr.vars) {
+            const v = box.v;
+            if (!isPtr(v) || !v.arr || this.arrays.indexOf(v.arr) !== ai) continue;
+            addPtr(name, v.off);
+          }
+        }
+      }
+
+      if (this.lastIdxAccess && this.lastIdxAccess.arrIdx === ai) {
         activeOff = this.lastIdxAccess.off;
-        if (!ptrs.some((p) => p.off === activeOff)) {
-          ptrs.push({ name: this.lastIdxAccess.varName || "•", off: activeOff });
+        if (indexedFrame) {
+          for (let fi = this.frames.length - 1; fi >= 0; fi -= 1) {
+            const fr = this.frames[fi];
+            const indices = this.frameIndexVars(fr);
+            const idxList = indexVarsInOrder(indices);
+            const arrBases = [];
+            for (const [, box] of fr.vars) {
+              const v = box.v;
+              if (isPtr(v) && v.arr && this.arrays.indexOf(v.arr) === ai) {
+                arrBases.push({ off: v.off });
+              }
+            }
+            if (idxList.length && arrBases.length) {
+              const live = new Set(idxList.map((idx) => arrBases[0].off + idx.val));
+              if (!live.has(activeOff)) activeOff = null;
+              break;
+            }
+          }
+        } else {
+          addPtr(this.lastIdxAccess.varName || "•", activeOff);
         }
       }
 
