@@ -21,6 +21,29 @@ export function preloadCompiler() {
 }
 
 /**
+ * browsercc always drives clang++ (filename before flags), so void* from malloc
+ * needs an explicit cast. Insert (Type*) on pointer = malloc(...) assignments.
+ */
+function prepareCSource(source) {
+  let s = source;
+  s = s.replace(
+    /((?:struct\s+)?[A-Za-z_]\w*)\s*(\*+)\s*([A-Za-z_]\w*)\s*=\s*malloc\s*\(/g,
+    (_, type, stars, name) => {
+      const ptrType = `${type}${stars}`.replace(/\s+/g, " ").trim();
+      return `${ptrType} ${name} = (${ptrType})malloc(`;
+    }
+  );
+  s = s.replace(
+    /(\b[A-Za-z_]\w*)\s*(\*+)([A-Za-z_]\w*)\s*=\s*malloc\s*\(/g,
+    (_, type, stars, name) => {
+      const ptrType = `${type}${stars}`;
+      return `${ptrType}${name} = (${ptrType})malloc(`;
+    }
+  );
+  return s;
+}
+
+/**
  * @param {string} source C source
  * @param {string} [stdin]
  * @returns {Promise<{ ok: boolean, stdout: string, stderr: string, compileOutput: string }>}
@@ -29,11 +52,11 @@ export async function compileAndRun(source, stdin = "") {
   const [{ compile }, wasi] = await loadDeps();
   const { WASI, File, OpenFile, ConsoleStdout } = wasi;
 
-  // browsercc invokes the clang++ driver; -x c forces C semantics (e.g. void* from malloc).
+  const prepared = prepareCSource(source);
   const { module, compileOutput } = await compile({
-    source,
+    source: prepared,
     fileName: "main.c",
-    flags: ["-x", "c", "-std=c11", "-Wall"],
+    flags: ["-Wall"],
   });
 
   if (!module) {

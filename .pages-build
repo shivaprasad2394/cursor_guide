@@ -1,1 +1,1 @@
-v25 — compile user C as C11 (-x c) so malloc void* works
+v26 — auto-cast malloc for clang++ browsercc runner
