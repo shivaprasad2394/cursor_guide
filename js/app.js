@@ -376,7 +376,7 @@
 
   async function getVisualizer() {
     if (!visualizerModule) {
-      visualizerModule = await import("./visualizer.js?v=18");
+      visualizerModule = await import("./visualizer.js?v=21");
     }
     return visualizerModule;
   }

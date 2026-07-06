@@ -3,7 +3,7 @@ id: "q92-avl-insert-ll-rebalance"
 title: "AVL insert with LL rebalance"
 pattern: "avl tree"
 difficulty: "hard"
-visualization: "tree"
+visualization: "avl-tree"
 treeKeys: "30,20,10"
 stdin: ""
 complexity: "O(log n) per insert"
@@ -14,36 +14,44 @@ expectedOutput: "insert 30,20,10 -> root=20 height=2\\\\\\\\n"
 - **Goal:** AVL insert with LL rebalance
 - **Pattern:** AVL tree
 - **Complexity:** O(log n) per insert
+- **Expected output:** `insert 30,20,10 -> root=20 height=2`
 
 ## Description
 
-Insert keys into an AVL tree; after each insert, update heights and rotate when |BF| > 1. Insert **30, 20, 10** triggers an **LL** case → **rotate right** at root.
+**AVL insert** = BST insert + **rebalance on the way back up** the recursion.
 
-**Walkthrough hint:**
+After each insert, walk back up and for every ancestor:
 
-After insert 10: root becomes 20
+1. **`updateHeight(node)`** — recompute from children
+2. **`bf = balanceFactor(node)`** — if `|bf| > 1`, rotate
+
+This question inserts **`30, 20, 10`** — a straight left-left chain. After the third insert, the root has **BF = +2** and the new key landed in the **left-left** subtree → **LL case** → **`rotateRight(root)`**.
+
+Result: balanced tree with root **20**, children **10** and **30**, height **2**.
 
 ## Algorithm
 
 ```text
-step1: Standard BST insert by key
-step2: On unwind, updateHeight(node)
-step3: bf = balanceFactor(node)
-step4: If bf > 1 and key < node->left->id  -> LL -> rotateRight(node)
-step5: If bf < -1 and key > node->right->id -> RR -> rotateLeft(node)
-step6: (LR/RL: rotate child first, then parent — full avlInsert handles all four)
-step7: Return new subtree root
+avlInsert(node, id):
+  step1: Standard BST insert (recurse left/right, create node at NULL)
+  step2: updateHeight(node)
+  step3: bf = balanceFactor(node)
+  step4: If bf > 1 && id < node->left->id   → LL → rotateRight(node)
+  step5: If bf < -1 && id > node->right->id → RR → rotateLeft(node)
+  step6: (LR / RL: rotate child first, then parent — see full solution)
+  step7: return node   ← may be a new subtree root after rotation
 ```
 
 ## Example Trace
 
 ```text
-insert 30:  [30]
-insert 20:  [30]/[20]        bf(30)=+1 OK
-insert 10:  [30]/[20]/[10]  bf(30)=+2, LL -> rotateRight
+insert 30:  [30]                         BF(30)=0
+insert 20:  [30]/[20]                    BF(30)=+1  OK
+insert 10:  [30]/[20]/[10]               BF(30)=+2  LL!
+            rotateRight(30)
 Result:       [20]
              /    \
-           10     30
+           10     30                     root=20, height=2
 ```
 
 ## Starter Code

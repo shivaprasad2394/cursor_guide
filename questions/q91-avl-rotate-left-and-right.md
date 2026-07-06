@@ -3,7 +3,7 @@ id: "q91-avl-rotate-left-and-right"
 title: "AVL \u2014 single rotations (left and right)"
 pattern: "avl tree"
 difficulty: "hard"
-visualization: "tree"
+visualization: "avl-tree"
 treeKeys: "30,20,10"
 stdin: ""
 complexity: "O(1) per rotation"
@@ -14,40 +14,50 @@ expectedOutput: "after rotateRight root=20 left=10 right=30\\\\\\\\n"
 - **Goal:** AVL — single rotations (left and right)
 - **Pattern:** AVL tree
 - **Complexity:** O(1) per rotation
+- **Expected output:** `after rotateRight root=20 left=10 right=30`
 
 ## Description
 
-Perform **single rotations** to rebalance an AVL subtree. **Right rotation** fixes left-heavy (LL); **left rotation** fixes right-heavy (RR).
+When a subtree becomes **too left-heavy** (BF = +2 at the top of a left-left chain), a **single right rotation** fixes it. The mirror **left rotation** fixes a right-right (RR) chain.
 
-**Walkthrough hint:**
+Think of a right rotation at node **y** as promoting **y->left** to be the new subtree root:
 
-LL: rotate right at unbalanced node
+```text
+rotateRight(y):   x = y->left
+                  x->right becomes y->left
+                  x->right = y
+                  return x
+```
+
+After rewiring, call **`updateHeight`** on the old root (**y**) first, then the new root (**x**).
+
+`main()` builds the LL chain `30 → 20 → 10`, calls **`rotateRight(&n30)`**, and prints the new root and its children.
 
 ## Algorithm
 
 ```text
-rotateRight(y):   // LL fix at y
-  x = y->left
-  y->left = x->right
-  x->right = y
-  update heights of y, then x
-  return x (new subtree root)
+rotateRight(y):
+  step1: x = y->left,  t2 = x->right
+  step2: x->right = y;  y->left = t2
+  step3: updateHeight(y); updateHeight(x)
+  step4: return x   ← new subtree root
 
-rotateLeft(x):    // RR fix — mirror of above
-  y = x->right
-  x->right = y->left
-  y->left = x
-  update heights
-  return y
+rotateLeft(x):     mirror — promote x->right
+  step1: y = x->right, t2 = y->left
+  step2: y->left = x;  x->right = t2
+  step3: updateHeight(x); updateHeight(y)
+  step4: return y
 ```
 
 ## Example Trace
 
 ```text
-Before (LL):  30          rotateRight(30)     After:
-             /                                  20
-           20                                  /  \
-         10                                  10   30
+Before (LL, BF(30)=+2):          rotateRight(30):          After:
+      30                              20                      20
+     /                               /  \                    /  \
+   20          ─────────►          10   30                10   30
+  /
+10
 ```
 
 ## Starter Code

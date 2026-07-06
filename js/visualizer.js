@@ -1,7 +1,8 @@
 /**
  * Execution Studio — step-through memory visualizer (Python Tutor inspired).
  */
-import { createListSession, renderListStudioRich } from "./list-viz.js?v=19";
+import { createListSession, renderListStudioRich } from "./list-viz.js?v=21";
+import { createAvlSession, renderAvlStudioRich } from "./avl-viz.js?v=21";
 
 export function createSession(meta, opts = {}) {
   const viz = meta.visualization || "none";
@@ -22,6 +23,9 @@ export function createSession(meta, opts = {}) {
       .filter((n) => !isNaN(n));
     const target = parseInt(meta.target, 10) || values[Math.floor(values.length / 2)] || 7;
     return { kind: "binary-search", steps: simulateBinarySearch(values, target), target };
+  }
+  if (viz === "avl-tree" || (viz === "tree" && /avl/i.test(String(meta.pattern || meta.section || "")))) {
+    return createAvlSession(meta);
   }
   if (viz === "tree") {
     const keys = String(meta.treeKeys || "50,30,70")
@@ -75,6 +79,8 @@ export function renderStudio(container, session, stepIndex) {
     renderTreeStudio(body, step, session);
   } else if (session.kind === "linked-list") {
     renderListStudioRich(body, step, session);
+  } else if (session.kind === "avl-tree") {
+    renderAvlStudioRich(body, step, session);
   } else if (session.kind === "array-cells") {
     renderArrayStudio(body, step, session);
   } else if (session.kind === "generic") {

@@ -930,6 +930,77 @@ a:hover {
 
 .viz-tree-null { opacity: 0.3; border-style: dashed; }
 
+/* ── AVL tree nodes ─────────────────────────────────────── */
+
+.viz-avl-canvas { gap: 0.65rem; }
+
+.viz-avl-node {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 3.5rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 4px;
+}
+
+.viz-avl-id {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--blue);
+}
+
+.viz-avl-meta {
+  font-size: 0.58rem;
+  color: var(--text-muted);
+  font-family: var(--mono);
+}
+
+.viz-avl-hot {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 2px rgba(240, 180, 41, 0.3);
+}
+
+.viz-avl-tilt {
+  border-color: rgba(91, 140, 255, 0.6);
+}
+
+.viz-avl-unbalanced {
+  border-color: #ff5f56;
+  box-shadow: 0 0 0 2px rgba(255, 95, 86, 0.35);
+  color: #ff5f56;
+}
+
+.viz-avl-pivot {
+  border-color: var(--amber);
+  background: rgba(240, 180, 41, 0.12);
+}
+
+.viz-avl-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  margin-top: 0.5rem;
+  font-size: 0.62rem;
+  color: var(--text-muted);
+}
+
+.viz-avl-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.viz-avl-swatch {
+  width: 0.65rem;
+  height: 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+}
+
+.viz-avl-swatch.viz-avl-tilt { border-color: rgba(91, 140, 255, 0.6); }
+.viz-avl-swatch.viz-avl-unbalanced { border-color: #ff5f56; background: rgba(255, 95, 86, 0.2); }
+.viz-avl-swatch.viz-avl-pivot { border-color: var(--amber); background: rgba(240, 180, 41, 0.25); }
+
 .viz-list-canvas {
   display: flex;
   flex-wrap: wrap;

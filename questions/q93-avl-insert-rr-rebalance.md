@@ -3,7 +3,7 @@ id: "q93-avl-insert-rr-rebalance"
 title: "AVL insert with RR rebalance"
 pattern: "avl tree"
 difficulty: "hard"
-visualization: "tree"
+visualization: "avl-tree"
 treeKeys: "10,20,30"
 stdin: ""
 complexity: "O(log n) per insert"
@@ -14,32 +14,38 @@ expectedOutput: "insert 10,20,30 -> root=20 height=2\\\\\\\\n"
 - **Goal:** AVL insert with RR rebalance
 - **Pattern:** AVL tree
 - **Complexity:** O(log n) per insert
+- **Expected output:** `insert 10,20,30 -> root=20 height=2`
 
 ## Description
 
-Same as LL insert, but keys **10, 20, 30** trigger **RR** → **rotate left** at root. After rebalance, root is **20**.
+Same **`avlInsert`** recipe as the LL question, but the keys **`10, 20, 30`** form a right-right chain.
 
-**Walkthrough hint:**
+After inserting **30**, the root **10** has **BF = −2** and the new key is in the **right-right** subtree → **RR case** → **`rotateLeft(root)`**.
 
-After insert 30: root becomes 20
+The tree becomes root **20** with children **10** and **30** — mirror image of the LL rebalance.
 
 ## Algorithm
 
 ```text
-step1: BST insert 10, then 20, then 30
-step2: At node 10 after inserting 30: bf = -2, RR case
-step3: rotateLeft(10) -> new root 20 with children 10 and 30
+avlInsert(node, id):
+  step1: BST insert by key
+  step2: updateHeight(node)
+  step3: bf = balanceFactor(node)
+  step4: If bf > 1 && id < node->left->id   → LL → rotateRight(node)
+  step5: If bf < -1 && id > node->right->id → RR → rotateLeft(node)   ← this question
+  step6: return node (possibly new root after rotation)
 ```
 
 ## Example Trace
 
 ```text
-insert 10:  [10]
-insert 20:  [10]\\[20]       bf(10)=-1 OK
-insert 30:  [10]\\[20]\\[30] bf(10)=-2, RR -> rotateLeft
+insert 10:  [10]                         BF(10)=0
+insert 20:  [10]\\[20]                   BF(10)=−1  OK
+insert 30:  [10]\\[20]\\[30]             BF(10)=−2  RR!
+            rotateLeft(10)
 Result:       [20]
              /    \\
-           10     30
+           10     30                     root=20, height=2
 ```
 
 ## Starter Code
