@@ -6,6 +6,96 @@
  */
 
 const PTR_COLORS = ["viz-ptr-left", "viz-ptr-right", "viz-ptr-mid", "viz-ptr-low", "viz-ptr-high"];
+const BIT_INDEX_NAMES = new Set(["pos", "bit"]);
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function sourceHasBitwise(source) {
+  return /<<|>>|(?:\|(?!\|))|(?:&(?![&]))|\^|~|0x[0-9a-fA-F]+|[0-9]+[uU]/.test(source);
+}
+
+function parseScalar(text) {
+  const t = String(text).trim();
+  if (!/^-?\d+$/.test(t)) return null;
+  return Number(t);
+}
+
+function registerWidth(values) {
+  const max = Math.max(...values.map((v) => Math.abs(v)));
+  if (max <= 0xff) return 8;
+  if (max <= 0xffff) return 16;
+  return 32;
+}
+
+function renderBitRow(value, width, highlightPositions, changed) {
+  const u = value >>> 0;
+  const bin = (u >>> 0).toString(2).padStart(width, "0");
+  const bits = bin.split("").map((b, i) => {
+    const pos = width - 1 - i;
+    const on = highlightPositions && highlightPositions.has(pos);
+    return `<span class="viz-bit ${b === "1" ? "viz-bit-on" : ""} ${on ? "viz-bit-pos" : ""} ${changed ? "viz-cell-changed" : ""}">${b}<small>${pos}</small></span>`;
+  }).join("");
+  const hex = `0x${(u >>> 0).toString(16).toUpperCase().padStart(Math.ceil(width / 4), "0")}`;
+  return { bits, hex, dec: String(value) };
+}
+
+function renderRegisters(step, prev, source) {
+  if (!sourceHasBitwise(source)) return "";
+  const activeFr = step.frames[step.frames.length - 1];
+  if (!activeFr) return "";
+
+  const prevVarText = new Map();
+  if (prev) {
+    const pfr = prev.frames[prev.frames.length - 1];
+    if (pfr) pfr.vars.forEach((v) => prevVarText.set(v.name, v.text));
+  }
+
+  const highlightPositions = new Set();
+  activeFr.vars.forEach((v) => {
+    if (!BIT_INDEX_NAMES.has(v.name)) return;
+    const p = parseScalar(v.text);
+    if (p !== null && p >= 0) highlightPositions.add(p);
+  });
+
+  const regs = activeFr.vars
+    .map((v) => {
+      if (v.ptr || BIT_INDEX_NAMES.has(v.name)) return null;
+      const num = parseScalar(v.text);
+      if (num === null) return null;
+      return { name: v.name, value: num, changed: prevVarText.has(v.name) && prevVarText.get(v.name) !== v.text };
+    })
+    .filter(Boolean);
+
+  if (!regs.length) return "";
+
+  const width = registerWidth(regs.map((r) => r.value));
+  const rows = regs.map((r) => {
+    const { bits, hex, dec } = renderBitRow(r.value, width, highlightPositions, r.changed);
+    return `<div class="viz-reg-row ${r.changed ? "viz-var-changed" : ""}">
+      <div class="viz-reg-head">
+        <span class="viz-reg-name">${escapeHtml(r.name)}</span>
+        <span class="viz-reg-meta"><span class="viz-reg-dec">${escapeHtml(dec)}</span> <span class="viz-reg-hex">${escapeHtml(hex)}</span></span>
+      </div>
+      <div class="viz-bit-row">${bits}</div>
+    </div>`;
+  }).join("");
+
+  const posNote = highlightPositions.size
+    ? `<div class="viz-reg-note">Highlighted bit${highlightPositions.size > 1 ? "s" : ""}: ${[...highlightPositions].sort((a, b) => a - b).join(", ")}</div>`
+    : "";
+
+  return `<div class="viz-array-block viz-reg-block">
+    <div class="viz-array-caption">REGISTERS · ${width}-bit</div>
+    ${rows}
+    ${posNote}
+  </div>`;
+}
 
 function fieldNextIdx(fields) {
   const f = fields.next;
@@ -114,14 +204,6 @@ function renderStructHeap(step, prev) {
   </div>`;
 }
 
-function escapeHtml(s) {
-  return String(s)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
 export function renderTraceStep(container, trace, source, idx) {
   const step = trace.steps[idx];
   const prev = idx > 0 ? trace.steps[idx - 1] : null;
@@ -220,7 +302,8 @@ export function renderTraceStep(container, trace, source, idx) {
     .join("");
 
   const heapHtml = renderStructHeap(step, prev);
-  const memoryHtml = [heapHtml, arraysHtml].filter(Boolean).join("");
+  const registersHtml = renderRegisters(step, prev, source);
+  const memoryHtml = [registersHtml, heapHtml, arraysHtml].filter(Boolean).join("");
 
   /* narration: what just ran, what runs next */
   const srcLine = (n) => (n >= 1 && n <= lines.length ? lines[n - 1].trim().slice(0, 90) : "");

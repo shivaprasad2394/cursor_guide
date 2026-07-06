@@ -1,8 +1,8 @@
 /**
  * Execution Studio — step-through memory visualizer (Python Tutor inspired).
  */
-import { createListSession, renderListStudioRich } from "./list-viz.js?v=23";
-import { createAvlSession, renderAvlStudioRich } from "./avl-viz.js?v=23";
+import { createListSession, renderListStudioRich } from "./list-viz.js?v=24";
+import { createAvlSession, renderAvlStudioRich } from "./avl-viz.js?v=24";
 
 export function createSession(meta, opts = {}) {
   const viz = meta.visualization || "none";

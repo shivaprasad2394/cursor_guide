@@ -1181,6 +1181,63 @@ a:hover {
   background: rgba(240, 180, 41, 0.1);
 }
 
+.viz-bit-pos {
+  border-color: var(--green);
+  box-shadow: 0 0 0 2px var(--green);
+  color: var(--green);
+  background: rgba(63, 185, 80, 0.12);
+}
+
+.viz-reg-block {
+  margin-bottom: 0.75rem;
+}
+
+.viz-reg-row {
+  margin-bottom: 0.65rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.viz-reg-row:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.viz-reg-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.viz-reg-name {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  color: var(--blue);
+}
+
+.viz-reg-meta {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.viz-reg-dec {
+  color: var(--text);
+}
+
+.viz-reg-hex {
+  color: var(--amber);
+}
+
+.viz-reg-note {
+  margin-top: 0.45rem;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
 .memory-tape {
   border: 1px solid var(--border);
   background: var(--bg);
