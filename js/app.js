@@ -376,7 +376,7 @@
 
   async function getVisualizer() {
     if (!visualizerModule) {
-      visualizerModule = await import("./visualizer.js?v=21");
+      visualizerModule = await import("./visualizer.js?v=22");
     }
     return visualizerModule;
   }
@@ -623,8 +623,8 @@
       let mods;
       try {
         mods = await Promise.all([
-          import("./ctracer.js?v=18"),
-          import("./tracer-view.js?v=18"),
+          import("./ctracer.js?v=22"),
+          import("./tracer-view.js?v=22"),
         ]);
       } catch (_) {
         return false;

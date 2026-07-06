@@ -200,7 +200,10 @@ export function renderTraceStep(container, trace, source, idx) {
             .filter((p) => p.off === idx)
             .map((p, bi) => `<span class="viz-ptr-badge ${PTR_COLORS[bi % PTR_COLORS.length]}">↓ ${escapeHtml(p.name)}</span>`)
             .join("");
-          const hot = arr.ptrs.some((p) => p.off === idx);
+          const hot =
+            arr.activeOff !== undefined && arr.activeOff !== null
+              ? arr.activeOff === idx
+              : arr.ptrs.some((p) => p.off === idx);
           const chg = cellChanged(ai, idx, val);
           return `<div class="viz-array-col">
             <div class="viz-ptr-slot">${badges}</div>

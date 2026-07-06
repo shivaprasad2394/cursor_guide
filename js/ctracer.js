@@ -497,6 +497,20 @@ class Parser {
 const isPtr = (v) => v !== null && typeof v === "object";
 const isStructPtr = (v) => isPtr(v) && v.stIdx !== undefined;
 
+const INDEX_VAR_NAMES = new Set([
+  "i", "j", "k", "idx", "mid", "low", "high", "left", "right", "pos", "start", "end",
+]);
+const INDEX_VAR_ORDER = [
+  "i", "j", "k", "idx", "mid", "low", "high", "left", "right", "pos", "start", "end",
+];
+
+function pickIndexVar(indices) {
+  for (const name of INDEX_VAR_ORDER) {
+    if (indices[name] !== undefined) return { name, val: indices[name] };
+  }
+  return null;
+}
+
 function structPtrEq(a, b) {
   const na = a === 0 || a === null || a === undefined ? -1 : a.stIdx;
   const nb = b === 0 || b === null || b === undefined ? -1 : b.stIdx;
@@ -525,6 +539,7 @@ class Interp {
     this.truncated = false;
     this.stopNote = "";
     this.srcLines = source.split("\n");
+    this.lastIdxAccess = null;
 
     this.globals.set("NULL", { v: 0 });
     this.globals.set("INT_MAX", { v: 2147483647 });
@@ -596,6 +611,23 @@ class Interp {
 
   frame() { return this.frames[this.frames.length - 1]; }
 
+  frameIndexVars(fr) {
+    const out = {};
+    for (const [name, box] of fr.vars) {
+      if (INDEX_VAR_NAMES.has(name) && typeof box.v === "number") out[name] = box.v;
+    }
+    return out;
+  }
+
+  noteIdxAccess(arr, off, varName) {
+    if (!arr) return;
+    this.lastIdxAccess = {
+      arrIdx: this.arrays.indexOf(arr),
+      off,
+      varName: varName || null,
+    };
+  }
+
   lookup(name) {
     for (let i = this.frames.length - 1; i >= 0; i -= 1) {
       if (this.frames[i].vars.has(name)) return this.frames[i].vars.get(name);
@@ -610,43 +642,74 @@ class Interp {
       throw new StopTrace();
     }
     const note = noteOverride || (line ? (this.srcLines[line - 1] || "").trim().slice(0, 100) : "");
-    const frames = this.frames.map((fr) => ({
-      name: fr.name,
-      vars: [...fr.vars.entries()].map(([name, box]) => {
-        const v = box.v;
-        let text;
-        let ptr = null;
-        if (isPtr(v) && v.arr) {
-          const ai = this.arrays.indexOf(v.arr);
-          text = `→ ${v.arr.label}[${v.off}]`;
-          ptr = { arrIdx: ai, off: v.off, name };
-        } else if (isStructPtr(v)) {
-          text = this.structFieldText(v.stIdx);
-          ptr = { structIdx: v.stIdx, name };
-        } else if (isPtr(v) && v.box) {
-          text = "→ (ref)";
-        } else if (box.isChar && typeof v === "number" && v > 0) {
-          text = `'${String.fromCharCode(v)}' (${v})`;
-        } else {
-          text = String(v);
-        }
-        return { name, text, ptr };
-      }),
-    }));
+    const frames = this.frames.map((fr) => {
+      const indices = this.frameIndexVars(fr);
+      return {
+        name: fr.name,
+        vars: [...fr.vars.entries()].map(([name, box]) => {
+          const v = box.v;
+          let text;
+          let ptr = null;
+          if (isPtr(v) && v.arr) {
+            const ai = this.arrays.indexOf(v.arr);
+            const idx = pickIndexVar(indices);
+            const effOff = idx ? v.off + idx.val : v.off;
+            text = `→ ${v.arr.label}[${effOff}]`;
+            ptr = { arrIdx: ai, off: effOff, name: idx ? idx.name : name };
+          } else if (isStructPtr(v)) {
+            text = this.structFieldText(v.stIdx);
+            ptr = { structIdx: v.stIdx, name };
+          } else if (isPtr(v) && v.box) {
+            text = "→ (ref)";
+          } else if (box.isChar && typeof v === "number" && v > 0) {
+            text = `'${String.fromCharCode(v)}' (${v})`;
+          } else {
+            text = String(v);
+          }
+          return { name, text, ptr };
+        }),
+      };
+    });
 
     const arrays = this.arrays.map((arr, ai) => {
       const ptrs = [];
       const hot = new Set();
-      for (const fr of frames) {
-        for (const v of fr.vars) {
-          if (v.ptr && v.ptr.arrIdx === ai && v.ptr.off >= 0) {
-            hot.add(v.ptr.off);
-            if (v.ptr.off < 512) ptrs.push({ name: v.ptr.name, off: v.ptr.off });
+      let activeOff = null;
+
+      for (let fi = this.frames.length - 1; fi >= 0; fi -= 1) {
+        const fr = this.frames[fi];
+        const indices = this.frameIndexVars(fr);
+        const idx = pickIndexVar(indices);
+        for (const [name, box] of fr.vars) {
+          const v = box.v;
+          if (!isPtr(v) || !v.arr || this.arrays.indexOf(v.arr) !== ai) continue;
+          if (idx) {
+            const off = v.off + idx.val;
+            if (activeOff === null) activeOff = off;
+            ptrs.push({ name: idx.name, off });
+          } else {
+            ptrs.push({ name, off: v.off });
           }
         }
+        if (activeOff !== null) break;
       }
-      for (let i = 0; i < arr.data.length; i += 1) {
-        if (arr.data[i] !== 0) hot.add(i);
+
+      if (activeOff === null && this.lastIdxAccess && this.lastIdxAccess.arrIdx === ai) {
+        activeOff = this.lastIdxAccess.off;
+        if (!ptrs.some((p) => p.off === activeOff)) {
+          ptrs.push({ name: this.lastIdxAccess.varName || "•", off: activeOff });
+        }
+      }
+
+      if (activeOff !== null) hot.add(activeOff);
+      else {
+        for (const p of ptrs) hot.add(p.off);
+      }
+
+      if (arr.isChar) {
+        for (let i = 0; i < arr.data.length; i += 1) {
+          if (arr.data[i] !== 0) hot.add(i);
+        }
       }
 
       const fmt = (x) =>
@@ -679,6 +742,7 @@ class Interp {
         cells,
         more: arr.data.length > MAX && hot.size === 0,
         ptrs,
+        activeOff,
       };
     });
 
@@ -693,6 +757,7 @@ class Interp {
       heap,
       output: this.output,
     });
+    this.lastIdxAccess = null;
   }
 
   run() {
@@ -864,6 +929,7 @@ class Interp {
       const base = this.evalExpr(e.base);
       const i = toNum(this.evalExpr(e.i));
       if (!isPtr(base) || !base.arr) throw new CUnsupported("indexing a non-array value");
+      this.noteIdxAccess(base.arr, base.off + i, e.i.k === "id" ? e.i.name : null);
       return { arr: base.arr, at: base.off + i };
     }
     if (e.k === "un" && e.op === "*") {
@@ -924,6 +990,7 @@ class Interp {
         const base = this.evalExpr(e.base);
         const i = toNum(this.evalExpr(e.i));
         if (!isPtr(base) || !base.arr) throw new CUnsupported("indexing a non-array value");
+        this.noteIdxAccess(base.arr, base.off + i, e.i.k === "id" ? e.i.name : null);
         const v = base.arr.data[base.off + i];
         return v !== undefined ? v : 0;
       }
