@@ -3,9 +3,11 @@ id: "q117-non-overlapping-intervals-greedy"
 title: "Non-Overlapping Intervals (Greedy)"
 pattern: "greedy"
 difficulty: "medium"
-visualization: "generic"
+visualization: "intervals"
 vizCategory: "dsa"
 stdin: ""
+intervals: "1-2,2-3,3-4,1-3"
+intervalMode: "remove"
 expectedOutput: "minRemove=1\n"
 ---
 ## At a glance

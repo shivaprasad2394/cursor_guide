@@ -3,9 +3,12 @@ id: "q118-number-of-islands-dfs"
 title: "Number of Islands (DFS)"
 pattern: "depth-first search"
 difficulty: "medium"
-visualization: "generic"
+visualization: "grid-dfs"
 vizCategory: "dsa"
 stdin: ""
+gridRows: 4
+gridCols: 5
+gridTape: "11100/11000/00011/00001"
 expectedOutput: "islands=3\n"
 ---
 ## At a glance

@@ -3,9 +3,11 @@ id: "q119-shortest-path-grid-bfs"
 title: "Shortest Path in Grid (BFS)"
 pattern: "breadth-first search"
 difficulty: "medium"
-visualization: "generic"
+visualization: "grid-bfs"
 vizCategory: "dsa"
 stdin: ""
+gridRows: 3
+gridCols: 3
 expectedOutput: "shortest=5\n"
 ---
 ## At a glance
@@ -72,8 +74,8 @@ int shortestPathGrid(const int g[][8], int R, int C) {
             vis[nr][nc] = 1;
             q[tail][0] = nr; q[tail][1] = nc; q[tail++][2] = d + 1;
         }
-    };
-return -1;
+    }
+    return -1;
 }
 
 int main(void) {

@@ -3,9 +3,10 @@ id: "q115-next-greater-element-monotonic-stack"
 title: "Next Greater Element (Monotonic Stack)"
 pattern: "monotonic stack"
 difficulty: "medium"
-visualization: "generic"
+visualization: "monotonic-stack"
 vizCategory: "dsa"
 stdin: ""
+tape: "2,1,2,4,3,8"
 expectedOutput: "nge: 4 2 4 8 -1 8\n"
 ---
 ## At a glance

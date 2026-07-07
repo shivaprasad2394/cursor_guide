@@ -353,7 +353,7 @@
   async function runInBrowser(source, stdin, onProgress) {
     if (!runnerModule) {
       if (onProgress) onProgress("Loading in-browser C compiler (first run ~60 MB, cached after)…");
-      runnerModule = await import("./runner.js?v=29");
+      runnerModule = await import("./runner.js?v=30");
     }
     if (onProgress) onProgress("Compiling & running…");
     return runnerModule.compileAndRun(source, stdin || "");
@@ -376,7 +376,7 @@
 
   async function getVisualizer() {
     if (!visualizerModule) {
-      visualizerModule = await import("./visualizer.js?v=29");
+      visualizerModule = await import("./visualizer.js?v=30");
     }
     return visualizerModule;
   }
@@ -627,9 +627,9 @@
       let mods;
       try {
         mods = await Promise.all([
-          import("./ctracer.js?v=29"),
-          import("./tracer-view.js?v=29"),
-          import("./viz-preprocess.js?v=29"),
+          import("./ctracer.js?v=30"),
+          import("./tracer-view.js?v=30"),
+          import("./viz-preprocess.js?v=30"),
         ]);
       } catch (_) {
         return false;
@@ -642,14 +642,15 @@
       if (solutionCode) candidates.push(solutionCode);
       for (const code of candidates) {
         try {
-          const { source, structDefs } = vp.preprocessVizSource(code);
-          const opts = structDefs.size
-            ? { vizStructs: true, structDefs, preprocessedSource: source }
-            : {};
+          const { source, structDefs, simplified } = vp.preprocessVizSource(code);
+          const opts =
+            structDefs.size || simplified
+              ? { vizStructs: structDefs.size > 0, structDefs, preprocessedSource: source }
+              : {};
           const t = ct.traceC(code, opts);
           if (!t.steps.length) continue;
           liveTrace = t;
-          liveCode = code;
+          liveCode = simplified || structDefs.size ? source : code;
           tracerView = tv;
           return true;
         } catch (_) { /* try next candidate */ }

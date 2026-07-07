@@ -3,9 +3,10 @@ id: "q114-daily-temperatures-monotonic-stack"
 title: "Daily Temperatures (Monotonic Stack)"
 pattern: "monotonic stack"
 difficulty: "medium"
-visualization: "generic"
+visualization: "monotonic-stack"
 vizCategory: "dsa"
 stdin: ""
+tape: "73,74,75,71,69,72,76,73"
 expectedOutput: "wait: 1 1 4 2 1 1 0 0\n"
 ---
 ## At a glance

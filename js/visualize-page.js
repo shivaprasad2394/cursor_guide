@@ -4,10 +4,10 @@
  * mini interpreter in ctracer.js and replays real execution.
  * Mode 2 "Pattern demo": falls back to the algorithm-pattern simulators.
  */
-import { traceC, CUnsupported } from "./ctracer.js?v=29";
-import { createSession, renderStudio, stepCount } from "./visualizer.js?v=29";
-import { renderTraceStep } from "./tracer-view.js?v=29";
-import { preprocessVizSource } from "./viz-preprocess.js?v=29";
+import { traceC, CUnsupported } from "./ctracer.js?v=30";
+import { createSession, renderStudio, stepCount } from "./visualizer.js?v=30";
+import { renderTraceStep } from "./tracer-view.js?v=30";
+import { preprocessVizSource } from "./viz-preprocess.js?v=30";
 
 function escapeHtml(s) {
   return String(s)
@@ -53,11 +53,13 @@ function extractSection(body, heading) {
 }
 
 function traceForVizPage(code) {
-  const { source, structDefs } = preprocessVizSource(code);
-  if (structDefs.size > 0) {
-    return traceC(code, { vizStructs: true, structDefs, preprocessedSource: source });
-  }
-  return traceC(code);
+  const { source, structDefs, simplified } = preprocessVizSource(code);
+  const opts =
+    structDefs.size || simplified
+      ? { vizStructs: structDefs.size > 0, structDefs, preprocessedSource: source }
+      : {};
+  const trace = traceC(code, opts);
+  return { trace, displayCode: simplified || structDefs.size ? source : code };
 }
 
 function extractAlgorithm(body) {
@@ -112,13 +114,15 @@ async function init() {
   let trace = null;
   let traceError = null;
   let codeToTrace = candidates.length ? candidates[0].code : "";
+  let displayCode = codeToTrace;
   let codeLabel = candidates.length ? candidates[0].label : "";
   for (const cand of candidates) {
     try {
-      const t = traceForVizPage(cand.code);
+      const { trace: t, displayCode: disp } = traceForVizPage(cand.code);
       if (!t.steps.length) throw new CUnsupported("no steps produced");
       trace = t;
       codeToTrace = cand.code;
+      displayCode = disp;
       codeLabel = cand.label;
       traceError = null;
       break;
@@ -145,7 +149,7 @@ async function init() {
 
   const render = () => {
     if (mode === "trace") {
-      renderTraceStep(stage, trace, codeToTrace, idx);
+      renderTraceStep(stage, trace, displayCode, idx);
     } else {
       stage.innerHTML = "";
       const holder = document.createElement("div");

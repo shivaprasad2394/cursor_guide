@@ -1,8 +1,15 @@
 /**
  * Execution Studio — step-through memory visualizer (Python Tutor inspired).
  */
-import { createListSession, renderListStudioRich } from "./list-viz.js?v=29";
-import { createAvlSession, renderAvlStudioRich } from "./avl-viz.js?v=29";
+import { createListSession, renderListStudioRich } from "./list-viz.js?v=30";
+import { createAvlSession, renderAvlStudioRich } from "./avl-viz.js?v=30";
+import {
+  createGridDfsSession,
+  createGridBfsSession,
+  createIntervalSession,
+  createMonotonicStackSession,
+  renderDsaStudioRich,
+} from "./dsa-viz.js?v=30";
 
 export function createSession(meta, opts = {}) {
   const viz = meta.visualization || "none";
@@ -36,6 +43,18 @@ export function createSession(meta, opts = {}) {
   }
   if (viz === "linked-list") {
     return createListSession(meta);
+  }
+  if (viz === "grid-dfs") {
+    return createGridDfsSession(meta);
+  }
+  if (viz === "grid-bfs") {
+    return createGridBfsSession(meta);
+  }
+  if (viz === "intervals") {
+    return createIntervalSession(meta);
+  }
+  if (viz === "monotonic-stack") {
+    return createMonotonicStackSession(meta);
   }
   if (viz === "array-cells") {
     const cells = String(meta.tape || "0,1,2,3,4,5,6,7").split(",").map((s) => s.trim());
@@ -83,6 +102,13 @@ export function renderStudio(container, session, stepIndex) {
     renderAvlStudioRich(body, step, session);
   } else if (session.kind === "array-cells") {
     renderArrayStudio(body, step, session);
+  } else if (
+    session.kind === "grid-dfs" ||
+    session.kind === "grid-bfs" ||
+    session.kind === "intervals" ||
+    session.kind === "monotonic-stack"
+  ) {
+    renderDsaStudioRich(body, session, step);
   } else if (session.kind === "generic") {
     renderGenericStudio(body, step, session);
   }

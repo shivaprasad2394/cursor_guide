@@ -295,7 +295,7 @@ export function renderTraceStep(container, trace, source, idx) {
         })
         .join("");
       return `<div class="viz-array-block">
-        <div class="viz-array-caption">${escapeHtml(arr.label)}${arr.more ? " (first 48)" : ""}</div>
+        <div class="viz-array-caption">${escapeHtml(arr.label)}${arr.more ? " (first 32)" : ""}</div>
         <div class="viz-array-grid">${cols}</div>
       </div>`;
     })

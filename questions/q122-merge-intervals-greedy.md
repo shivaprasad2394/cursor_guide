@@ -3,9 +3,11 @@ id: "q122-merge-intervals-greedy"
 title: "Merge Intervals (Greedy)"
 pattern: "greedy"
 difficulty: "medium"
-visualization: "generic"
+visualization: "intervals"
 vizCategory: "dsa"
 stdin: ""
+intervals: "1-3,2-6,8-10,15-18"
+intervalMode: "merge"
 expectedOutput: "merged: [1,6] [8,10] [15,18]\n"
 ---
 ## At a glance

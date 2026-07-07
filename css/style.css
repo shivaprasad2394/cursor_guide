@@ -1867,3 +1867,56 @@ a:hover {
   border-color: var(--green);
   box-shadow: 0 0 0 1px rgba(57, 217, 138, 0.35);
 }
+
+/* DSA pattern demos */
+.viz-grid { display: grid; gap: 0.25rem; margin: 0.75rem 0; }
+.viz-grid-row { display: flex; gap: 0.25rem; }
+.viz-grid-cell {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  background: rgba(255, 255, 255, 0.04);
+}
+.viz-grid-hot {
+  border-color: var(--amber);
+  background: rgba(240, 180, 41, 0.25);
+  font-weight: 700;
+}
+.viz-int-track {
+  position: relative;
+  height: 3.5rem;
+  margin: 1rem 0;
+  border-bottom: 2px solid var(--border);
+}
+.viz-int-bar {
+  position: absolute;
+  bottom: 0;
+  height: 1.75rem;
+  border-radius: 4px 4px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-family: var(--mono);
+  min-width: 2rem;
+}
+.viz-int-kept { background: rgba(57, 217, 138, 0.45); border: 1px solid var(--green); }
+.viz-int-active { background: rgba(100, 149, 237, 0.35); border: 1px solid #6495ed; }
+.viz-int-removed { background: rgba(255, 95, 86, 0.35); border: 1px solid #ff5f56; text-decoration: line-through; }
+.viz-int-idle { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border); }
+.viz-int-merged { margin-top: 0.5rem; font-family: var(--mono); font-size: 0.85rem; color: var(--green); }
+.viz-stack-col { display: flex; flex-direction: column-reverse; gap: 0.25rem; min-height: 4rem; }
+.viz-stack-cell {
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: var(--mono);
+  background: rgba(100, 149, 237, 0.2);
+  text-align: center;
+}
