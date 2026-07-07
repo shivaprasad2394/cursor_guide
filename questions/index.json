@@ -819,7 +819,7 @@
     {
       "id": "q105-insert-at-head-double-pointer",
       "file": "q105-insert-at-head-double-pointer.md",
-      "title": "Insert at Head with Node **head",
+      "title": "Prepend Node with Node **head and Node *local",
       "pattern": "pointer-to-pointer",
       "difficulty": "medium",
       "section": "pointers"
@@ -851,7 +851,7 @@
     {
       "id": "q109-delete-node-double-pointer",
       "file": "q109-delete-node-double-pointer.md",
-      "title": "Delete Node with Node **cursor",
+      "title": "Delete Node by Address with Node **head",
       "pattern": "pointer-to-pointer",
       "difficulty": "medium",
       "section": "pointers"
@@ -863,6 +863,94 @@
       "pattern": "output parameters",
       "difficulty": "easy",
       "section": "pointers"
+    },
+    {
+      "id": "q111-climbing-stairs-dp",
+      "file": "q111-climbing-stairs-dp.md",
+      "title": "Climbing Stairs (DP)",
+      "pattern": "dynamic programming",
+      "difficulty": "easy",
+      "section": "dsa patterns"
+    },
+    {
+      "id": "q112-house-robber-dp",
+      "file": "q112-house-robber-dp.md",
+      "title": "House Robber (DP)",
+      "pattern": "dynamic programming",
+      "difficulty": "medium",
+      "section": "dsa patterns"
+    },
+    {
+      "id": "q113-coin-change-dp",
+      "file": "q113-coin-change-dp.md",
+      "title": "Coin Change (DP)",
+      "pattern": "dynamic programming",
+      "difficulty": "medium",
+      "section": "dsa patterns"
+    },
+    {
+      "id": "q114-daily-temperatures-monotonic-stack",
+      "file": "q114-daily-temperatures-monotonic-stack.md",
+      "title": "Daily Temperatures (Monotonic Stack)",
+      "pattern": "monotonic stack",
+      "difficulty": "medium",
+      "section": "dsa patterns"
+    },
+    {
+      "id": "q115-next-greater-element-monotonic-stack",
+      "file": "q115-next-greater-element-monotonic-stack.md",
+      "title": "Next Greater Element (Monotonic Stack)",
+      "pattern": "monotonic stack",
+      "difficulty": "medium",
+      "section": "dsa patterns"
+    },
+    {
+      "id": "q116-jump-game-greedy",
+      "file": "q116-jump-game-greedy.md",
+      "title": "Jump Game (Greedy)",
+      "pattern": "greedy",
+      "difficulty": "medium",
+      "section": "dsa patterns"
+    },
+    {
+      "id": "q117-non-overlapping-intervals-greedy",
+      "file": "q117-non-overlapping-intervals-greedy.md",
+      "title": "Non-Overlapping Intervals (Greedy)",
+      "pattern": "greedy",
+      "difficulty": "medium",
+      "section": "dsa patterns"
+    },
+    {
+      "id": "q118-number-of-islands-dfs",
+      "file": "q118-number-of-islands-dfs.md",
+      "title": "Number of Islands (DFS)",
+      "pattern": "depth-first search",
+      "difficulty": "medium",
+      "section": "dsa patterns"
+    },
+    {
+      "id": "q119-shortest-path-grid-bfs",
+      "file": "q119-shortest-path-grid-bfs.md",
+      "title": "Shortest Path in Grid (BFS)",
+      "pattern": "breadth-first search",
+      "difficulty": "medium",
+      "section": "dsa patterns"
+    },
+    {
+      "id": "q120-tree-path-sum-dfs",
+      "file": "q120-tree-path-sum-dfs.md",
+      "title": "Path Sum on Binary Tree (DFS)",
+      "pattern": "depth-first search",
+      "difficulty": "medium",
+      "section": "dsa patterns"
+    },
+    {
+      "id": "q122-merge-intervals-greedy",
+      "file": "q122-merge-intervals-greedy.md",
+      "title": "Merge Intervals (Greedy)",
+      "pattern": "greedy",
+      "difficulty": "medium",
+      "section": "dsa patterns"
     }
   ]
 }

@@ -1,35 +1,38 @@
 ---
 id: "q109-delete-node-double-pointer"
-title: "Delete Node with Node **cursor"
+title: "Delete Node by Address with Node **head"
 pattern: "pointer-to-pointer"
 difficulty: "medium"
 visualization: "linked-list"
 vizCategory: "pointers"
 stdin: ""
-expectedOutput: "after delete 20: 10 -> 30 -> NULL\n"
+expectedOutput: "after delete n20: 10 -> 30 -> NULL\n"
 ---
 ## At a glance
 
-- **Goal:** Delete Node with Node **cursor
-- **Pattern:** Pointer-To-Pointer
-- **Expected output:** `after delete 20: 10 -> 30 -> NULL`
+- **Goal:** Delete a node by pointer using `Node **head` and `Node *target`
+- **Pattern:** Pointer-to-pointer
+- **Expected output:** `after delete n20: 10 -> 30 -> NULL`
 
 ## Description
 
-Delete the first node with a given key using `Node **cur` so you can update the previous `next` pointer (including head).
+Given a list and a **pointer to the node to remove** (`target`), implement `void deleteNode(Node **head, Node *target)`. Walk with `Node **cur` until `*cur == target` — no key/value search.
 
 ## Algorithm
 
 ```text
-step1: while *cur != NULL
-step2:   if (*cur)->id == key: save node, *cur = node->next, free node, return
-step3:   cur = &((*cur)->next)   (address of next field — double pointer walk)
+step1: cur = head (address of head pointer)
+step2: while *cur != NULL:
+step3:   if *cur == target: *cur = target->next; free(target); return
+step4:   cur = &((*cur)->next)
 ```
 
 ## Example Trace
 
 ```text
-10->20->30, delete 20 → 10->30
+head -> n10(10) -> n20(20) -> n30(30)
+deleteNode(&head, n20)
+head -> n10(10) -> n30(30)
 ```
 
 ## Starter Code
@@ -40,19 +43,28 @@ step3:   cur = &((*cur)->next)   (address of next field — double pointer walk)
 #include <string.h>
 #include <ctype.h>
 #include <limits.h>
+
 typedef struct Node { int id; struct Node *next; } Node;
-/* TODO: implement the helper function(s) your main needs */
+
+Node *makeNode(int id) {
+    Node *local = (Node *)malloc(sizeof *local);
+    local->id = id;
+    local->next = NULL;
+    return local;
+}
+
+/* TODO: void deleteNode(Node **head, Node *target) */
 
 int main(void) {
-    Node *head = NULL, **tail = &head;
-    for (int id = 10; id <= 30; id += 10) {
-        *tail = (Node *)malloc(sizeof **tail);
-        (*tail)->id = id;
-        (*tail)->next = NULL;
-        tail = &((*tail)->next);
-    }
-    deleteByKey(&head, 20);
-    printf("after delete 20:");
+    Node *head = NULL;
+    Node *n10 = makeNode(10);
+    Node *n20 = makeNode(20);
+    Node *n30 = makeNode(30);
+    n10->next = n20;
+    n20->next = n30;
+    head = n10;
+    deleteNode(&head, n20);
+    printf("after delete n20:");
     for (Node *c = head; c; c = c->next) printf(" %d ->", c->id);
     printf(" NULL\n");
     while (head) {
@@ -72,13 +84,22 @@ int main(void) {
 #include <string.h>
 #include <ctype.h>
 #include <limits.h>
+
 typedef struct Node { int id; struct Node *next; } Node;
-void deleteByKey(Node **cur, int key) {
+
+Node *makeNode(int id) {
+    Node *local = (Node *)malloc(sizeof *local);
+    local->id = id;
+    local->next = NULL;
+    return local;
+}
+
+void deleteNode(Node **head, Node *target) {
+    Node **cur = head;
     while (*cur) {
-        if ((*cur)->id == key) {
-            Node *gone = *cur;
-            *cur = gone->next;
-            free(gone);
+        if (*cur == target) {
+            *cur = target->next;
+            free(target);
             return;
         }
         cur = &((*cur)->next);
@@ -86,15 +107,15 @@ void deleteByKey(Node **cur, int key) {
 }
 
 int main(void) {
-    Node *head = NULL, **tail = &head;
-    for (int id = 10; id <= 30; id += 10) {
-        *tail = (Node *)malloc(sizeof **tail);
-        (*tail)->id = id;
-        (*tail)->next = NULL;
-        tail = &((*tail)->next);
-    }
-    deleteByKey(&head, 20);
-    printf("after delete 20:");
+    Node *head = NULL;
+    Node *n10 = makeNode(10);
+    Node *n20 = makeNode(20);
+    Node *n30 = makeNode(30);
+    n10->next = n20;
+    n20->next = n30;
+    head = n10;
+    deleteNode(&head, n20);
+    printf("after delete n20:");
     for (Node *c = head; c; c = c->next) printf(" %d ->", c->id);
     printf(" NULL\n");
     while (head) {

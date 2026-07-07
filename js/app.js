@@ -353,7 +353,7 @@
   async function runInBrowser(source, stdin, onProgress) {
     if (!runnerModule) {
       if (onProgress) onProgress("Loading in-browser C compiler (first run ~60 MB, cached after)…");
-      runnerModule = await import("./runner.js?v=27");
+      runnerModule = await import("./runner.js?v=28");
     }
     if (onProgress) onProgress("Compiling & running…");
     return runnerModule.compileAndRun(source, stdin || "");
@@ -376,7 +376,7 @@
 
   async function getVisualizer() {
     if (!visualizerModule) {
-      visualizerModule = await import("./visualizer.js?v=27");
+      visualizerModule = await import("./visualizer.js?v=28");
     }
     return visualizerModule;
   }
@@ -403,6 +403,7 @@
     "bit manipulation",
     "math / number",
     "linked list",
+    "dsa patterns",
     "binary search tree",
     "avl tree",
     "queues & stacks",
@@ -418,6 +419,7 @@
     "bit manipulation": { label: "Bit Manipulation", icon: "01", blurb: "XOR tricks, masks, shifts" },
     "math / number": { label: "Math & Numbers", icon: "π", blurb: "Primes, GCD, Fibonacci, digits" },
     "linked list": { label: "Linked Lists", icon: "→", blurb: "Reverse, merge, cycle detection" },
+    "dsa patterns": { label: "DSA Patterns", icon: "DP", blurb: "DP, greedy, monotonic stack, BFS/DFS" },
     "binary search tree": { label: "Binary Search Tree", icon: "BST", blurb: "Insert, search, delete, traverse" },
     "avl tree": { label: "AVL Tree", icon: "AVL", blurb: "Rotations and rebalancing" },
     "queues & stacks": { label: "Queues & Stacks", icon: "⊟", blurb: "Ring buffer, valid parentheses" },
@@ -625,8 +627,8 @@
       let mods;
       try {
         mods = await Promise.all([
-          import("./ctracer.js?v=27"),
-          import("./tracer-view.js?v=27"),
+          import("./ctracer.js?v=28"),
+          import("./tracer-view.js?v=28"),
         ]);
       } catch (_) {
         return false;
