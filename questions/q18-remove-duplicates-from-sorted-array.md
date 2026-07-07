@@ -67,7 +67,8 @@ arr = [1, 1, 2, 2, 3, 4, 4]
 
 int main(void) {
     int a[]={
-    1,1,2,2,3,4,4};
+        1,1,2,2,3,4,4
+    }
     int n=removeDuplicates(a,7);
     printf("removeDups: ");
     pr(a,n);
@@ -84,7 +85,7 @@ int main(void) {
 #include <ctype.h>
 #include <limits.h>
 
-static void pr(const int*a,int n){for(int i=0;i<n;i++)printf("%d ",a[i]);printf("\n");}
+static void pr(const int*a,int n){for (int i=0;i<n;i++)printf("%d ",a[i]);printf("\n");}
 
 int removeDuplicates(int arr[], int n) {
     if (n == 0) return 0;
@@ -99,7 +100,12 @@ int removeDuplicates(int arr[], int n) {
 }
 
 int main(void) {
-    int a[]={1,1,2,2,3,4,4}; int n=removeDuplicates(a,7); printf("removeDups: "); pr(a,n);
+    int a[]={
+        1,1,2,2,3,4,4
+    }
+    int n=removeDuplicates(a,7);
+    printf("removeDups: ");
+    pr(a,n);
     return 0;
 }
 ```

@@ -61,7 +61,9 @@ arr = [2, 3, 7, 9, 11, 2, 3, 11]
 
 int main(void) {
     int a[]={
-    2,3,7,9,11,2,3,11},x,y;
+        2,3,7,9,11,2,3,11
+    }
+    ,x,y;
     findTwoUniques(a,8,&x,&y);
     printf("two uniques=%d,%d\n",x,y);
     return 0;
@@ -90,7 +92,12 @@ void findTwoUniques(const int arr[], int n, int *a, int *b) {
 }
 
 int main(void) {
-    int a[]={2,3,7,9,11,2,3,11},x,y; findTwoUniques(a,8,&x,&y); printf("two uniques=%d,%d\n",x,y);
+    int a[]={
+        2,3,7,9,11,2,3,11
+    }
+    ,x,y;
+    findTwoUniques(a,8,&x,&y);
+    printf("two uniques=%d,%d\n",x,y);
     return 0;
 }
 ```

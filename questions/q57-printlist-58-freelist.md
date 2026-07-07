@@ -34,13 +34,12 @@ typedef struct Node { int id; struct Node *next; } Node;
 
 int main(void) {
     Node*h=NULL;
-    for(int i=3;
-    i>=1;
-    i--){
-    Node*n=createNode(i);
-    n->next=h;
-    h=n;
-    } printList(h);
+    for (int i=3; i>=1; i--) {
+        Node*n=createNode(i);
+        n->next=h;
+        h=n;
+    }
+    printList(h);
     freeList(h);
     return 0;
 }
@@ -75,7 +74,14 @@ void freeList(Node *head) {
 }
 
 int main(void) {
-    Node*h=NULL; for(int i=3;i>=1;i--){Node*n=createNode(i);n->next=h;h=n;} printList(h); freeList(h);
+    Node*h=NULL;
+    for (int i=3;i>=1;i--){
+        Node*n=createNode(i);
+        n->next=h;
+        h=n;
+    }
+    printList(h);
+    freeList(h);
     return 0;
 }
 ```

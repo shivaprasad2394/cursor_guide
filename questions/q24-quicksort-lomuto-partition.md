@@ -44,7 +44,8 @@ step4: Recurse on left partition (low..p-1) and right (p+1..high)
 
 int main(void) {
     int a[]={
-    10,7,8,9,1,5};
+        10,7,8,9,1,5
+    }
     quickSort(a,0,5);
     printf("quickSort: ");
     pr(a,6);
@@ -61,7 +62,7 @@ int main(void) {
 #include <ctype.h>
 #include <limits.h>
 
-static void pr(const int*a,int n){for(int i=0;i<n;i++)printf("%d ",a[i]);printf("\n");}
+static void pr(const int*a,int n){for (int i=0;i<n;i++)printf("%d ",a[i]);printf("\n");}
 static void swapi(int *a, int *b) { int t = *a; *a = *b; *b = t; }
 static int partition(int arr[], int low, int high) {
     int pivot = arr[high];
@@ -82,7 +83,12 @@ void quickSort(int arr[], int low, int high) {
 }
 
 int main(void) {
-    int a[]={10,7,8,9,1,5}; quickSort(a,0,5); printf("quickSort: "); pr(a,6);
+    int a[]={
+        10,7,8,9,1,5
+    }
+    quickSort(a,0,5);
+    printf("quickSort: ");
+    pr(a,6);
     return 0;
 }
 ```

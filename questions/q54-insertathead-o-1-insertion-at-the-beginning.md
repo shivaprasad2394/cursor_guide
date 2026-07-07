@@ -60,14 +60,12 @@ int main(void) {
     Node*h=NULL;
     insertAtHead(&h,10);
     insertAtHead(&h,5);
-    for(Node*c=h;
-    c;
-    c=c->next)printf("%d -> ",c->id);
+    for (Node*c=h; c; c=c->next) printf("%d -> ",c->id);
     printf("NULL\n");
-    while(h){
-    Node*t=h->next;
-    free(h);
-    h=t;
+    while (h){
+        Node*t=h->next;
+        free(h);
+        h=t;
     }
     return 0;
 }
@@ -100,7 +98,16 @@ int insertAtHead(Node **head, int id) {
 }
 
 int main(void) {
-    Node*h=NULL; insertAtHead(&h,10); insertAtHead(&h,5); for(Node*c=h;c;c=c->next)printf("%d -> ",c->id); printf("NULL\n"); while(h){Node*t=h->next;free(h);h=t;}
+    Node*h=NULL;
+    insertAtHead(&h,10);
+    insertAtHead(&h,5);
+    for (Node*c=h;c;c=c->next)printf("%d -> ",c->id);
+    printf("NULL\n");
+    while (h){
+        Node*t=h->next;
+        free(h);
+        h=t;
+    }
     return 0;
 }
 ```

@@ -42,8 +42,12 @@ step3: When one array is exhausted, copy the remainder of the other
 
 int main(void) {
     int a[]={
-    1,3,5},b[]={
-    2,4,6},o[6];
+        1,3,5
+    }
+    ,b[]={
+        2,4,6
+    }
+    ,o[6];
     mergeSorted(a,3,b,3,o);
     printf("merge: ");
     pr(o,6);
@@ -60,7 +64,7 @@ int main(void) {
 #include <ctype.h>
 #include <limits.h>
 
-static void pr(const int*a,int n){for(int i=0;i<n;i++)printf("%d ",a[i]);printf("\n");}
+static void pr(const int*a,int n){for (int i=0;i<n;i++)printf("%d ",a[i]);printf("\n");}
 
 void mergeSorted(const int a[], int m, const int b[], int n, int out[]) {
     int i = 0, j = 0, k = 0;
@@ -71,7 +75,16 @@ void mergeSorted(const int a[], int m, const int b[], int n, int out[]) {
 }
 
 int main(void) {
-    int a[]={1,3,5},b[]={2,4,6},o[6]; mergeSorted(a,3,b,3,o); printf("merge: "); pr(o,6);
+    int a[]={
+        1,3,5
+    }
+    ,b[]={
+        2,4,6
+    }
+    ,o[6];
+    mergeSorted(a,3,b,3,o);
+    printf("merge: ");
+    pr(o,6);
     return 0;
 }
 ```

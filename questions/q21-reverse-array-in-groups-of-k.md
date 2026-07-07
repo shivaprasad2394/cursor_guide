@@ -55,7 +55,8 @@ arr = [1,2,3,4,5,6,7,8,9], k=3
 
 int main(void) {
     int a[]={
-    1,2,3,4,5,6,7,8,9};
+        1,2,3,4,5,6,7,8,9
+    }
     reverseInGroups(a,9,3);
     printf("revGroups3: ");
     pr(a,9);
@@ -72,7 +73,7 @@ int main(void) {
 #include <ctype.h>
 #include <limits.h>
 
-static void pr(const int*a,int n){for(int i=0;i<n;i++)printf("%d ",a[i]);printf("\n");}
+static void pr(const int*a,int n){for (int i=0;i<n;i++)printf("%d ",a[i]);printf("\n");}
 static void revArr(int a[], int i, int j) {
     while (i < j) { int t = a[i]; a[i] = a[j]; a[j] = t; i++; j--; }
 }
@@ -86,7 +87,12 @@ void reverseInGroups(int arr[], int n, int k) {
 }
 
 int main(void) {
-    int a[]={1,2,3,4,5,6,7,8,9}; reverseInGroups(a,9,3); printf("revGroups3: "); pr(a,9);
+    int a[]={
+        1,2,3,4,5,6,7,8,9
+    }
+    reverseInGroups(a,9,3);
+    printf("revGroups3: ");
+    pr(a,9);
     return 0;
 }
 ```

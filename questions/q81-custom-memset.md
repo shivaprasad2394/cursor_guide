@@ -47,13 +47,15 @@ my_memset(buf, '*', 4) -> buf = "****"
 /* TODO: implement the helper function(s) your main needs */
 
 int main(void) {
-    char buf[8] = {0};
+    char buf[8] = {
+        0
+    }
     my_memset(buf, '*', 4);
     printf("my_memset('*',4) -> %s\n", buf);
-
     /* show the byte-fill gotcha on ints */
     int arr[2];
-    my_memset(arr, 1, sizeof arr);      /* each BYTE = 0x01 */
+    my_memset(arr, 1, sizeof arr);
+    /* each BYTE = 0x01 */
     printf("my_memset(arr,1) -> arr[0]=0x%08X (NOT 1!)\n", arr[0]);
     return 0;
 }
@@ -87,13 +89,15 @@ void *my_memset(void *dst, int c, size_t n) {
 }
 
 int main(void) {
-    char buf[8] = {0};
+    char buf[8] = {
+        0
+    }
     my_memset(buf, '*', 4);
     printf("my_memset('*',4) -> %s\n", buf);
-
     /* show the byte-fill gotcha on ints */
     int arr[2];
-    my_memset(arr, 1, sizeof arr);      /* each BYTE = 0x01 */
+    my_memset(arr, 1, sizeof arr);
+    /* each BYTE = 0x01 */
     printf("my_memset(arr,1) -> arr[0]=0x%08X (NOT 1!)\n", arr[0]);
     return 0;
 }

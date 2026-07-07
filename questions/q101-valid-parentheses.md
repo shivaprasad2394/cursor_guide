@@ -50,8 +50,8 @@ s = "{[]}"
 /* TODO: implement the helper function(s) your main needs */
 
 int main(void) {
-        printf("isValid(\"()\")=%d\n", isValid("()"));
-        printf("isValid(\"(]\")=%d\n", isValid("(]"));
+    printf("isValid(\"()\")=%d\n", isValid("()"));
+    printf("isValid(\"(]\")=%d\n", isValid("(]"));
     return 0;
 }
 ```
@@ -81,8 +81,8 @@ int isValid(const char *s) {
 }
 
 int main(void) {
-        printf("isValid(\"()\")=%d\n", isValid("()"));
-        printf("isValid(\"(]\")=%d\n", isValid("(]"));
+    printf("isValid(\"()\")=%d\n", isValid("()"));
+    printf("isValid(\"(]\")=%d\n", isValid("(]"));
     return 0;
 }
 ```

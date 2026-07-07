@@ -78,7 +78,9 @@ int parseIPv4(const char *str, int octets[4]) {
 }
 
 int main(void) {
-    int o[4]; int ok=parseIPv4("192.168.1.10",o); printf("valid=%d -> %d.%d.%d.%d\n",ok,o[0],o[1],o[2],o[3]);
+    int o[4];
+    int ok=parseIPv4("192.168.1.10",o);
+    printf("valid=%d -> %d.%d.%d.%d\n",ok,o[0],o[1],o[2],o[3]);
     return 0;
 }
 ```

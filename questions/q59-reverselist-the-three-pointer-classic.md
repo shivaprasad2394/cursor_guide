@@ -62,22 +62,19 @@ typedef struct Node { int id; struct Node *next; } Node;
 
 int main(void) {
     Node*h=NULL;
-    for(int i=3;
-    i>=1;
-    i--){
-    Node*n=malloc(sizeof*n);
-    n->id=i;
-    n->next=h;
-    h=n;
-    } h=reverseList(h);
-    for(Node*c=h;
-    c;
-    c=c->next)printf("%d -> ",c->id);
+    for (int i=3; i>=1; i--) {
+        Node*n=malloc(sizeof*n);
+        n->id=i;
+        n->next=h;
+        h=n;
+    }
+    h=reverseList(h);
+    for (Node*c=h; c; c=c->next) printf("%d -> ",c->id);
     printf("NULL\n");
-    while(h){
-    Node*t=h->next;
-    free(h);
-    h=t;
+    while (h){
+        Node*t=h->next;
+        free(h);
+        h=t;
     }
     return 0;
 }
@@ -106,7 +103,21 @@ Node *reverseList(Node *head) {
 }
 
 int main(void) {
-    Node*h=NULL; for(int i=3;i>=1;i--){Node*n=malloc(sizeof*n);n->id=i;n->next=h;h=n;} h=reverseList(h); for(Node*c=h;c;c=c->next)printf("%d -> ",c->id); printf("NULL\n"); while(h){Node*t=h->next;free(h);h=t;}
+    Node*h=NULL;
+    for (int i=3;i>=1;i--){
+        Node*n=malloc(sizeof*n);
+        n->id=i;
+        n->next=h;
+        h=n;
+    }
+    h=reverseList(h);
+    for (Node*c=h;c;c=c->next)printf("%d -> ",c->id);
+    printf("NULL\n");
+    while (h){
+        Node*t=h->next;
+        free(h);
+        h=t;
+    }
     return 0;
 }
 ```

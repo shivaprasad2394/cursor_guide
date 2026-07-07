@@ -76,10 +76,15 @@ typedef struct AvlNode {
 /* TODO: implement the helper function(s) your main needs */
 
 int main(void) {
-    AvlNode n10 = {10, 1, NULL, NULL};
-    AvlNode n20 = {20, 2, &n10, NULL};
-    AvlNode n30 = {30, 3, &n20, NULL};
-
+    AvlNode n10 = {
+        10, 1, NULL, NULL
+    }
+    AvlNode n20 = {
+        20, 2, &n10, NULL
+    }
+    AvlNode n30 = {
+        30, 3, &n20, NULL
+    }
     AvlNode *root = rotateRight(&n30);
     printf("after rotateRight root=%d left=%d right=%d\n",
            root->id,
@@ -134,10 +139,15 @@ AvlNode *rotateLeft(AvlNode *x) {
 }
 
 int main(void) {
-    AvlNode n10 = {10, 1, NULL, NULL};
-    AvlNode n20 = {20, 2, &n10, NULL};
-    AvlNode n30 = {30, 3, &n20, NULL};
-
+    AvlNode n10 = {
+        10, 1, NULL, NULL
+    }
+    AvlNode n20 = {
+        20, 2, &n10, NULL
+    }
+    AvlNode n30 = {
+        30, 3, &n20, NULL
+    }
     AvlNode *root = rotateRight(&n30);
     printf("after rotateRight root=%d left=%d right=%d\n",
            root->id,

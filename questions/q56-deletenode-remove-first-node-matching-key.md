@@ -55,21 +55,18 @@ typedef struct Node { int id; struct Node *next; } Node;
 
 int main(void) {
     Node*h=NULL;
-    for(int i=1;
-    i<=3;
-    i++){
-    Node*n=createNode(i*10);
-    n->next=h;
-    h=n;
-    } /* h: 30 20 10 */ deleteNode(&h,20);
-    for(Node*c=h;
-    c;
-    c=c->next)printf("%d -> ",c->id);
+    for (int i=1; i<=3; i++) {
+        Node*n=createNode(i*10);
+        n->next=h;
+        h=n;
+    }
+    /* h: 30 20 10 */ deleteNode(&h,20);
+    for (Node*c=h; c; c=c->next) printf("%d -> ",c->id);
     printf("NULL\n");
-    while(h){
-    Node*t=h->next;
-    free(h);
-    h=t;
+    while (h){
+        Node*t=h->next;
+        free(h);
+        h=t;
     }
     return 0;
 }
@@ -109,7 +106,20 @@ void deleteNode(Node **head, int key) {
 }
 
 int main(void) {
-    Node*h=NULL; for(int i=1;i<=3;i++){Node*n=createNode(i*10);n->next=h;h=n;} /* h: 30 20 10 */ deleteNode(&h,20); for(Node*c=h;c;c=c->next)printf("%d -> ",c->id); printf("NULL\n"); while(h){Node*t=h->next;free(h);h=t;}
+    Node*h=NULL;
+    for (int i=1;i<=3;i++){
+        Node*n=createNode(i*10);
+        n->next=h;
+        h=n;
+    }
+    /* h: 30 20 10 */ deleteNode(&h,20);
+    for (Node*c=h;c;c=c->next)printf("%d -> ",c->id);
+    printf("NULL\n");
+    while (h){
+        Node*t=h->next;
+        free(h);
+        h=t;
+    }
     return 0;
 }
 ```

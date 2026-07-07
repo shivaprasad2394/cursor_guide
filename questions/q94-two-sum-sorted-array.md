@@ -54,11 +54,13 @@ arr = [2, 7, 11, 15], target = 9
 /* TODO: implement the helper function(s) your main needs */
 
 int main(void) {
-        int a[] = {2, 7, 11, 15};
-        int i, j;
-        if (twoSum(a, 4, 9, &i, &j))
+    int a[] = {
+        2, 7, 11, 15
+    }
+    int i, j;
+    if (twoSum(a, 4, 9, &i, &j))
             printf("twoSum([2,7,11,15],9) -> %d,%d\n", i, j);
-        else
+    else
             printf("no pair\n");
     return 0;
 }
@@ -84,11 +86,13 @@ int twoSum(const int arr[], int n, int target, int *i, int *j) {
 }
 
 int main(void) {
-        int a[] = {2, 7, 11, 15};
-        int i, j;
-        if (twoSum(a, 4, 9, &i, &j))
+    int a[] = {
+        2, 7, 11, 15
+    }
+    int i, j;
+    if (twoSum(a, 4, 9, &i, &j))
             printf("twoSum([2,7,11,15],9) -> %d,%d\n", i, j);
-        else
+    else
             printf("no pair\n");
     return 0;
 }

@@ -77,27 +77,39 @@ int main(void) {
     size_t n = 4096;                    /* one page */
     char *mem = mmap(NULL, n, PROT_READ | PROT_WRITE,
                      MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-    if (mem == MAP_FAILED) { perror("mmap anon"); return 1; }
+    if (mem == MAP_FAILED) {
+        perror("mmap anon");
+        return 1;
+    }
     strcpy(mem, "anonymous mmap memory works like an array");
     printf("anonymous map -> \"%s\"\n", mem);
     munmap(mem, n);
-
     /* ---- B) file mapping: file bytes appear as a memory array ---- */
     const char *path = "/tmp/mmap_demo.txt";
     int fd = open(path, O_RDWR | O_CREAT | O_TRUNC, 0600);
-    if (fd < 0) { perror("open"); return 1; }
+    if (fd < 0) {
+        perror("open");
+        return 1;
+    }
     const char *init = "hello mmap file";
-    if (write(fd, init, strlen(init)) < 0) { perror("write"); close(fd); return 1; }
-
+    if (write(fd, init, strlen(init)) < 0) {
+        perror("write");
+        close(fd);
+        return 1;
+    }
     size_t flen = strlen(init);
     char *fmap = mmap(NULL, flen, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-    if (fmap == MAP_FAILED) { perror("mmap file"); close(fd); return 1; }
-
+    if (fmap == MAP_FAILED) {
+        perror("mmap file");
+        close(fd);
+        return 1;
+    }
     printf("file map (before) -> \"%.*s\"\n", (int)flen, fmap);
-    fmap[0] = (char)toupper((unsigned char)fmap[0]);   /* edit via pointer */
-    msync(fmap, flen, MS_SYNC);          /* flush change back to the file */
+    fmap[0] = (char)toupper((unsigned char)fmap[0]);
+    /* edit via pointer */
+    msync(fmap, flen, MS_SYNC);
+    /* flush change back to the file */
     printf("file map (after)  -> \"%.*s\"\n", (int)flen, fmap);
-
     munmap(fmap, flen);
     close(fd);
     unlink(path);
@@ -150,27 +162,39 @@ int main(void) {
     size_t n = 4096;                    /* one page */
     char *mem = mmap(NULL, n, PROT_READ | PROT_WRITE,
                      MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-    if (mem == MAP_FAILED) { perror("mmap anon"); return 1; }
+    if (mem == MAP_FAILED) {
+        perror("mmap anon");
+        return 1;
+    }
     strcpy(mem, "anonymous mmap memory works like an array");
     printf("anonymous map -> \"%s\"\n", mem);
     munmap(mem, n);
-
     /* ---- B) file mapping: file bytes appear as a memory array ---- */
     const char *path = "/tmp/mmap_demo.txt";
     int fd = open(path, O_RDWR | O_CREAT | O_TRUNC, 0600);
-    if (fd < 0) { perror("open"); return 1; }
+    if (fd < 0) {
+        perror("open");
+        return 1;
+    }
     const char *init = "hello mmap file";
-    if (write(fd, init, strlen(init)) < 0) { perror("write"); close(fd); return 1; }
-
+    if (write(fd, init, strlen(init)) < 0) {
+        perror("write");
+        close(fd);
+        return 1;
+    }
     size_t flen = strlen(init);
     char *fmap = mmap(NULL, flen, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-    if (fmap == MAP_FAILED) { perror("mmap file"); close(fd); return 1; }
-
+    if (fmap == MAP_FAILED) {
+        perror("mmap file");
+        close(fd);
+        return 1;
+    }
     printf("file map (before) -> \"%.*s\"\n", (int)flen, fmap);
-    fmap[0] = (char)toupper((unsigned char)fmap[0]);   /* edit via pointer */
-    msync(fmap, flen, MS_SYNC);          /* flush change back to the file */
+    fmap[0] = (char)toupper((unsigned char)fmap[0]);
+    /* edit via pointer */
+    msync(fmap, flen, MS_SYNC);
+    /* flush change back to the file */
     printf("file map (after)  -> \"%.*s\"\n", (int)flen, fmap);
-
     munmap(fmap, flen);
     close(fd);
     unlink(path);

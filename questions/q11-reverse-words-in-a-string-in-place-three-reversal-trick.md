@@ -84,7 +84,9 @@ void reverseWords(char *s) {
 }
 
 int main(void) {
-    char s[]="the sky is blue"; reverseWords(s); printf("reverseWords=%s\n", s);
+    char s[]="the sky is blue";
+    reverseWords(s);
+    printf("reverseWords=%s\n", s);
     return 0;
 }
 ```

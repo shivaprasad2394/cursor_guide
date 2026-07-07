@@ -39,16 +39,17 @@ typedef struct {
 
 int main(void) {
     rx_ring_init();
-    int tail = 0;   /* driver's read cursor, like a ring-buffer tail */
+    int tail = 0;
+    /* driver's read cursor, like a ring-buffer tail */
 
-    const char *packets[] = {"PKT-alpha", "PKT-bravo", "PKT-charlie",
-                             "PKT-delta", "PKT-echo"};
+    const char *packets[] = {
+        "PKT-alpha", "PKT-bravo", "PKT-charlie",
+                             "PKT-delta", "PKT-echo"
+    }
     int np = (int)(sizeof(packets)/sizeof(packets[0]));
-
     for (int p = 0; p < np; p++) {
         /* NIC fills the slot at the hardware's current position (we mirror tail) */
         nic_receive(tail % RING_SIZE, packets[p]);
-
         /* Driver polls: is the slot at 'tail' now owned by SW? */
         Descriptor *d = &ring[tail % RING_SIZE];
         if (d->own == OWN_SW) {
@@ -57,8 +58,11 @@ int main(void) {
             tmp[d->len] = '\0';
             printf("[drv] slot %d received \"%s\" (%u bytes)\n",
                    tail % RING_SIZE, tmp, d->len);
-            d->own = OWN_HW;            /* RE-ARM: give slot back to NIC */
-            tail++;                     /* advance; wraps via % RING_SIZE */
+            d->own = OWN_HW;
+            /* RE-ARM: give slot back to NIC */
+            tail++;
+            /* advance;
+            wraps via % RING_SIZE */
         }
     }
     printf("Processed %d packets through a %d-slot descriptor ring.\n", np, RING_SIZE);
@@ -135,16 +139,17 @@ static void nic_receive(int slot, const char *packet) {
 
 int main(void) {
     rx_ring_init();
-    int tail = 0;   /* driver's read cursor, like a ring-buffer tail */
+    int tail = 0;
+    /* driver's read cursor, like a ring-buffer tail */
 
-    const char *packets[] = {"PKT-alpha", "PKT-bravo", "PKT-charlie",
-                             "PKT-delta", "PKT-echo"};
+    const char *packets[] = {
+        "PKT-alpha", "PKT-bravo", "PKT-charlie",
+                             "PKT-delta", "PKT-echo"
+    }
     int np = (int)(sizeof(packets)/sizeof(packets[0]));
-
     for (int p = 0; p < np; p++) {
         /* NIC fills the slot at the hardware's current position (we mirror tail) */
         nic_receive(tail % RING_SIZE, packets[p]);
-
         /* Driver polls: is the slot at 'tail' now owned by SW? */
         Descriptor *d = &ring[tail % RING_SIZE];
         if (d->own == OWN_SW) {
@@ -153,8 +158,11 @@ int main(void) {
             tmp[d->len] = '\0';
             printf("[drv] slot %d received \"%s\" (%u bytes)\n",
                    tail % RING_SIZE, tmp, d->len);
-            d->own = OWN_HW;            /* RE-ARM: give slot back to NIC */
-            tail++;                     /* advance; wraps via % RING_SIZE */
+            d->own = OWN_HW;
+            /* RE-ARM: give slot back to NIC */
+            tail++;
+            /* advance;
+            wraps via % RING_SIZE */
         }
     }
     printf("Processed %d packets through a %d-slot descriptor ring.\n", np, RING_SIZE);

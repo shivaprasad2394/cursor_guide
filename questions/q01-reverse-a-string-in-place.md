@@ -89,7 +89,9 @@ void reverseString(char *s) {
 }
 
 int main(void) {
-    char s[]="hello"; reverseString(s); printf("reverse(\"hello\") = %s\n", s);
+    char s[]="hello";
+    reverseString(s);
+    printf("reverse(\"hello\") = %s\n", s);
     return 0;
 }
 ```

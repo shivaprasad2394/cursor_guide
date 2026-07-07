@@ -46,7 +46,8 @@ Children of node i: left = 2*i+1, right = 2*i+2
 
 int main(void) {
     int a[]={
-    12,11,13,5,6,7};
+        12,11,13,5,6,7
+    }
     heapSort(a,6);
     printf("heapSort: ");
     pr(a,6);
@@ -63,7 +64,7 @@ int main(void) {
 #include <ctype.h>
 #include <limits.h>
 
-static void pr(const int*a,int n){for(int i=0;i<n;i++)printf("%d ",a[i]);printf("\n");}
+static void pr(const int*a,int n){for (int i=0;i<n;i++)printf("%d ",a[i]);printf("\n");}
 static void heapify(int arr[], int n, int root) {
     int largest = root;
     int left    = 2 * root + 1;
@@ -85,7 +86,12 @@ void heapSort(int arr[], int n) {
 }
 
 int main(void) {
-    int a[]={12,11,13,5,6,7}; heapSort(a,6); printf("heapSort: "); pr(a,6);
+    int a[]={
+        12,11,13,5,6,7
+    }
+    heapSort(a,6);
+    printf("heapSort: ");
+    pr(a,6);
     return 0;
 }
 ```

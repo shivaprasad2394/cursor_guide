@@ -56,7 +56,7 @@ line = "timeout=30"
 
 int main(void) {
     char k[64],val[64];
-    if(parseKeyValue("timeout=30",k,sizeof k,val,sizeof val)==2) printf("key=%s value=%s\n",k,val);
+    if (parseKeyValue("timeout=30",k,sizeof k,val,sizeof val)==2) printf("key=%s value=%s\n",k,val);
     return 0;
 }
 ```
@@ -81,7 +81,8 @@ int parseKeyValue(const char *line, char *key, size_t keySz,
 }
 
 int main(void) {
-    char k[64],val[64]; if(parseKeyValue("timeout=30",k,sizeof k,val,sizeof val)==2) printf("key=%s value=%s\n",k,val);
+    char k[64],val[64];
+    if (parseKeyValue("timeout=30",k,sizeof k,val,sizeof val)==2) printf("key=%s value=%s\n",k,val);
     return 0;
 }
 ```

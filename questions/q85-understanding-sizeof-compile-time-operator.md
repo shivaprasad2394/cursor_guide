@@ -41,7 +41,6 @@ int main(void) {
     int   i;
     double d;
     int   arr[10];
-
     printf("MY_SIZEOF(int)    = %ld (real sizeof = %zu)\n",
            MY_SIZEOF(i), sizeof i);
     printf("MY_SIZEOF(double) = %ld (real sizeof = %zu)\n",
@@ -84,7 +83,6 @@ int main(void) {
     int   i;
     double d;
     int   arr[10];
-
     printf("MY_SIZEOF(int)    = %ld (real sizeof = %zu)\n",
            MY_SIZEOF(i), sizeof i);
     printf("MY_SIZEOF(double) = %ld (real sizeof = %zu)\n",

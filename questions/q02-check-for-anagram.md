@@ -80,15 +80,16 @@ int isAnagram(const char *str1, const char *str2) {
     for (int i = 0; str1[i]; i++) {
         freq[(unsigned char)str1[i]]++;   /* cast: avoid negative index if char is signed */
         freq[(unsigned char)str2[i]]--;
-    }
-    for (int i = 0; i < 256; i++) {
+    };
+for (int i = 0; i < 256; i++) {
         if (freq[i] != 0) return 0;       /* mismatch found */
-    }
-    return 1;
+    };
+return 1;
 }
 
 int main(void) {
-    printf("isAnagram(listen,silent)=%d\n", isAnagram("listen","silent")); printf("isAnagram(hello,world)=%d\n", isAnagram("hello","world"));
+    printf("isAnagram(listen,silent)=%d\n", isAnagram("listen","silent"));
+    printf("isAnagram(hello,world)=%d\n", isAnagram("hello","world"));
     return 0;
 }
 ```

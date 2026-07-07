@@ -82,10 +82,9 @@ typedef struct BstNode { int id; struct BstNode *left,*right; } BstNode;
 int main(void) {
     BstNode*r=NULL;
     int k[]={
-    50,30,70,20,40};
-    for(int i=0;
-    i<5;
-    i++) r=bstInsert(r,k[i]);
+        50,30,70,20,40
+    };
+    for (int i=0; i<5; i++) r=bstInsert(r,k[i]);
     printf("inorder: ");
     inorder(r);
     printf("\npreorder: ");
@@ -115,19 +114,30 @@ BstNode *createBstNode(int id) {
 }
 BstNode *bstInsert(BstNode *root, int id) {
     if (root == NULL) return createBstNode(id);
-    if      (id <  root->id) root->left  = bstInsert(root->left,  id);
+    if (id <  root->id) root->left  = bstInsert(root->left,  id);
     else if (id >  root->id) root->right = bstInsert(root->right, id);
     return root;
 }
 
-void inorder  (const BstNode *r) { if(r){ inorder(r->left);  printf("%d ",r->id); inorder(r->right); }}
+void inorder  (const BstNode *r) { if (r){ inorder(r->left);  printf("%d ",r->id); inorder(r->right); }}
 
-void preorder (const BstNode *r) { if(r){ printf("%d ",r->id); preorder(r->left);  preorder(r->right);}}
+void preorder (const BstNode *r) { if (r){ printf("%d ",r->id); preorder(r->left);  preorder(r->right);}}
 
-void postorder(const BstNode *r) { if(r){ postorder(r->left); postorder(r->right); printf("%d ",r->id);}}
+void postorder(const BstNode *r) { if (r){ postorder(r->left); postorder(r->right); printf("%d ",r->id);}}
 
 int main(void) {
-    BstNode*r=NULL; int k[]={50,30,70,20,40}; for(int i=0;i<5;i++) r=bstInsert(r,k[i]); printf("inorder: "); inorder(r); printf("\npreorder: "); preorder(r); printf("\npostorder: "); postorder(r); printf("\n");
+    BstNode*r=NULL;
+    int k[]={
+        50,30,70,20,40
+    };
+    for (int i=0;i<5;i++) r=bstInsert(r,k[i]);
+    printf("inorder: ");
+    inorder(r);
+    printf("\npreorder: ");
+    preorder(r);
+    printf("\npostorder: ");
+    postorder(r);
+    printf("\n");
     return 0;
 }
 ```

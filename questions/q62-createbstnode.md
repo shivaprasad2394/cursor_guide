@@ -86,7 +86,9 @@ BstNode *createBstNode(int id) {
 }
 
 int main(void) {
-    BstNode*n=createBstNode(5); printf("createBstNode(5): id=%d\n", n->id); free(n);
+    BstNode*n=createBstNode(5);
+    printf("createBstNode(5): id=%d\n", n->id);
+    free(n);
     return 0;
 }
 ```

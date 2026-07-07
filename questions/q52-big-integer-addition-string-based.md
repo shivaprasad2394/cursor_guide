@@ -91,7 +91,9 @@ void addBigInt(const char *a, const char *b, char *result, int resCap) {
 }
 
 int main(void) {
-    char r[64]; addBigInt("999","1",r,sizeof r); printf("999+1=%s\n", r);
+    char r[64];
+    addBigInt("999","1",r,sizeof r);
+    printf("999+1=%s\n", r);
     return 0;
 }
 ```

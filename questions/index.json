@@ -799,6 +799,70 @@
       "pattern": "math / number",
       "difficulty": "easy",
       "section": "math / number"
+    },
+    {
+      "id": "q103-swap-two-integers-using-pointers",
+      "file": "q103-swap-two-integers-using-pointers.md",
+      "title": "Swap Two Integers Using Pointers",
+      "pattern": "pointer parameters",
+      "difficulty": "easy",
+      "section": "pointers"
+    },
+    {
+      "id": "q104-reverse-array-with-pointer-walking",
+      "file": "q104-reverse-array-with-pointer-walking.md",
+      "title": "Reverse Array with Pointer Walking",
+      "pattern": "pointer arithmetic",
+      "difficulty": "easy",
+      "section": "pointers"
+    },
+    {
+      "id": "q105-insert-at-head-double-pointer",
+      "file": "q105-insert-at-head-double-pointer.md",
+      "title": "Insert at Head with Node **head",
+      "pattern": "pointer-to-pointer",
+      "difficulty": "medium",
+      "section": "pointers"
+    },
+    {
+      "id": "q106-pointer-to-array-vs-array-of-pointers",
+      "file": "q106-pointer-to-array-vs-array-of-pointers.md",
+      "title": "Pointer to Array vs Array of Pointers",
+      "pattern": "pointer types",
+      "difficulty": "medium",
+      "section": "pointers"
+    },
+    {
+      "id": "q107-modify-array-through-pointer-parameter",
+      "file": "q107-modify-array-through-pointer-parameter.md",
+      "title": "Modify Array Through Pointer Parameter",
+      "pattern": "pointer parameter",
+      "difficulty": "easy",
+      "section": "pointers"
+    },
+    {
+      "id": "q108-sort-array-of-string-pointers",
+      "file": "q108-sort-array-of-string-pointers.md",
+      "title": "Sort an Array of String Pointers",
+      "pattern": "array of pointers",
+      "difficulty": "medium",
+      "section": "pointers"
+    },
+    {
+      "id": "q109-delete-node-double-pointer",
+      "file": "q109-delete-node-double-pointer.md",
+      "title": "Delete Node with Node **cursor",
+      "pattern": "pointer-to-pointer",
+      "difficulty": "medium",
+      "section": "pointers"
+    },
+    {
+      "id": "q110-return-min-max-via-output-pointers",
+      "file": "q110-return-min-max-via-output-pointers.md",
+      "title": "Return Min and Max via Output Pointers",
+      "pattern": "output parameters",
+      "difficulty": "easy",
+      "section": "pointers"
     }
   ]
 }

@@ -77,21 +77,33 @@ typedef struct {
 int main(void) {
     /* ---- single block transfer ---- */
     char source[] = "DMA_PAYLOAD_DATA";
-    char dest[32] = {0};
-    DmaDescriptor d = { source, dest, strlen(source) + 1, 0 };
-    dma_run(&d);                        /* start engine */
-    while (!d.done) { /* CPU would poll or wait for an IRQ here */ }
+    char dest[32] = {
+        0
+    }
+    DmaDescriptor d = {
+        source, dest, strlen(source) + 1, 0
+    }
+    dma_run(&d);
+    /* start engine */
+    while (!d.done) {
+        /* CPU would poll or wait for an IRQ here */
+    }
     printf("single transfer -> \"%s\" (%zu bytes)\n", dest, d.len);
-
     /* ---- scatter-gather: 3 descriptors gather into one buffer ---- */
-    const char *parts[] = { "GET ", "/index ", "HTTP/1.1" };
+    const char *parts[] = {
+        "GET ", "/index ", "HTTP/1.1"
+    }
     char gathered[64];
     size_t off = 0;
     for (int i = 0; i < 3; i++) {
-        DmaDescriptor sg = { parts[i], gathered + off, strlen(parts[i]), 0 };
+        DmaDescriptor sg = {
+            parts[i], gathered + off, strlen(parts[i]), 0
+        }
         dma_run(&sg);
-        while (!sg.done) { }
-        off += sg.len;                  /* advance the gather cursor */
+        while (!sg.done) {
+        }
+        off += sg.len;
+        /* advance the gather cursor */
     }
     gathered[off] = '\0';
     printf("scatter-gather -> \"%s\" (%zu bytes in 3 descriptors)\n",
@@ -152,21 +164,33 @@ static void dma_run(DmaDescriptor *d) {
 int main(void) {
     /* ---- single block transfer ---- */
     char source[] = "DMA_PAYLOAD_DATA";
-    char dest[32] = {0};
-    DmaDescriptor d = { source, dest, strlen(source) + 1, 0 };
-    dma_run(&d);                        /* start engine */
-    while (!d.done) { /* CPU would poll or wait for an IRQ here */ }
+    char dest[32] = {
+        0
+    }
+    DmaDescriptor d = {
+        source, dest, strlen(source) + 1, 0
+    }
+    dma_run(&d);
+    /* start engine */
+    while (!d.done) {
+        /* CPU would poll or wait for an IRQ here */
+    }
     printf("single transfer -> \"%s\" (%zu bytes)\n", dest, d.len);
-
     /* ---- scatter-gather: 3 descriptors gather into one buffer ---- */
-    const char *parts[] = { "GET ", "/index ", "HTTP/1.1" };
+    const char *parts[] = {
+        "GET ", "/index ", "HTTP/1.1"
+    }
     char gathered[64];
     size_t off = 0;
     for (int i = 0; i < 3; i++) {
-        DmaDescriptor sg = { parts[i], gathered + off, strlen(parts[i]), 0 };
+        DmaDescriptor sg = {
+            parts[i], gathered + off, strlen(parts[i]), 0
+        }
         dma_run(&sg);
-        while (!sg.done) { }
-        off += sg.len;                  /* advance the gather cursor */
+        while (!sg.done) {
+        }
+        off += sg.len;
+        /* advance the gather cursor */
     }
     gathered[off] = '\0';
     printf("scatter-gather -> \"%s\" (%zu bytes in 3 descriptors)\n",

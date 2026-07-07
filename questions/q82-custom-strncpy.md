@@ -52,10 +52,11 @@ int main(void) {
     char dst[6];
     my_strncpy(dst, "Hi", 6);
     printf("my_strncpy(Hi,6) -> \"%s\" (padded with nulls)\n", dst);
-
     char dst2[4];
-    my_strncpy(dst2, "Hello", 4);       /* src longer than n: NOT terminated */
-    dst2[3] = '\0';                      /* SAFE-USE: terminate ourselves */
+    my_strncpy(dst2, "Hello", 4);
+    /* src longer than n: NOT terminated */
+    dst2[3] = '\0';
+    /* SAFE-USE: terminate ourselves */
     printf("my_strncpy(Hello,4)+manual NUL -> \"%s\"\n", dst2);
     return 0;
 }
@@ -96,10 +97,11 @@ int main(void) {
     char dst[6];
     my_strncpy(dst, "Hi", 6);
     printf("my_strncpy(Hi,6) -> \"%s\" (padded with nulls)\n", dst);
-
     char dst2[4];
-    my_strncpy(dst2, "Hello", 4);       /* src longer than n: NOT terminated */
-    dst2[3] = '\0';                      /* SAFE-USE: terminate ourselves */
+    my_strncpy(dst2, "Hello", 4);
+    /* src longer than n: NOT terminated */
+    dst2[3] = '\0';
+    /* SAFE-USE: terminate ourselves */
     printf("my_strncpy(Hello,4)+manual NUL -> \"%s\"\n", dst2);
     return 0;
 }

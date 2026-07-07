@@ -54,8 +54,10 @@ prices = [7, 1, 5, 3, 6, 4]
 /* TODO: implement the helper function(s) your main needs */
 
 int main(void) {
-        int p[] = {7, 1, 5, 3, 6, 4};
-        printf("maxProfit=%d\n", maxProfit(p, 6));
+    int p[] = {
+        7, 1, 5, 3, 6, 4
+    };
+    printf("maxProfit=%d\n", maxProfit(p, 6));
     return 0;
 }
 ```
@@ -82,8 +84,10 @@ int maxProfit(const int prices[], int n) {
 }
 
 int main(void) {
-        int p[] = {7, 1, 5, 3, 6, 4};
-        printf("maxProfit=%d\n", maxProfit(p, 6));
+    int p[] = {
+        7, 1, 5, 3, 6, 4
+    };
+    printf("maxProfit=%d\n", maxProfit(p, 6));
     return 0;
 }
 ```

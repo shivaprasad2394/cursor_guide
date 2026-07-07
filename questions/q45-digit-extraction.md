@@ -80,7 +80,8 @@ void extractDigits(int n) {
 }
 
 int main(void) {
-    printf("digits of 5283: "); extractDigits(5283);
+    printf("digits of 5283: ");
+    extractDigits(5283);
     return 0;
 }
 ```

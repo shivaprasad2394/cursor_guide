@@ -33,7 +33,8 @@ Implement **Missing Number from 1..N (XOR variant)** using the pattern above. Wr
 
 int main(void) {
     int a[]={
-    1,2,4,5};
+        1,2,4,5
+    };
     printf("missing 1..5=%d\n", findMissing1toN(a,5));
     return 0;
 }
@@ -56,7 +57,10 @@ int findMissing1toN(const int arr[], int n) {
 }
 
 int main(void) {
-    int a[]={1,2,4,5}; printf("missing 1..5=%d\n", findMissing1toN(a,5));
+    int a[]={
+        1,2,4,5
+    };
+    printf("missing 1..5=%d\n", findMissing1toN(a,5));
     return 0;
 }
 ```

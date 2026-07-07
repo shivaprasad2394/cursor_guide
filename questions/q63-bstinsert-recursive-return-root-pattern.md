@@ -69,12 +69,10 @@ typedef struct BstNode { int id; struct BstNode *left,*right; } BstNode;
 int main(void) {
     BstNode*r=NULL;
     int k[]={
-    50,30,70,20,40};
-    for(int i=0;
-    i<5;
-    i++) r=bstInsert(r,k[i]);
-    printf("inserted 5 keys;
-    root=%d left=%d right=%d\n", r->id, r->left->id, r->right->id);
+        50,30,70,20,40
+    };
+    for (int i=0; i<5; i++) r=bstInsert(r,k[i]);
+    printf("inserted 5 keys; root=%d left=%d right=%d\n", r->id, r->left->id, r->right->id);
     /* leak ok for demo */
     return 0;
 }
@@ -99,13 +97,19 @@ BstNode *createBstNode(int id) {
 
 BstNode *bstInsert(BstNode *root, int id) {
     if (root == NULL) return createBstNode(id);
-    if      (id <  root->id) root->left  = bstInsert(root->left,  id);
+    if (id <  root->id) root->left  = bstInsert(root->left,  id);
     else if (id >  root->id) root->right = bstInsert(root->right, id);
     return root;
 }
 
 int main(void) {
-    BstNode*r=NULL; int k[]={50,30,70,20,40}; for(int i=0;i<5;i++) r=bstInsert(r,k[i]); printf("inserted 5 keys; root=%d left=%d right=%d\n", r->id, r->left->id, r->right->id); /* leak ok for demo */
+    BstNode*r=NULL;
+    int k[]={
+        50,30,70,20,40
+    };
+    for (int i=0;i<5;i++) r=bstInsert(r,k[i]);
+    printf("inserted 5 keys; root=%d left=%d right=%d\n", r->id, r->left->id, r->right->id);
+    /* leak ok for demo */
     return 0;
 }
 ```

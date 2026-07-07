@@ -69,7 +69,9 @@ Node *createNode(int id) {
 }
 
 int main(void) {
-    Node*n=createNode(42); printf("createNode(42): id=%d next=%p\n", n->id,(void*)n->next); free(n);
+    Node*n=createNode(42);
+    printf("createNode(42): id=%d next=%p\n", n->id,(void*)n->next);
+    free(n);
     return 0;
 }
 ```

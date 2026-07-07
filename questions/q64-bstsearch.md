@@ -71,10 +71,9 @@ typedef struct BstNode { int id; struct BstNode *left,*right; } BstNode;
 int main(void) {
     BstNode*r=NULL;
     int k[]={
-    50,30,70,20,40};
-    for(int i=0;
-    i<5;
-    i++) r=bstInsert(r,k[i]);
+        50,30,70,20,40
+    };
+    for (int i=0; i<5; i++) r=bstInsert(r,k[i]);
     printf("search 40: %s\n", bstSearch(r,40)?"found":"not found");
     printf("search 99: %s\n", bstSearch(r,99)?"found":"not found");
     return 0;
@@ -99,7 +98,7 @@ BstNode *createBstNode(int id) {
 }
 BstNode *bstInsert(BstNode *root, int id) {
     if (root == NULL) return createBstNode(id);
-    if      (id <  root->id) root->left  = bstInsert(root->left,  id);
+    if (id <  root->id) root->left  = bstInsert(root->left,  id);
     else if (id >  root->id) root->right = bstInsert(root->right, id);
     return root;
 }
@@ -111,7 +110,13 @@ BstNode *bstSearch(BstNode *root, int key) {
 }
 
 int main(void) {
-    BstNode*r=NULL; int k[]={50,30,70,20,40}; for(int i=0;i<5;i++) r=bstInsert(r,k[i]); printf("search 40: %s\n", bstSearch(r,40)?"found":"not found"); printf("search 99: %s\n", bstSearch(r,99)?"found":"not found");
+    BstNode*r=NULL;
+    int k[]={
+        50,30,70,20,40
+    };
+    for (int i=0;i<5;i++) r=bstInsert(r,k[i]);
+    printf("search 40: %s\n", bstSearch(r,40)?"found":"not found");
+    printf("search 99: %s\n", bstSearch(r,99)?"found":"not found");
     return 0;
 }
 ```

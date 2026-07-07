@@ -71,7 +71,9 @@ typedef struct AvlNode {
 
 int main(void) {
     AvlNode *root = NULL;
-    int keys[] = {30, 20, 10};
+    int keys[] = {
+        30, 20, 10
+    };
     for (int i = 0; i < 3; i++) {
         root = avlInsert(root, keys[i]);
     }
@@ -170,7 +172,9 @@ AvlNode *avlInsert(AvlNode *node, int id) {
 
 int main(void) {
     AvlNode *root = NULL;
-    int keys[] = {30, 20, 10};
+    int keys[] = {
+        30, 20, 10
+    };
     for (int i = 0; i < 3; i++) {
         root = avlInsert(root, keys[i]);
     }

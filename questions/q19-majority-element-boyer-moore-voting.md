@@ -61,7 +61,8 @@ arr = [2, 2, 1, 1, 1, 2, 2]
 
 int main(void) {
     int a[]={
-    2,2,1,1,1,2,2};
+        2,2,1,1,1,2,2
+    };
     printf("majority=%d\n", findMajority(a,7));
     return 0;
 }
@@ -89,7 +90,10 @@ int findMajority(const int arr[], int n) {
 }
 
 int main(void) {
-    int a[]={2,2,1,1,1,2,2}; printf("majority=%d\n", findMajority(a,7));
+    int a[]={
+        2,2,1,1,1,2,2
+    };
+    printf("majority=%d\n", findMajority(a,7));
     return 0;
 }
 ```

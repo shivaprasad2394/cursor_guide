@@ -60,7 +60,8 @@ arr = [12, 35, 1, 10, 34, 1]
 
 int main(void) {
     int a[]={
-    12,35,1,10,34,1};
+        12,35,1,10,34,1
+    };
     printf("2nd largest=%d\n", findSecondLargest(a,6));
     return 0;
 }
@@ -89,7 +90,10 @@ int findSecondLargest(const int arr[], int n) {
 }
 
 int main(void) {
-    int a[]={12,35,1,10,34,1}; printf("2nd largest=%d\n", findSecondLargest(a,6));
+    int a[]={
+        12,35,1,10,34,1
+    };
+    printf("2nd largest=%d\n", findSecondLargest(a,6));
     return 0;
 }
 ```

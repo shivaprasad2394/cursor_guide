@@ -100,7 +100,9 @@ void longestPalindrome(const char *s, int *outStart, int *outLen) {
 }
 
 int main(void) {
-    int s,l; longestPalindrome("babad",&s,&l); printf("LPS(babad)=\"%.*s\" len %d\n", l, "babad"+s, l);
+    int s,l;
+    longestPalindrome("babad",&s,&l);
+    printf("LPS(babad)=\"%.*s\" len %d\n", l, "babad"+s, l);
     return 0;
 }
 ```

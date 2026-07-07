@@ -59,14 +59,12 @@ int main(void) {
     insertAtEnd(&h,10);
     insertAtEnd(&h,20);
     insertAtEnd(&h,30);
-    for(Node*c=h;
-    c;
-    c=c->next)printf("%d -> ",c->id);
+    for (Node*c=h; c; c=c->next) printf("%d -> ",c->id);
     printf("NULL\n");
-    while(h){
-    Node*t=h->next;
-    free(h);
-    h=t;
+    while (h){
+        Node*t=h->next;
+        free(h);
+        h=t;
     }
     return 0;
 }
@@ -101,7 +99,17 @@ int insertAtEnd(Node **head, int id) {
 }
 
 int main(void) {
-    Node*h=NULL; insertAtEnd(&h,10); insertAtEnd(&h,20); insertAtEnd(&h,30); for(Node*c=h;c;c=c->next)printf("%d -> ",c->id); printf("NULL\n"); while(h){Node*t=h->next;free(h);h=t;}
+    Node*h=NULL;
+    insertAtEnd(&h,10);
+    insertAtEnd(&h,20);
+    insertAtEnd(&h,30);
+    for (Node*c=h;c;c=c->next)printf("%d -> ",c->id);
+    printf("NULL\n");
+    while (h){
+        Node*t=h->next;
+        free(h);
+        h=t;
+    }
     return 0;
 }
 ```

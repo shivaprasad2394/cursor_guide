@@ -52,12 +52,21 @@ typedef struct Node { int id; struct Node *next; } Node;
 /* TODO: implement the helper function(s) your main needs */
 
 int main(void) {
-        Node *h = NULL;
-        for (int i = 5; i >= 1; i--) { Node *n=malloc(sizeof*n); n->id=i; n->next=h; h=n; }
-        h = removeNthFromEnd(h, 2);
-        for (Node *c = h; c; c = c->next) printf("%d -> ", c->id);
-        printf("NULL\n");
-        while (h) { Node *t = h->next; free(h); h = t; }
+    Node *h = NULL;
+    for (int i = 5; i >= 1; i--) {
+        Node *n=malloc(sizeof*n);
+        n->id=i;
+        n->next=h;
+        h=n;
+    }
+    h = removeNthFromEnd(h, 2);
+    for (Node *c = h; c; c = c->next) printf("%d -> ", c->id);
+    printf("NULL\n");
+    while (h) {
+        Node *t = h->next;
+        free(h);
+        h = t;
+    }
     return 0;
 }
 ```
@@ -82,12 +91,21 @@ Node *removeNthFromEnd(Node *head, int n) {
 }
 
 int main(void) {
-        Node *h = NULL;
-        for (int i = 5; i >= 1; i--) { Node *n=malloc(sizeof*n); n->id=i; n->next=h; h=n; }
-        h = removeNthFromEnd(h, 2);
-        for (Node *c = h; c; c = c->next) printf("%d -> ", c->id);
-        printf("NULL\n");
-        while (h) { Node *t = h->next; free(h); h = t; }
+    Node *h = NULL;
+    for (int i = 5; i >= 1; i--) {
+        Node *n=malloc(sizeof*n);
+        n->id=i;
+        n->next=h;
+        h=n;
+    }
+    h = removeNthFromEnd(h, 2);
+    for (Node *c = h; c; c = c->next) printf("%d -> ", c->id);
+    printf("NULL\n");
+    while (h) {
+        Node *t = h->next;
+        free(h);
+        h = t;
+    }
     return 0;
 }
 ```

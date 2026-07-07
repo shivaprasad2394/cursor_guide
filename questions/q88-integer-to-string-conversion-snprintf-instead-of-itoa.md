@@ -69,7 +69,9 @@ void intToStr(int value, char *buf, size_t size) {
 }
 
 int main(void) {
-    char b[16]; intToStr(-42,b,sizeof b); printf("intToStr(-42)=%s\n",b);
+    char b[16];
+    intToStr(-42,b,sizeof b);
+    printf("intToStr(-42)=%s\n",b);
     return 0;
 }
 ```

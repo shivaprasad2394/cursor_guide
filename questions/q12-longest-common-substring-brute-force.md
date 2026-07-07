@@ -91,7 +91,9 @@ char *longestCommonSubstring(const char *a, const char *b) {
 }
 
 int main(void) {
-    char *r=longestCommonSubstring("abcdfgh","zcdemgh"); printf("LCS substr=%s\n", r); free(r);
+    char *r=longestCommonSubstring("abcdfgh","zcdemgh");
+    printf("LCS substr=%s\n", r);
+    free(r);
     return 0;
 }
 ```

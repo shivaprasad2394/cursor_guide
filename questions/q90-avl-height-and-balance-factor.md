@@ -77,10 +77,15 @@ typedef struct AvlNode {
 /* TODO: implement the helper function(s) your main needs */
 
 int main(void) {
-    AvlNode n10 = {10, 1, NULL, NULL};
-    AvlNode n20 = {20, 2, &n10, NULL};
-    AvlNode n30 = {30, 3, &n20, NULL};
-
+    AvlNode n10 = {
+        10, 1, NULL, NULL
+    }
+    AvlNode n20 = {
+        20, 2, &n10, NULL
+    }
+    AvlNode n30 = {
+        30, 3, &n20, NULL
+    };
     printf("height(30)=%d bf(30)=%d bf(20)=%d bf(10)=%d\n",
            nodeHeight(&n30), balanceFactor(&n30),
            balanceFactor(&n20), balanceFactor(&n10));
@@ -111,10 +116,15 @@ int balanceFactor(AvlNode *n) {
 }
 
 int main(void) {
-    AvlNode n10 = {10, 1, NULL, NULL};
-    AvlNode n20 = {20, 2, &n10, NULL};
-    AvlNode n30 = {30, 3, &n20, NULL};
-
+    AvlNode n10 = {
+        10, 1, NULL, NULL
+    }
+    AvlNode n20 = {
+        20, 2, &n10, NULL
+    }
+    AvlNode n30 = {
+        30, 3, &n20, NULL
+    };
     printf("height(30)=%d bf(30)=%d bf(20)=%d bf(10)=%d\n",
            nodeHeight(&n30), balanceFactor(&n30),
            balanceFactor(&n20), balanceFactor(&n10));

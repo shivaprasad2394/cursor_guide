@@ -58,7 +58,8 @@ arr = [1,2,3,4,5,6,7], d=2
 
 int main(void) {
     int a[]={
-    1,2,3,4,5,6,7};
+        1,2,3,4,5,6,7
+    }
     rotateLeft(a,7,2);
     printf("rotateLeft2: ");
     pr(a,7);
@@ -75,7 +76,7 @@ int main(void) {
 #include <ctype.h>
 #include <limits.h>
 
-static void pr(const int*a,int n){for(int i=0;i<n;i++)printf("%d ",a[i]);printf("\n");}
+static void pr(const int*a,int n){for (int i=0;i<n;i++)printf("%d ",a[i]);printf("\n");}
 static void revArr(int a[], int i, int j) {
     while (i < j) { int t = a[i]; a[i] = a[j]; a[j] = t; i++; j--; }
 }
@@ -90,7 +91,12 @@ void rotateLeft(int arr[], int n, int d) {
 }
 
 int main(void) {
-    int a[]={1,2,3,4,5,6,7}; rotateLeft(a,7,2); printf("rotateLeft2: "); pr(a,7);
+    int a[]={
+        1,2,3,4,5,6,7
+    }
+    rotateLeft(a,7,2);
+    printf("rotateLeft2: ");
+    pr(a,7);
     return 0;
 }
 ```

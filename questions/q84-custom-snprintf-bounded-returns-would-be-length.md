@@ -53,9 +53,9 @@ int main(void) {
     char buf[16];
     int n = my_snprintf(buf, sizeof buf, "x=%d s=%s", 42, "hi");
     printf("my_snprintf -> \"%s\" (returned %d)\n", buf, n);
-
     char small[5];
-    n = my_snprintf(small, sizeof small, "%d", 123456);   /* truncates */
+    n = my_snprintf(small, sizeof small, "%d", 123456);
+    /* truncates */
     printf("truncated -> \"%s\" (would-be %d, %s)\n",
            small, n, (size_t)n >= sizeof small ? "TRUNCATED" : "fit");
     return 0;
@@ -127,9 +127,9 @@ int main(void) {
     char buf[16];
     int n = my_snprintf(buf, sizeof buf, "x=%d s=%s", 42, "hi");
     printf("my_snprintf -> \"%s\" (returned %d)\n", buf, n);
-
     char small[5];
-    n = my_snprintf(small, sizeof small, "%d", 123456);   /* truncates */
+    n = my_snprintf(small, sizeof small, "%d", 123456);
+    /* truncates */
     printf("truncated -> \"%s\" (would-be %d, %s)\n",
            small, n, (size_t)n >= sizeof small ? "TRUNCATED" : "fit");
     return 0;

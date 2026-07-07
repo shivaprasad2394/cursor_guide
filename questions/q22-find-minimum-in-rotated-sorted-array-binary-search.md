@@ -63,7 +63,8 @@ arr = [4, 5, 6, 7, 0, 1, 2]
 
 int main(void) {
     int a[]={
-    4,5,6,7,0,1,2};
+        4,5,6,7,0,1,2
+    };
     printf("minRotated=%d\n", findMinRotated(a,7));
     return 0;
 }
@@ -89,7 +90,10 @@ int findMinRotated(const int arr[], int n) {
 }
 
 int main(void) {
-    int a[]={4,5,6,7,0,1,2}; printf("minRotated=%d\n", findMinRotated(a,7));
+    int a[]={
+        4,5,6,7,0,1,2
+    };
+    printf("minRotated=%d\n", findMinRotated(a,7));
     return 0;
 }
 ```

@@ -55,9 +55,14 @@ arr = [1, 2, 3, 1]
 /* TODO: implement the helper function(s) your main needs */
 
 int main(void) {
-        int a1[] = {1, 2, 3, 1}, a2[] = {1, 2, 3, 4};
-        printf("containsDuplicate([1,2,3,1])=%d\n", containsDuplicate(a1, 4));
-        printf("containsDuplicate([1,2,3,4])=%d\n", containsDuplicate(a2, 4));
+    int a1[] = {
+        1, 2, 3, 1
+    }
+    , a2[] = {
+        1, 2, 3, 4
+    };
+    printf("containsDuplicate([1,2,3,1])=%d\n", containsDuplicate(a1, 4));
+    printf("containsDuplicate([1,2,3,4])=%d\n", containsDuplicate(a2, 4));
     return 0;
 }
 ```
@@ -75,14 +80,19 @@ int containsDuplicate(const int arr[], int n) {
     for (int i = 0; i < n; i++) {
         if (seen[arr[i] + 50000]) return 1;
         seen[arr[i] + 50000] = 1;
-    }
-    return 0;
+    };
+return 0;
 }
 
 int main(void) {
-        int a1[] = {1, 2, 3, 1}, a2[] = {1, 2, 3, 4};
-        printf("containsDuplicate([1,2,3,1])=%d\n", containsDuplicate(a1, 4));
-        printf("containsDuplicate([1,2,3,4])=%d\n", containsDuplicate(a2, 4));
+    int a1[] = {
+        1, 2, 3, 1
+    }
+    , a2[] = {
+        1, 2, 3, 4
+    };
+    printf("containsDuplicate([1,2,3,1])=%d\n", containsDuplicate(a1, 4));
+    printf("containsDuplicate([1,2,3,4])=%d\n", containsDuplicate(a2, 4));
     return 0;
 }
 ```

@@ -42,9 +42,10 @@ typedef struct Node { int data; struct Node *next; } Node;
 /* TODO: implement the helper function(s) your main needs */
 
 int main(void) {
-    int vals[] = {30, 10, 50, 20, 40};
+    int vals[] = {
+        30, 10, 50, 20, 40
+    }
     int n = (int)(sizeof(vals) / sizeof(vals[0]));
-
     Node *asc = NULL, *desc = NULL;
     for (int i = 0; i < n; i++) {
         asc  = insertAscending(asc,  vals[i]);
@@ -52,7 +53,6 @@ int main(void) {
     }
     printList("Ascending : ", asc);
     printList("Descending: ", desc);
-
     freeList(asc);
     freeList(desc);
     return 0;
@@ -119,9 +119,10 @@ static void freeList(Node *head) {
 }
 
 int main(void) {
-    int vals[] = {30, 10, 50, 20, 40};
+    int vals[] = {
+        30, 10, 50, 20, 40
+    }
     int n = (int)(sizeof(vals) / sizeof(vals[0]));
-
     Node *asc = NULL, *desc = NULL;
     for (int i = 0; i < n; i++) {
         asc  = insertAscending(asc,  vals[i]);
@@ -129,7 +130,6 @@ int main(void) {
     }
     printList("Ascending : ", asc);
     printList("Descending: ", desc);
-
     freeList(asc);
     freeList(desc);
     return 0;

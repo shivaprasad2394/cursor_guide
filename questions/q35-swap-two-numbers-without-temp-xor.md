@@ -64,7 +64,9 @@ void swapXOR(int *a, int *b) {
 }
 
 int main(void) {
-    int a=5,b=10; swapXOR(&a,&b); printf("after swap a=%d b=%d\n",a,b);
+    int a=5,b=10;
+    swapXOR(&a,&b);
+    printf("after swap a=%d b=%d\n",a,b);
     return 0;
 }
 ```

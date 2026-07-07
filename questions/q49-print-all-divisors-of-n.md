@@ -80,7 +80,8 @@ void printDivisors(int n) {
 }
 
 int main(void) {
-    printf("divisors of 36: "); printDivisors(36);
+    printf("divisors of 36: ");
+    printDivisors(36);
     return 0;
 }
 ```

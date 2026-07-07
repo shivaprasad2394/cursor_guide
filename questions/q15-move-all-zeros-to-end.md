@@ -66,7 +66,8 @@ arr = [0, 1, 0, 3, 12]
 
 int main(void) {
     int a[]={
-    0,1,0,3,12};
+        0,1,0,3,12
+    }
     moveZerosToEnd(a,5);
     printf("moveZeros: ");
     pr(a,5);
@@ -83,7 +84,7 @@ int main(void) {
 #include <ctype.h>
 #include <limits.h>
 
-static void pr(const int*a,int n){for(int i=0;i<n;i++)printf("%d ",a[i]);printf("\n");}
+static void pr(const int*a,int n){for (int i=0;i<n;i++)printf("%d ",a[i]);printf("\n");}
 
 void moveZerosToEnd(int arr[], int n) {
     int w = 0;
@@ -94,7 +95,12 @@ void moveZerosToEnd(int arr[], int n) {
 }
 
 int main(void) {
-    int a[]={0,1,0,3,12}; moveZerosToEnd(a,5); printf("moveZeros: "); pr(a,5);
+    int a[]={
+        0,1,0,3,12
+    }
+    moveZerosToEnd(a,5);
+    printf("moveZeros: ");
+    pr(a,5);
     return 0;
 }
 ```

@@ -53,7 +53,8 @@ fields {"id","name","age"} -> "id,name,age"
 int main(void) {
     char csv[64];
     const char*f[]={
-    "id","name","age"};
+        "id","name","age"
+    }
     buildCSVRow(csv,sizeof csv,f,3);
     printf("csv=%s\n",csv);
     return 0;
@@ -82,7 +83,12 @@ int buildCSVRow(char *buf, size_t size, const char *fields[], int count) {
 }
 
 int main(void) {
-    char csv[64]; const char*f[]={"id","name","age"}; buildCSVRow(csv,sizeof csv,f,3); printf("csv=%s\n",csv);
+    char csv[64];
+    const char*f[]={
+        "id","name","age"
+    }
+    buildCSVRow(csv,sizeof csv,f,3);
+    printf("csv=%s\n",csv);
     return 0;
 }
 ```

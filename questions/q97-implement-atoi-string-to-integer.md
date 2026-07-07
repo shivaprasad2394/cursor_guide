@@ -55,8 +55,8 @@ s = "  -4193"
 /* TODO: implement the helper function(s) your main needs */
 
 int main(void) {
-        printf("atoi(\"42\")=%d\n", myAtoi("42"));
-        printf("atoi(\"  -4193\")=%d\n", myAtoi("  -4193"));
+    printf("atoi(\"42\")=%d\n", myAtoi("42"));
+    printf("atoi(\"  -4193\")=%d\n", myAtoi("  -4193"));
     return 0;
 }
 ```
@@ -84,8 +84,8 @@ int myAtoi(const char *s) {
 }
 
 int main(void) {
-        printf("atoi(\"42\")=%d\n", myAtoi("42"));
-        printf("atoi(\"  -4193\")=%d\n", myAtoi("  -4193"));
+    printf("atoi(\"42\")=%d\n", myAtoi("42"));
+    printf("atoi(\"  -4193\")=%d\n", myAtoi("  -4193"));
     return 0;
 }
 ```

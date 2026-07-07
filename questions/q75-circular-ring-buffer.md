@@ -37,19 +37,19 @@ typedef struct {
 /* TODO: implement the helper function(s) your main needs */
 
 int main(void) {
-    Ring r; ring_init(&r);
+    Ring r;
+    ring_init(&r);
     int v;
-
     /* fill past capacity to show FULL rejection */
     for (int i = 1; i <= 7; i++)
         printf("put %d -> %s\n", i, ring_put(&r, i) ? "ok" : "FULL (rejected)");
-
     /* read two (frees space), then wrap-around writes */
-    ring_get(&r, &v); printf("get -> %d\n", v);
-    ring_get(&r, &v); printf("get -> %d\n", v);
+    ring_get(&r, &v);
+    printf("get -> %d\n", v);
+    ring_get(&r, &v);
+    printf("get -> %d\n", v);
     printf("put 6 -> %s (wraps to index 0)\n", ring_put(&r, 6) ? "ok" : "FULL");
     printf("put 7 -> %s\n", ring_put(&r, 7) ? "ok" : "FULL");
-
     /* drain everything */
     printf("drain: ");
     while (ring_get(&r, &v)) printf("%d ", v);
@@ -107,19 +107,19 @@ static bool ring_get(Ring *r, int *out) {
 }
 
 int main(void) {
-    Ring r; ring_init(&r);
+    Ring r;
+    ring_init(&r);
     int v;
-
     /* fill past capacity to show FULL rejection */
     for (int i = 1; i <= 7; i++)
         printf("put %d -> %s\n", i, ring_put(&r, i) ? "ok" : "FULL (rejected)");
-
     /* read two (frees space), then wrap-around writes */
-    ring_get(&r, &v); printf("get -> %d\n", v);
-    ring_get(&r, &v); printf("get -> %d\n", v);
+    ring_get(&r, &v);
+    printf("get -> %d\n", v);
+    ring_get(&r, &v);
+    printf("get -> %d\n", v);
     printf("put 6 -> %s (wraps to index 0)\n", ring_put(&r, 6) ? "ok" : "FULL");
     printf("put 7 -> %s\n", ring_put(&r, 7) ? "ok" : "FULL");
-
     /* drain everything */
     printf("drain: ");
     while (ring_get(&r, &v)) printf("%d ", v);

@@ -64,7 +64,8 @@ arr = [-2, -3, 4, -1, -2, 1, 5, -3]
 
 int main(void) {
     int a[]={
-    -2,-3,4,-1,-2,1,5,-3};
+        -2,-3,4,-1,-2,1,5,-3
+    };
     printf("kadane=%d\n", kadane(a,8));
     return 0;
 }
@@ -92,7 +93,10 @@ int kadane(const int arr[], int n) {
 }
 
 int main(void) {
-    int a[]={-2,-3,4,-1,-2,1,5,-3}; printf("kadane=%d\n", kadane(a,8));
+    int a[]={
+        -2,-3,4,-1,-2,1,5,-3
+    };
+    printf("kadane=%d\n", kadane(a,8));
     return 0;
 }
 ```

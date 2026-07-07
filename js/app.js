@@ -353,7 +353,7 @@
   async function runInBrowser(source, stdin, onProgress) {
     if (!runnerModule) {
       if (onProgress) onProgress("Loading in-browser C compiler (first run ~60 MB, cached after)…");
-      runnerModule = await import("./runner.js?v=26");
+      runnerModule = await import("./runner.js?v=27");
     }
     if (onProgress) onProgress("Compiling & running…");
     return runnerModule.compileAndRun(source, stdin || "");
@@ -376,7 +376,7 @@
 
   async function getVisualizer() {
     if (!visualizerModule) {
-      visualizerModule = await import("./visualizer.js?v=26");
+      visualizerModule = await import("./visualizer.js?v=27");
     }
     return visualizerModule;
   }
@@ -399,6 +399,7 @@
   const SECTION_ORDER = [
     "strings",
     "arrays",
+    "pointers",
     "bit manipulation",
     "math / number",
     "linked list",
@@ -413,6 +414,7 @@
   const SECTION_META = {
     strings: { label: "Strings", icon: "Aa", blurb: "Two-pointer, frequency, sliding window" },
     arrays: { label: "Arrays", icon: "[]", blurb: "Search, sort, Kadane, two-sum" },
+    pointers: { label: "Pointers", icon: "*→", blurb: "Double pointers, pointer arithmetic, arrays of pointers" },
     "bit manipulation": { label: "Bit Manipulation", icon: "01", blurb: "XOR tricks, masks, shifts" },
     "math / number": { label: "Math & Numbers", icon: "π", blurb: "Primes, GCD, Fibonacci, digits" },
     "linked list": { label: "Linked Lists", icon: "→", blurb: "Reverse, merge, cycle detection" },
@@ -623,8 +625,8 @@
       let mods;
       try {
         mods = await Promise.all([
-          import("./ctracer.js?v=26"),
-          import("./tracer-view.js?v=26"),
+          import("./ctracer.js?v=27"),
+          import("./tracer-view.js?v=27"),
         ]);
       } catch (_) {
         return false;

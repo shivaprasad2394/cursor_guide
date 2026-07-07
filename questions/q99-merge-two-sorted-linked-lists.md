@@ -53,20 +53,33 @@ typedef struct Node { int id; struct Node *next; } Node;
 /* TODO: implement the helper function(s) your main needs */
 
 int main(void) {
-        Node *a = NULL, *b = NULL;
-        int v1[] = {4, 2, 1}, v2[] = {4, 3, 1};
-        for (int i = 0; i < 3; i++) {
-            Node *n = malloc(sizeof *n);
-            n->id = v1[i]; n->next = a; a = n;
-        }
-        for (int i = 0; i < 3; i++) {
-            Node *n = malloc(sizeof *n);
-            n->id = v2[i]; n->next = b; b = n;
-        }
-        Node *h = mergeLists(a, b);
-        for (Node *c = h; c; c = c->next) printf("%d -> ", c->id);
-        printf("NULL\n");
-        while (h) { Node *t = h->next; free(h); h = t; }
+    Node *a = NULL, *b = NULL;
+    int v1[] = {
+        4, 2, 1
+    }
+    , v2[] = {
+        4, 3, 1
+    };
+    for (int i = 0; i < 3; i++) {
+        Node *n = malloc(sizeof *n);
+        n->id = v1[i];
+        n->next = a;
+        a = n;
+    }
+    for (int i = 0; i < 3; i++) {
+        Node *n = malloc(sizeof *n);
+        n->id = v2[i];
+        n->next = b;
+        b = n;
+    }
+    Node *h = mergeLists(a, b);
+    for (Node *c = h; c; c = c->next) printf("%d -> ", c->id);
+    printf("NULL\n");
+    while (h) {
+        Node *t = h->next;
+        free(h);
+        h = t;
+    }
     return 0;
 }
 ```
@@ -92,20 +105,33 @@ Node *mergeLists(Node *a, Node *b) {
 }
 
 int main(void) {
-        Node *a = NULL, *b = NULL;
-        int v1[] = {4, 2, 1}, v2[] = {4, 3, 1};
-        for (int i = 0; i < 3; i++) {
-            Node *n = malloc(sizeof *n);
-            n->id = v1[i]; n->next = a; a = n;
-        }
-        for (int i = 0; i < 3; i++) {
-            Node *n = malloc(sizeof *n);
-            n->id = v2[i]; n->next = b; b = n;
-        }
-        Node *h = mergeLists(a, b);
-        for (Node *c = h; c; c = c->next) printf("%d -> ", c->id);
-        printf("NULL\n");
-        while (h) { Node *t = h->next; free(h); h = t; }
+    Node *a = NULL, *b = NULL;
+    int v1[] = {
+        4, 2, 1
+    }
+    , v2[] = {
+        4, 3, 1
+    };
+    for (int i = 0; i < 3; i++) {
+        Node *n = malloc(sizeof *n);
+        n->id = v1[i];
+        n->next = a;
+        a = n;
+    }
+    for (int i = 0; i < 3; i++) {
+        Node *n = malloc(sizeof *n);
+        n->id = v2[i];
+        n->next = b;
+        b = n;
+    }
+    Node *h = mergeLists(a, b);
+    for (Node *c = h; c; c = c->next) printf("%d -> ", c->id);
+    printf("NULL\n");
+    while (h) {
+        Node *t = h->next;
+        free(h);
+        h = t;
+    }
     return 0;
 }
 ```

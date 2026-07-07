@@ -72,10 +72,9 @@ typedef struct BstNode { int id; struct BstNode *left,*right; } BstNode;
 int main(void) {
     BstNode*r=NULL;
     int k[]={
-    50,30,70,20,80};
-    for(int i=0;
-    i<5;
-    i++) r=bstInsert(r,k[i]);
+        50,30,70,20,80
+    };
+    for (int i=0; i<5; i++) r=bstInsert(r,k[i]);
     printf("min=%d max=%d\n", bstMin(r)->id, bstMax(r)->id);
     return 0;
 }
@@ -99,7 +98,7 @@ BstNode *createBstNode(int id) {
 }
 BstNode *bstInsert(BstNode *root, int id) {
     if (root == NULL) return createBstNode(id);
-    if      (id <  root->id) root->left  = bstInsert(root->left,  id);
+    if (id <  root->id) root->left  = bstInsert(root->left,  id);
     else if (id >  root->id) root->right = bstInsert(root->right, id);
     return root;
 }
@@ -117,7 +116,12 @@ BstNode *bstMax(BstNode *root) {
 }
 
 int main(void) {
-    BstNode*r=NULL; int k[]={50,30,70,20,80}; for(int i=0;i<5;i++) r=bstInsert(r,k[i]); printf("min=%d max=%d\n", bstMin(r)->id, bstMax(r)->id);
+    BstNode*r=NULL;
+    int k[]={
+        50,30,70,20,80
+    };
+    for (int i=0;i<5;i++) r=bstInsert(r,k[i]);
+    printf("min=%d max=%d\n", bstMin(r)->id, bstMax(r)->id);
     return 0;
 }
 ```

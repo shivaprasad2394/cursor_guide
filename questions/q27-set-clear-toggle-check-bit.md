@@ -58,7 +58,10 @@ unsigned int toggleBit (unsigned int n, int pos) { return n ^  (1u << pos); }
 int          checkBit  (unsigned int n, int pos) { return (n >> pos) & 1;   }
 
 int main(void) {
-    printf("set bit1 of 12=%u\n",setBit(12,1)); printf("clear bit2 of 12=%u\n",clearBit(12,2)); printf("toggle bit1 of 12=%u\n",toggleBit(12,1)); printf("check bit2 of 12=%d\n",checkBit(12,2));
+    printf("set bit1 of 12=%u\n",setBit(12,1));
+    printf("clear bit2 of 12=%u\n",clearBit(12,2));
+    printf("toggle bit1 of 12=%u\n",toggleBit(12,1));
+    printf("check bit2 of 12=%d\n",checkBit(12,2));
     return 0;
 }
 ```

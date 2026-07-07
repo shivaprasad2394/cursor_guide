@@ -50,12 +50,13 @@ array "ABCDEF", move 6 bytes from index 0 to index 2 (dst>src)
 
 int main(void) {
     char a[] = "ABCDEF..";
-    my_memmove(a + 2, a, 6);            /* overlapping shift right by 2 */
+    my_memmove(a + 2, a, 6);
+    /* overlapping shift right by 2 */
     a[8 - 1] = '\0';
     printf("my_memmove(shift right 2) -> %s\n", a);
-
     char b[] = "XYZ123";
-    my_memmove(b, b + 3, 3);            /* shift left, dst<src, forward */
+    my_memmove(b, b + 3, 3);
+    /* shift left, dst<src, forward */
     b[3] = '\0';
     printf("my_memmove(shift left 3) -> %s\n", b);
     return 0;
@@ -98,12 +99,13 @@ void *my_memmove(void *dst, const void *src, size_t n) {
 
 int main(void) {
     char a[] = "ABCDEF..";
-    my_memmove(a + 2, a, 6);            /* overlapping shift right by 2 */
+    my_memmove(a + 2, a, 6);
+    /* overlapping shift right by 2 */
     a[8 - 1] = '\0';
     printf("my_memmove(shift right 2) -> %s\n", a);
-
     char b[] = "XYZ123";
-    my_memmove(b, b + 3, 3);            /* shift left, dst<src, forward */
+    my_memmove(b, b + 3, 3);
+    /* shift left, dst<src, forward */
     b[3] = '\0';
     printf("my_memmove(shift left 3) -> %s\n", b);
     return 0;

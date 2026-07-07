@@ -93,7 +93,9 @@ void removeDupChars(char *str) {
 }
 
 int main(void) {
-    char s[]="programming"; removeDupChars(s); printf("removeDup(programming)=%s\n", s);
+    char s[]="programming";
+    removeDupChars(s);
+    printf("removeDup(programming)=%s\n", s);
     return 0;
 }
 ```

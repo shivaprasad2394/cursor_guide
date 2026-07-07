@@ -96,10 +96,19 @@ int rqPeek(const RingQ *q, int *out) {
     *out = q->data[q->front]; return 0;
 }
 
-void rqDestroy(RingQ *q) { if(q){free(q->data); free(q);} }
+void rqDestroy(RingQ *q) { if (q){free(q->data); free(q);} }
 
 int main(void) {
-    RingQ*q=rqCreate(4); rqEnqueue(q,1); rqEnqueue(q,2); rqEnqueue(q,3); int v; rqDequeue(q,&v); printf("ring dequeue=%d\n",v); rqPeek(q,&v); printf("ring peek=%d\n",v); rqDestroy(q);
+    RingQ*q=rqCreate(4);
+    rqEnqueue(q,1);
+    rqEnqueue(q,2);
+    rqEnqueue(q,3);
+    int v;
+    rqDequeue(q,&v);
+    printf("ring dequeue=%d\n",v);
+    rqPeek(q,&v);
+    printf("ring peek=%d\n",v);
+    rqDestroy(q);
     return 0;
 }
 ```

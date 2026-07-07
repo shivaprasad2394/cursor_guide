@@ -77,7 +77,9 @@ int buildUserString(char *buf, size_t size, const char *name, int age) {
 }
 
 int main(void) {
-    char buf[40]; int rc=buildUserString(buf,sizeof buf,"Alice",30); printf("rc=%d buf=%s\n",rc,buf);
+    char buf[40];
+    int rc=buildUserString(buf,sizeof buf,"Alice",30);
+    printf("rc=%d buf=%s\n",rc,buf);
     return 0;
 }
 ```

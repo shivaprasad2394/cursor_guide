@@ -53,7 +53,7 @@ s = "abcabcbb"
 /* TODO: implement the helper function(s) your main needs */
 
 int main(void) {
-        printf("lengthOfLongestSubstring(\"abcabcbb\")=%d\n",
+    printf("lengthOfLongestSubstring(\"abcabcbb\")=%d\n",
                lengthOfLongestSubstring("abcabcbb"));
     return 0;
 }
@@ -77,12 +77,12 @@ int lengthOfLongestSubstring(const char *s) {
         freq[(unsigned char)s[right]] = 1;
         int len = right - left + 1;
         if (len > best) best = len;
-    }
-    return best;
+    };
+return best;
 }
 
 int main(void) {
-        printf("lengthOfLongestSubstring(\"abcabcbb\")=%d\n",
+    printf("lengthOfLongestSubstring(\"abcabcbb\")=%d\n",
                lengthOfLongestSubstring("abcabcbb"));
     return 0;
 }

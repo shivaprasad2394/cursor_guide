@@ -56,7 +56,8 @@ arr = [3, 0, 1], n = 3 (should have 0,1,2,3)
 
 int main(void) {
     int a[]={
-    3,0,1};
+        3,0,1
+    };
     printf("missing in 0..3=%d\n", findMissing(a,3));
     return 0;
 }
@@ -79,7 +80,10 @@ int findMissing(const int arr[], int n) {
 }
 
 int main(void) {
-    int a[]={3,0,1}; printf("missing in 0..3=%d\n", findMissing(a,3));
+    int a[]={
+        3,0,1
+    };
+    printf("missing in 0..3=%d\n", findMissing(a,3));
     return 0;
 }
 ```

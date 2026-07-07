@@ -91,7 +91,9 @@ void compressString(const char *str, char *out, int outCap) {
 }
 
 int main(void) {
-    char out[64]; compressString("aabcccccaaa",out,sizeof out); printf("compress=%s\n",out);
+    char out[64];
+    compressString("aabcccccaaa",out,sizeof out);
+    printf("compress=%s\n",out);
     return 0;
 }
 ```

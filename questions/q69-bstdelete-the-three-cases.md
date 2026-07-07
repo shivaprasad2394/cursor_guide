@@ -82,10 +82,9 @@ typedef struct BstNode { int id; struct BstNode *left,*right; } BstNode;
 int main(void) {
     BstNode*r=NULL;
     int k[]={
-    50,30,70,20,40,60,80};
-    for(int i=0;
-    i<7;
-    i++) r=bstInsert(r,k[i]);
+        50,30,70,20,40,60,80
+    };
+    for (int i=0; i<7; i++) r=bstInsert(r,k[i]);
     r=bstDelete(r,50);
     printf("after delete 50, inorder: ");
     inorder(r);
@@ -112,7 +111,7 @@ BstNode *createBstNode(int id) {
 }
 BstNode *bstInsert(BstNode *root, int id) {
     if (root == NULL) return createBstNode(id);
-    if      (id <  root->id) root->left  = bstInsert(root->left,  id);
+    if (id <  root->id) root->left  = bstInsert(root->left,  id);
     else if (id >  root->id) root->right = bstInsert(root->right, id);
     return root;
 }
@@ -121,11 +120,11 @@ BstNode *bstMin(BstNode *root) {
     while (root->left) root = root->left;
     return root;
 }
-void inorder  (const BstNode *r) { if(r){ inorder(r->left);  printf("%d ",r->id); inorder(r->right); }}
+void inorder  (const BstNode *r) { if (r){ inorder(r->left);  printf("%d ",r->id); inorder(r->right); }}
 
 BstNode *bstDelete(BstNode *root, int id) {
     if (root == NULL) return NULL;
-    if      (id <  root->id) root->left  = bstDelete(root->left,  id);
+    if (id <  root->id) root->left  = bstDelete(root->left,  id);
     else if (id >  root->id) root->right = bstDelete(root->right, id);
     else {
         if (root->left == NULL) { BstNode *r = root->right; free(root); return r; }
@@ -138,7 +137,15 @@ BstNode *bstDelete(BstNode *root, int id) {
 }
 
 int main(void) {
-    BstNode*r=NULL; int k[]={50,30,70,20,40,60,80}; for(int i=0;i<7;i++) r=bstInsert(r,k[i]); r=bstDelete(r,50); printf("after delete 50, inorder: "); inorder(r); printf("\n");
+    BstNode*r=NULL;
+    int k[]={
+        50,30,70,20,40,60,80
+    };
+    for (int i=0;i<7;i++) r=bstInsert(r,k[i]);
+    r=bstDelete(r,50);
+    printf("after delete 50, inorder: ");
+    inorder(r);
+    printf("\n");
     return 0;
 }
 ```

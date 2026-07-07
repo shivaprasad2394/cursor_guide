@@ -52,8 +52,11 @@ copy 4 bytes of "ABCD" -> dst
 
 int main(void) {
     char src[] = "ABCDEFG";
-    char dst[8] = {0};
-    my_memcpy(dst, src, 8);             /* 7 chars + '\0' */
+    char dst[8] = {
+        0
+    }
+    my_memcpy(dst, src, 8);
+    /* 7 chars + '\0' */
     printf("my_memcpy(ABCDEFG) -> %s\n", dst);
     return 0;
 }
@@ -88,8 +91,11 @@ void *my_memcpy(void *dst, const void *src, size_t n) {
 
 int main(void) {
     char src[] = "ABCDEFG";
-    char dst[8] = {0};
-    my_memcpy(dst, src, 8);             /* 7 chars + '\0' */
+    char dst[8] = {
+        0
+    }
+    my_memcpy(dst, src, 8);
+    /* 7 chars + '\0' */
     printf("my_memcpy(ABCDEFG) -> %s\n", dst);
     return 0;
 }

@@ -43,42 +43,55 @@ int main(void) {
     /* ---- PART A: extract bitfields from a Frame Control word ---- */
     /* 0x0108 = data frame (type 2), ToDS=1: typical uplink data frame */
     extract_frame_control(0x0108);
-
     /* ---- PART B: pack a MAC header, then unpack it back ---- */
     printf("\nPART B - PACK then UNPACK MAC header\n");
     MacHeader tx = {
         .frame_control = 0x0108,
         .duration      = 0x002C,
-        .addr1 = {0x00,0x11,0x22,0x33,0x44,0x55},
-        .addr2 = {0xAA,0xBB,0xCC,0xDD,0xEE,0xFF},
-        .addr3 = {0x66,0x77,0x88,0x99,0xAA,0xBB},
+        .addr1 = {
+            0x00,0x11,0x22,0x33,0x44,0x55
+        }
+        ,
+        .addr2 = {
+            0xAA,0xBB,0xCC,0xDD,0xEE,0xFF
+        }
+        ,
+        .addr3 = {
+            0x66,0x77,0x88,0x99,0xAA,0xBB
+        }
+        ,
         .seq_ctrl = 0x0010
-    };
+    }
     uint8_t wire[MAC_HDR_LEN];
     pack_mac_header(&tx, wire);
     printf("  packed %d bytes: ", MAC_HDR_LEN);
     for (int i = 0; i < MAC_HDR_LEN; i++) printf("%02X", wire[i]);
     printf("\n");
-
     MacHeader rx;
     unpack_mac_header(wire, &rx);
     printf("  unpacked FC=0x%04X dur=0x%04X seq=0x%04X\n",
            rx.frame_control, rx.duration, rx.seq_ctrl);
-    printf("  addr1 (RA) = "); print_mac(rx.addr1); printf("\n");
-    printf("  addr2 (TA) = "); print_mac(rx.addr2); printf("\n");
-    printf("  addr3 (BSSID) = "); print_mac(rx.addr3); printf("\n");
+    printf("  addr1 (RA) = ");
+    print_mac(rx.addr1);
+    printf("\n");
+    printf("  addr2 (TA) = ");
+    print_mac(rx.addr2);
+    printf("\n");
+    printf("  addr3 (BSSID) = ");
+    print_mac(rx.addr3);
+    printf("\n");
     printf("  round-trip %s\n",
            memcmp(&tx, &rx, sizeof tx) == 0 ? "MATCHED" : "FAILED");
-
     /* ---- PART C: pack TLV information elements, then unpack ---- */
     printf("\nPART C - PACK then UNPACK TLV information elements\n");
     uint8_t ie[64];
     int off = 0;
-    off += pack_tlv(ie + off, 0, (const uint8_t*)"Home",  4);  /* SSID */
-    off += pack_tlv(ie + off, 1, (const uint8_t*)"\x02\x04\x0b\x16", 4); /* rates */
+    off += pack_tlv(ie + off, 0, (const uint8_t*)"Home",  4);
+    /* SSID */
+    off += pack_tlv(ie + off, 1, (const uint8_t*)"\x02\x04\x0b\x16", 4);
+    /* rates */
     printf("  packed %d TLV bytes\n", off);
     unpack_tlvs(ie, off);
-
     return 0;
 }
 ```
@@ -193,9 +206,7 @@ static void unpack_tlvs(const uint8_t *buf, int total) {
         uint8_t type = buf[off];
         uint8_t len  = buf[off + 1];
         if (off + 2 + len > total) break;       /* malformed guard */
-        printf("  TLV type=%u len=%u value=\"", type, len);
-        for (int i = 0; i < len; i++) putchar(buf[off + 2 + i]);
-        printf("\"\n");
+        printf("  TLV type=%u len=%u value=\"", type, len); for (int i = 0; i < len; i++) putchar(buf[off + 2 + i]); printf("\"\n");
         off += 2 + len;
     }
 }
@@ -204,42 +215,55 @@ int main(void) {
     /* ---- PART A: extract bitfields from a Frame Control word ---- */
     /* 0x0108 = data frame (type 2), ToDS=1: typical uplink data frame */
     extract_frame_control(0x0108);
-
     /* ---- PART B: pack a MAC header, then unpack it back ---- */
     printf("\nPART B - PACK then UNPACK MAC header\n");
     MacHeader tx = {
         .frame_control = 0x0108,
         .duration      = 0x002C,
-        .addr1 = {0x00,0x11,0x22,0x33,0x44,0x55},
-        .addr2 = {0xAA,0xBB,0xCC,0xDD,0xEE,0xFF},
-        .addr3 = {0x66,0x77,0x88,0x99,0xAA,0xBB},
+        .addr1 = {
+            0x00,0x11,0x22,0x33,0x44,0x55
+        }
+        ,
+        .addr2 = {
+            0xAA,0xBB,0xCC,0xDD,0xEE,0xFF
+        }
+        ,
+        .addr3 = {
+            0x66,0x77,0x88,0x99,0xAA,0xBB
+        }
+        ,
         .seq_ctrl = 0x0010
-    };
+    }
     uint8_t wire[MAC_HDR_LEN];
     pack_mac_header(&tx, wire);
     printf("  packed %d bytes: ", MAC_HDR_LEN);
     for (int i = 0; i < MAC_HDR_LEN; i++) printf("%02X", wire[i]);
     printf("\n");
-
     MacHeader rx;
     unpack_mac_header(wire, &rx);
     printf("  unpacked FC=0x%04X dur=0x%04X seq=0x%04X\n",
            rx.frame_control, rx.duration, rx.seq_ctrl);
-    printf("  addr1 (RA) = "); print_mac(rx.addr1); printf("\n");
-    printf("  addr2 (TA) = "); print_mac(rx.addr2); printf("\n");
-    printf("  addr3 (BSSID) = "); print_mac(rx.addr3); printf("\n");
+    printf("  addr1 (RA) = ");
+    print_mac(rx.addr1);
+    printf("\n");
+    printf("  addr2 (TA) = ");
+    print_mac(rx.addr2);
+    printf("\n");
+    printf("  addr3 (BSSID) = ");
+    print_mac(rx.addr3);
+    printf("\n");
     printf("  round-trip %s\n",
            memcmp(&tx, &rx, sizeof tx) == 0 ? "MATCHED" : "FAILED");
-
     /* ---- PART C: pack TLV information elements, then unpack ---- */
     printf("\nPART C - PACK then UNPACK TLV information elements\n");
     uint8_t ie[64];
     int off = 0;
-    off += pack_tlv(ie + off, 0, (const uint8_t*)"Home",  4);  /* SSID */
-    off += pack_tlv(ie + off, 1, (const uint8_t*)"\x02\x04\x0b\x16", 4); /* rates */
+    off += pack_tlv(ie + off, 0, (const uint8_t*)"Home",  4);
+    /* SSID */
+    off += pack_tlv(ie + off, 1, (const uint8_t*)"\x02\x04\x0b\x16", 4);
+    /* rates */
     printf("  packed %d TLV bytes\n", off);
     unpack_tlvs(ie, off);
-
     return 0;
 }
 ```

@@ -56,19 +56,18 @@ typedef struct Node { int id; struct Node *next; } Node;
 
 int main(void) {
     Node*h=NULL;
-    for(int i=5;
-    i>=1;
-    i--){
-    Node*n=malloc(sizeof*n);
-    n->id=i;
-    n->next=h;
-    h=n;
-    } Node*m=findMiddle(h);
+    for (int i=5; i>=1; i--) {
+        Node*n=malloc(sizeof*n);
+        n->id=i;
+        n->next=h;
+        h=n;
+    }
+    Node*m=findMiddle(h);
     printf("middle=%d\n", m->id);
-    while(h){
-    Node*t=h->next;
-    free(h);
-    h=t;
+    while (h){
+        Node*t=h->next;
+        free(h);
+        h=t;
     }
     return 0;
 }
@@ -96,7 +95,20 @@ Node *findMiddle(Node *head) {
 }
 
 int main(void) {
-    Node*h=NULL; for(int i=5;i>=1;i--){Node*n=malloc(sizeof*n);n->id=i;n->next=h;h=n;} Node*m=findMiddle(h); printf("middle=%d\n", m->id); while(h){Node*t=h->next;free(h);h=t;}
+    Node*h=NULL;
+    for (int i=5;i>=1;i--){
+        Node*n=malloc(sizeof*n);
+        n->id=i;
+        n->next=h;
+        h=n;
+    }
+    Node*m=findMiddle(h);
+    printf("middle=%d\n", m->id);
+    while (h){
+        Node*t=h->next;
+        free(h);
+        h=t;
+    }
     return 0;
 }
 ```

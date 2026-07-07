@@ -101,7 +101,8 @@ int isValidIPv4(const char *ip) {
 }
 
 int main(void) {
-    printf("isValidIPv4(192.168.1.10)=%d\n", isValidIPv4("192.168.1.10")); printf("isValidIPv4(1.2.3)=%d\n", isValidIPv4("1.2.3"));
+    printf("isValidIPv4(192.168.1.10)=%d\n", isValidIPv4("192.168.1.10"));
+    printf("isValidIPv4(1.2.3)=%d\n", isValidIPv4("1.2.3"));
     return 0;
 }
 ```

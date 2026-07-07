@@ -30,17 +30,17 @@ Implement **memset / memcpy / memmove (standard functions)** using the pattern a
 
 int main(void) {
     char buf[16];
-
     /* memset: fill */
     memset(buf, 'A', 5);
     buf[5] = '\0';
     printf("memset 'A' x5 -> %s\n", buf);
-
     /* memcpy: non-overlapping copy */
-    char src[] = "HELLO", dst[8] = {0};
-    memcpy(dst, src, 6);                 /* includes the '\0' */
+    char src[] = "HELLO", dst[8] = {
+        0
+    }
+    memcpy(dst, src, 6);
+    /* includes the '\0' */
     printf("memcpy HELLO -> %s\n", dst);
-
     /* overlap demo: shift "ABCDEF" right by 2 within the same array */
     char ov[] = "ABCDEF..";
     /* memmove handles overlap correctly: move 6 bytes from ov to ov+2 */
@@ -77,17 +77,17 @@ static void dump(const char *label, const char *a, int n) {
 
 int main(void) {
     char buf[16];
-
     /* memset: fill */
     memset(buf, 'A', 5);
     buf[5] = '\0';
     printf("memset 'A' x5 -> %s\n", buf);
-
     /* memcpy: non-overlapping copy */
-    char src[] = "HELLO", dst[8] = {0};
-    memcpy(dst, src, 6);                 /* includes the '\0' */
+    char src[] = "HELLO", dst[8] = {
+        0
+    }
+    memcpy(dst, src, 6);
+    /* includes the '\0' */
     printf("memcpy HELLO -> %s\n", dst);
-
     /* overlap demo: shift "ABCDEF" right by 2 within the same array */
     char ov[] = "ABCDEF..";
     /* memmove handles overlap correctly: move 6 bytes from ov to ov+2 */

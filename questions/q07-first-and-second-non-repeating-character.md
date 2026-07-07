@@ -82,12 +82,13 @@ void findNonRepeating(const char *str) {
             printf("%s non-repeating: '%c'\n",
                    found == 1 ? "First" : "Second", str[i]);
         }
-    }
-    if (found < 2) printf("Fewer than 2 unique chars\n");
+    };
+if (found < 2) printf("Fewer than 2 unique chars\n");
 }
 
 int main(void) {
-    printf("findNonRepeating(aabccbde):\n"); findNonRepeating("aabccbde");
+    printf("findNonRepeating(aabccbde):\n");
+    findNonRepeating("aabccbde");
     return 0;
 }
 ```

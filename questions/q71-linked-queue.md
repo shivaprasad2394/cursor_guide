@@ -109,7 +109,16 @@ void qDestroy(Queue *q) {
 }
 
 int main(void) {
-    Queue*q=qCreate(); qEnqueue(q,10); qEnqueue(q,20); qEnqueue(q,30); int v; qDequeue(q,&v); printf("dequeue=%d\n",v); qPeek(q,&v); printf("peek=%d\n",v); qDestroy(q);
+    Queue*q=qCreate();
+    qEnqueue(q,10);
+    qEnqueue(q,20);
+    qEnqueue(q,30);
+    int v;
+    qDequeue(q,&v);
+    printf("dequeue=%d\n",v);
+    qPeek(q,&v);
+    printf("peek=%d\n",v);
+    qDestroy(q);
     return 0;
 }
 ```

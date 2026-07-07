@@ -76,7 +76,9 @@ int parseThreeInts(const char *str, int *a, int *b, int *c) {
 }
 
 int main(void) {
-    int a,b,c; int n=parseThreeInts("10 20 30",&a,&b,&c); printf("matched=%d -> %d,%d,%d\n",n,a,b,c);
+    int a,b,c;
+    int n=parseThreeInts("10 20 30",&a,&b,&c);
+    printf("matched=%d -> %d,%d,%d\n",n,a,b,c);
     return 0;
 }
 ```

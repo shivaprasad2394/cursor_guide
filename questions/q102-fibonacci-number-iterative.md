@@ -50,9 +50,9 @@ n=5: 0,1,1,2,3,5 → return 5
 /* TODO: implement the helper function(s) your main needs */
 
 int main(void) {
-        printf("fib(0)=%d\n", fib(0));
-        printf("fib(1)=%d\n", fib(1));
-        printf("fib(10)=%d\n", fib(10));
+    printf("fib(0)=%d\n", fib(0));
+    printf("fib(1)=%d\n", fib(1));
+    printf("fib(10)=%d\n", fib(10));
     return 0;
 }
 ```
@@ -77,9 +77,9 @@ int fib(int n) {
 }
 
 int main(void) {
-        printf("fib(0)=%d\n", fib(0));
-        printf("fib(1)=%d\n", fib(1));
-        printf("fib(10)=%d\n", fib(10));
+    printf("fib(0)=%d\n", fib(0));
+    printf("fib(1)=%d\n", fib(1));
+    printf("fib(10)=%d\n", fib(10));
     return 0;
 }
 ```

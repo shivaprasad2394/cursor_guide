@@ -64,7 +64,9 @@ unsigned int writeBitsInRange(unsigned int reg, int s, int e, unsigned int val) 
 }
 
 int main(void) {
-    printf("setRange[1..3] of 0=0x%X\n", setBitsInRange(0,1,3)); printf("clearRange[1..3] of 0xFF=0x%X\n", clearBitsInRange(0xFF,1,3)); printf("write 5 into [1..3] of 0=0x%X\n", writeBitsInRange(0,1,3,5));
+    printf("setRange[1..3] of 0=0x%X\n", setBitsInRange(0,1,3));
+    printf("clearRange[1..3] of 0xFF=0x%X\n", clearBitsInRange(0xFF,1,3));
+    printf("write 5 into [1..3] of 0=0x%X\n", writeBitsInRange(0,1,3,5));
     return 0;
 }
 ```

@@ -58,7 +58,8 @@ arr = [4, 1, 2, 1, 2]
 
 int main(void) {
     int a[]={
-    4,1,2,1,2};
+        4,1,2,1,2
+    };
     printf("single=%d\n", findSingle(a,5));
     return 0;
 }
@@ -80,7 +81,10 @@ int findSingle(const int arr[], int n) {
 }
 
 int main(void) {
-    int a[]={4,1,2,1,2}; printf("single=%d\n", findSingle(a,5));
+    int a[]={
+        4,1,2,1,2
+    };
+    printf("single=%d\n", findSingle(a,5));
     return 0;
 }
 ```
