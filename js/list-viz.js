@@ -41,8 +41,9 @@ function inferOp(meta) {
   if (/cycle|floyd|tortoise|hare/i.test(t)) return "cycle";
   if (/merge/i.test(t)) return "merge";
   if (/remove.*nth|nth.*end/i.test(t)) return "remove-nth";
-  if (/insertathead|insert.*head/i.test(t)) return "insert-head";
+  if (/insertathead|insert.*head|prepend/i.test(t)) return "insert-head";
   if (/insertatend|insert.*tail|insert.*end/i.test(t)) return "insert-tail";
+  if (/delete.*double|delete.*address|delete-node-double/i.test(t)) return "delete-target";
   if (/delete|deletenode/i.test(t)) return "delete";
   if (/createnode|create.*node/i.test(t)) return "create";
   if (/freelist/i.test(t)) return "free";
@@ -106,12 +107,10 @@ const SNIPPETS = {
     { id: 7, text: "}" },
   ],
   "insert-head": [
-    { id: 1, text: "int insertAtHead(Node **head, int id) {" },
-    { id: 2, text: "    Node *n = createNode(id);" },
-    { id: 3, text: "    n->next = *head;" },
-    { id: 4, text: "    *head = n;" },
-    { id: 5, text: "    return 0;" },
-    { id: 6, text: "}" },
+    { id: 1, text: "void prependNode(Node **head, Node *local) {" },
+    { id: 2, text: "    local->next = *head;" },
+    { id: 3, text: "    *head = local;" },
+    { id: 4, text: "}" },
   ],
   traverse: [
     { id: 1, text: "void printList(Node *head) {" },
@@ -133,6 +132,18 @@ const SNIPPETS = {
     { id: 10, text: "    if (cur == NULL) return;" },
     { id: 11, text: "    prev->next = cur->next; free(cur);" },
     { id: 12, text: "}" },
+  ],
+  "delete-target": [
+    { id: 1, text: "void deleteNode(Node **head, Node *target) {" },
+    { id: 2, text: "    Node **cur = head;" },
+    { id: 3, text: "    while (*cur) {" },
+    { id: 4, text: "        if (*cur == target) {" },
+    { id: 5, text: "            *cur = target->next;" },
+    { id: 6, text: "            free(target); return;" },
+    { id: 7, text: "        }" },
+    { id: 8, text: "        cur = &((*cur)->next);" },
+    { id: 9, text: "    }" },
+    { id: 10, text: "}" },
   ],
   create: [
     { id: 1, text: "Node *createNode(int id) {" },
@@ -355,7 +366,7 @@ function simulateInsertHead() {
     head = id;
     steps.push(
       snap({
-        func: "insertAtHead",
+        func: "prependNode",
         snippet,
         heap,
         vars: { head, newNode: id },
@@ -850,6 +861,69 @@ function simulateFree(values) {
   return steps;
 }
 
+function simulateDeleteByTarget(values, targetVal) {
+  const heap = buildLinear(values);
+  const snippet = SNIPPETS["delete-target"];
+  const steps = [];
+  let head = 0;
+  let target = heap.findIndex((n) => n.val === String(targetVal));
+  if (target < 0) target = 1;
+
+  const push = (patch) =>
+    steps.push(
+      snap({
+        func: "deleteNode",
+        snippet,
+        heap: cloneHeap(heap),
+        vars: {
+          head,
+          target,
+          cur: patch.cur !== undefined ? patch.cur : head,
+        },
+        hot: patch.hot || [],
+        prevLine: patch.prevLine,
+        currLine: patch.currLine,
+        note: patch.note,
+        phaseLabel: patch.phaseLabel,
+        removed: patch.removed !== undefined ? patch.removed : null,
+      })
+    );
+
+  push({
+    prevLine: 1,
+    currLine: 2,
+    note: `List ${values.join(" → ")} → NULL — delete node@${target} (id=${targetVal})`,
+    phaseLabel: "Enter",
+    hot: [head, target],
+  });
+  push({
+    prevLine: 3,
+    currLine: 4,
+    note: `*cur == target — unlink node@${target}`,
+    phaseLabel: "Match",
+    cur: target,
+    hot: [target],
+  });
+  if (target === head) {
+    head = heap[target].next;
+  } else {
+    for (let i = 0; i < heap.length; i++) {
+      if (heap[i].next === target) heap[i].next = heap[target].next;
+    }
+  }
+  push({
+    prevLine: 5,
+    currLine: 6,
+    note: `free(node@${target}); list now skips id=${targetVal}`,
+    phaseLabel: "Free",
+    cur: head,
+    hot: [head].filter((x) => x !== null),
+    removed: target,
+  });
+  push({ prevLine: 6, currLine: 7, note: "Done — target removed by address", phaseLabel: "Done", cur: head, hot: [head].filter((x) => x !== null) });
+  return steps;
+}
+
 export function createListSession(meta) {
   const values = parseValues(meta);
   const op = inferOp(meta);
@@ -883,6 +957,10 @@ export function createListSession(meta) {
     case "delete":
       steps = simulateDelete(["30", "20", "10"], Number(meta.listHighlight) || 20);
       snippet = SNIPPETS.delete;
+      break;
+    case "delete-target":
+      steps = simulateDeleteByTarget(["10", "20", "30"], 20);
+      snippet = SNIPPETS["delete-target"];
       break;
     case "create":
       steps = simulateCreate(10);

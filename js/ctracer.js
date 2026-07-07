@@ -1001,7 +1001,14 @@ class Interp {
       const node = this.structHeap[loc.stField.stIdx];
       return node ? node.fields[loc.stField.field] : 0;
     }
-    if (loc.box) return loc.box.v;
+    if (loc.box) {
+      const v = loc.box.v;
+      if (v && v.fieldAddr) {
+        const node = this.structHeap[v.fieldAddr.stIdx];
+        return node ? node.fields[v.fieldAddr.field] : 0;
+      }
+      return loc.box.v;
+    }
     return loc.arr.data[loc.at] !== undefined ? loc.arr.data[loc.at] : 0;
   }
 
@@ -1079,6 +1086,11 @@ class Interp {
         const base = this.evalExpr(e.e.base);
         const i = toNum(this.evalExpr(e.e.i));
         if (isPtr(base) && base.arr) return { arr: base.arr, off: base.off + i };
+      }
+      if (e.e.k === "member" && e.e.op === "->") {
+        const base = this.evalExpr(e.e.base);
+        if (!isStructPtr(base)) throw new CUnsupported("address-of member on non-struct pointer");
+        return { fieldAddr: { stIdx: base.stIdx, field: e.e.field } };
       }
       throw new CUnsupported("address-of expression");
     }

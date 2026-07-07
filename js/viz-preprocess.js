@@ -24,9 +24,9 @@ function parseStructFields(body) {
 export function preprocessVizSource(source) {
   const structDefs = new Map();
   const sourceOut = source.replace(
-    /typedef\s+struct\s+(\w+)\s*\{([^}]*)\}\s*(\w+)\s*;/g,
+    /typedef\s+struct\s+(?:(\w+)\s+)?\{([^}]*)\}\s*(\w+)\s*;/g,
     (_, tag, body, alias) => {
-      structDefs.set(alias, { tag, fields: parseStructFields(body) });
+      structDefs.set(alias, { tag: tag || alias, fields: parseStructFields(body) });
       return `/* viz: typedef ${alias} stripped */`;
     }
   );
