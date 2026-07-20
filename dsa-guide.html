@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DSA Primer · Lset Prep</title>
-  <link rel="stylesheet" href="css/style.css?v=35">
+  <link rel="stylesheet" href="css/style.css?v=36">
 </head>
 <body data-page="guide">
   <header class="site-header">
@@ -139,7 +139,7 @@
         </div>
 
         <h3>Minimal C skeleton</h3>
-        <pre class="guide-code"><code><span class="guide-code-ann">/* Grid DFS — 4 directions */</span>
+        <pre class="guide-code"><code class="language-c"><span class="guide-code-ann">/* Grid DFS — 4 directions */</span>
 <span class="guide-code-kw">void</span> dfs(<span class="guide-code-kw">char</span> g[][COLS], <span class="guide-code-kw">int</span> rows, <span class="guide-code-kw">int</span> cols, <span class="guide-code-kw">int</span> r, <span class="guide-code-kw">int</span> c) {
     <span class="guide-code-ann">/* 1. BASE CASE — stop if out of bounds or not land */</span>
     <span class="guide-code-kw">if</span> (r &lt; 0 || r &gt;= rows || c &lt; 0 || c &gt;= cols) <span class="guide-code-kw">return</span>;
@@ -199,22 +199,30 @@
         </div>
 
         <h3>Minimal C skeleton</h3>
-        <pre class="guide-code"><code><span class="guide-code-ann">/* Queue stores (row, col, dist). head/tail indices. */</span>
-<span class="guide-code-kw">int</span> q_r[MAX], q_c[MAX], q_d[MAX];
-<span class="guide-code-kw">int</span> head = 0, tail = 0;
+        <pre class="guide-code"><code class="language-c"><span class="guide-code-ann">/* Queue arrays live outside or as static — but head/tail reset EACH call */</span>
+<span class="guide-code-kw">int</span> q_r[MAX_CELLS], q_c[MAX_CELLS], q_d[MAX_CELLS];
 
-<span class="guide-code-kw">void</span> enqueue(<span class="guide-code-kw">int</span> r, <span class="guide-code-kw">int</span> c, <span class="guide-code-kw">int</span> d) {
-    q_r[tail] = r; q_c[tail] = c; q_d[tail] = d; tail++;
-}
+<span class="guide-code-kw">int</span> shortestPath(<span class="guide-code-kw">char</span> g[ROWS][COLS], <span class="guide-code-kw">int</span> goal_r, <span class="guide-code-kw">int</span> goal_c) {
+    <span class="guide-code-ann">/* FIX: reset head/tail inside helper — not as globals */</span>
+    <span class="guide-code-kw">int</span> head = 0;
+    <span class="guide-code-kw">int</span> tail = 0;
+    <span class="guide-code-kw">int</span> vis[ROWS][COLS] = {0};
 
-<span class="guide-code-ann">/* In shortest-path helper: */</span>
-<span class="guide-code-kw">int</span> vis[ROWS][COLS] = {0};
-enqueue(0, 0, 1); vis[0][0] = 1;
+    q_r[tail] = 0; q_c[tail] = 0; q_d[tail] = 1;
+    tail++;
+    vis[0][0] = 1;
 
-<span class="guide-code-kw">while</span> (head &lt; tail) {
-    <span class="guide-code-kw">int</span> r = q_r[head], c = q_c[head], d = q_d[head]; head++;
-    <span class="guide-code-kw">if</span> (r == goal_r &amp;&amp; c == goal_c) <span class="guide-code-kw">return</span> d;   <span class="guide-code-ann">/* found shortest */</span>
-    <span class="guide-code-ann">/* for each open neighbor: if (!vis[nr][nc]) { vis=1; enqueue(nr,nc,d+1); } */</span>
+    <span class="guide-code-kw">while</span> (head &lt; tail) {
+        <span class="guide-code-kw">int</span> r = q_r[head];
+        <span class="guide-code-kw">int</span> c = q_c[head];
+        <span class="guide-code-kw">int</span> d = q_d[head];
+        head++;
+
+        <span class="guide-code-kw">if</span> (r == goal_r &amp;&amp; c == goal_c) <span class="guide-code-kw">return</span> d;
+
+        <span class="guide-code-ann">/* for each open neighbor: if (!vis[nr][nc]) { vis[nr][nc]=1; enqueue(nr,nc,d+1); } */</span>
+    }
+    <span class="guide-code-kw">return</span> -1;   <span class="guide-code-ann">/* goal unreachable */</span>
 }</code></pre>
 
         <h3>Line-by-line trace</h3>
@@ -283,7 +291,7 @@ enqueue(0, 0, 1); vis[0][0] = 1;
         </div>
 
         <h3>Minimal C skeleton</h3>
-        <pre class="guide-code"><code><span class="guide-code-kw">struct</span> Node { <span class="guide-code-kw">int</span> val; <span class="guide-code-kw">struct</span> Node *left, *right; };
+        <pre class="guide-code"><code class="language-c"><span class="guide-code-kw">struct</span> Node { <span class="guide-code-kw">int</span> val; <span class="guide-code-kw">struct</span> Node *left, *right; };
 
 <span class="guide-code-kw">int</span> hasPathSum(<span class="guide-code-kw">struct</span> Node *root, <span class="guide-code-kw">int</span> target) {
     <span class="guide-code-kw">if</span> (!root) <span class="guide-code-kw">return</span> 0;
@@ -305,10 +313,13 @@ enqueue(0, 0, 1); vis[0][0] = 1;
         </div>
 
         <div class="guide-callout guide-callout-key">
-          <strong>One sentence:</strong> Solve small versions of the problem, save answers in a table, and build up to the big answer — so you never solve the same sub-problem twice.
+          <strong>One sentence:</strong> Save answers to smaller sub-problems in an array so you never recalculate them from scratch.
         </div>
 
-        <h3>How to think (the part that confused you)</h3>
+        <h3>Real-life analogy</h3>
+        <p class="guide-plain">You write down "1+1+1+1+1 = 5" on paper. When someone adds another "+1", you don't count from the beginning — you use the 5 you already wrote and add 1 to get 6. DP is that scratch paper as an array.</p>
+
+        <h3>How to think</h3>
         <p class="guide-plain">DP is not a special library or keyword in C. It's a <strong>recipe</strong>:</p>
         <ol class="guide-trace">
           <li><strong>Define</strong> <code>dp[i]</code> in English: "number of ways to reach stair i" or "best loot using houses 0..i"</li>
@@ -336,14 +347,35 @@ enqueue(0, 0, 1); vis[0][0] = 1;
           <p class="guide-viz-note"></p>
         </div>
 
-        <h3>Minimal C — two variables instead of a full array</h3>
-        <pre class="guide-code"><code><span class="guide-code-kw">int</span> climbStairs(<span class="guide-code-kw">int</span> n) {
+        <h3>Minimal C skeleton (bottom-up table)</h3>
+        <pre class="guide-code"><code class="language-c"><span class="guide-code-kw">int</span> climbStairs(<span class="guide-code-kw">int</span> n) {
+    <span class="guide-code-kw">if</span> (n &lt;= 2) <span class="guide-code-kw">return</span> n;
+
+    <span class="guide-code-kw">int</span> dp[n + 1];
+    dp[1] = 1;
+    dp[2] = 2;
+
+    <span class="guide-code-kw">for</span> (<span class="guide-code-kw">int</span> i = 3; i &lt;= n; i++) {
+        dp[i] = dp[i - 1] + dp[i - 2];   <span class="guide-code-ann">/* past answers, no recompute */</span>
+    }
+    <span class="guide-code-kw">return</span> dp[n];
+}</code></pre>
+
+        <h3>Line-by-line trace</h3>
+        <ol class="guide-trace">
+          <li><strong>Small n:</strong> return 1 or 2 directly for 0–2 steps (base cases).</li>
+          <li><strong>Allocate table:</strong> <code>dp[n+1]</code> holds every sub-answer up to stair <code>n</code>.</li>
+          <li><strong>Fill upward:</strong> loop from 3 to n; each <code>dp[i]</code> reads only <code>dp[i-1]</code> and <code>dp[i-2]</code> — no deep recursion tree.</li>
+        </ol>
+
+        <h3>Space-saving variant (2 variables)</h3>
+        <pre class="guide-code"><code class="language-c"><span class="guide-code-kw">int</span> climbStairs(<span class="guide-code-kw">int</span> n) {
     <span class="guide-code-kw">if</span> (n &lt;= 1) <span class="guide-code-kw">return</span> 1;
     <span class="guide-code-kw">int</span> a = 1, b = 1;   <span class="guide-code-ann">/* dp[0], dp[1] */</span>
     <span class="guide-code-kw">for</span> (<span class="guide-code-kw">int</span> i = 2; i &lt;= n; i++) {
-        <span class="guide-code-kw">int</span> c = a + b;    <span class="guide-code-ann">/* dp[i] = dp[i-1] + dp[i-2] */</span>
+        <span class="guide-code-kw">int</span> c = a + b;
         a = b;
-        b = c;            <span class="guide-code-ann">/* slide the window */</span>
+        b = c;
     }
     <span class="guide-code-kw">return</span> b;
 }</code></pre>
@@ -372,8 +404,11 @@ enqueue(0, 0, 1); vis[0][0] = 1;
         </div>
 
         <div class="guide-callout guide-callout-key">
-          <strong>One sentence:</strong> At each step, make the locally best choice and never reconsider — often just one loop and one or two variables. No table needed.
+          <strong>One sentence:</strong> Make the best local choice at each step and hope those immediate jumps lead to the global best — often one loop, one variable, no table.
         </div>
+
+        <h3>Real-life analogy</h3>
+        <p class="guide-plain">Climbing a hill in pitch-black fog. You can't see the summit — only your feet. Each step, pick the direction that goes steepest upward right now. Greedy never reconsiders past choices.</p>
 
         <h3>Interactive trace — Jump Game</h3>
         <p class="guide-plain">From index <code>i</code> you can jump up to <code>nums[i]</code> steps. Track <code>farthest</code> — the rightmost index reachable so far.</p>
@@ -389,14 +424,27 @@ enqueue(0, 0, 1); vis[0][0] = 1;
         </div>
 
         <h3>Minimal C skeleton</h3>
-        <pre class="guide-code"><code><span class="guide-code-kw">int</span> canJump(<span class="guide-code-kw">int</span> *nums, <span class="guide-code-kw">int</span> n) {
-    <span class="guide-code-kw">int</span> farthest = 0;
-    <span class="guide-code-kw">for</span> (<span class="guide-code-kw">int</span> i = 0; i &lt; n &amp;&amp; i &lt;= farthest; i++) {
-        <span class="guide-code-kw">if</span> (i + nums[i] &gt; farthest)
-            farthest = i + nums[i];
+        <pre class="guide-code"><code class="language-c"><span class="guide-code-kw">int</span> canJump(<span class="guide-code-kw">int</span> *nums, <span class="guide-code-kw">int</span> numsSize) {
+    <span class="guide-code-kw">int</span> maxReachable = 0;
+
+    <span class="guide-code-kw">for</span> (<span class="guide-code-kw">int</span> i = 0; i &lt; numsSize; i++) {
+        <span class="guide-code-kw">if</span> (i &gt; maxReachable) <span class="guide-code-kw">return</span> 0;   <span class="guide-code-ann">/* stuck — can't reach i */</span>
+
+        <span class="guide-code-kw">int</span> currentReach = i + nums[i];
+        <span class="guide-code-kw">if</span> (currentReach &gt; maxReachable)
+            maxReachable = currentReach;
+
+        <span class="guide-code-kw">if</span> (maxReachable &gt;= numsSize - 1) <span class="guide-code-kw">return</span> 1;
     }
-    <span class="guide-code-kw">return</span> farthest &gt;= n - 1;
+    <span class="guide-code-kw">return</span> 0;
 }</code></pre>
+
+        <h3>Line-by-line trace</h3>
+        <ol class="guide-trace">
+          <li><strong>Horizon:</strong> <code>maxReachable = 0</code> — furthest index you can touch.</li>
+          <li><strong>Scan:</strong> if current index <code>i</code> is past that horizon, you're stuck → return 0.</li>
+          <li><strong>Local choice:</strong> update horizon with <code>i + nums[i]</code>; early exit once horizon passes the last index.</li>
+        </ol>
 
         <p class="guide-plain">Interval problems (<a href="question.html?id=q117-non-overlapping-intervals-greedy">q117</a>, <a href="question.html?id=q122-merge-intervals-greedy">q122</a>) use the same spirit: sort by end time, keep the greedy choice, one pass.</p>
         <p class="guide-link-q"><a class="btn" href="question.html?id=q116-jump-game-greedy">Practice q116 →</a></p>
@@ -410,8 +458,11 @@ enqueue(0, 0, 1); vis[0][0] = 1;
         </div>
 
         <div class="guide-callout guide-callout-key">
-          <strong>One sentence:</strong> Walk the array once; keep a stack of indices whose values stay in sorted order. When the current value "breaks" the order, pop and answer questions about what you popped.
+          <strong>One sentence:</strong> Keep a stack sorted in one direction (increasing or decreasing) to find the "next greater" or "next smaller" element in O(n) time.
         </div>
+
+        <h3>Real-life analogy</h3>
+        <p class="guide-plain">People in a single-file line. A tall person joins at the back — they block the view of everyone shorter in front of them from a back-to-front perspective. The stack holds who still "matters" when scanning backward.</p>
 
         <h3>Diagram — Daily Temperatures</h3>
         <div class="guide-diagram guide-diagram-wide">
@@ -431,13 +482,35 @@ enqueue(0, 0, 1); vis[0][0] = 1;
           </div>
         </div>
 
-        <h3>Minimal C skeleton</h3>
-        <pre class="guide-code"><code><span class="guide-code-kw">int</span> stack[MAX], top = -1;
+        <h3>Minimal C skeleton (next greater — scan right to left)</h3>
+        <pre class="guide-code"><code class="language-c"><span class="guide-code-kw">void</span> nextGreaterElement(<span class="guide-code-kw">int</span> *nums, <span class="guide-code-kw">int</span> size, <span class="guide-code-kw">int</span> *result) {
+    <span class="guide-code-kw">int</span> stack[size];
+    <span class="guide-code-kw">int</span> top = -1;
+
+    <span class="guide-code-kw">for</span> (<span class="guide-code-kw">int</span> i = size - 1; i &gt;= 0; i--) {
+        <span class="guide-code-kw">while</span> (top &gt;= 0 &amp;&amp; stack[top] &lt;= nums[i])
+            top--;                          <span class="guide-code-ann">/* pop smaller — can't be next greater */</span>
+
+        result[i] = (top == -1) ? -1 : stack[top];
+        stack[++top] = nums[i];
+    }
+}</code></pre>
+
+        <h3>Line-by-line trace</h3>
+        <ol class="guide-trace">
+          <li><strong>Setup:</strong> array <code>stack[]</code> + <code>top = -1</code> (empty stack).</li>
+          <li><strong>Backward scan:</strong> start at the last index — each step asks "what's the next greater to my right?"</li>
+          <li><strong>Pop smaller:</strong> while stack top ≤ current value, pop — those values are useless for anything left of here.</li>
+          <li><strong>Answer &amp; push:</strong> stack top (if any) is the next greater; push current value for future indices.</li>
+        </ol>
+
+        <h3>Variant — Daily Temperatures (forward scan, index stack)</h3>
+        <pre class="guide-code"><code class="language-c"><span class="guide-code-kw">int</span> stack[MAX], top = -1;
 
 <span class="guide-code-kw">for</span> (<span class="guide-code-kw">int</span> i = 0; i &lt; n; i++) {
     <span class="guide-code-kw">while</span> (top &gt;= 0 &amp;&amp; T[i] &gt; T[stack[top]]) {
         <span class="guide-code-kw">int</span> prev = stack[top--];
-        wait[prev] = i - prev;   <span class="guide-code-ann">/* warmer day found */</span>
+        wait[prev] = i - prev;
     }
     stack[++top] = i;
 }</code></pre>
@@ -456,28 +529,32 @@ enqueue(0, 0, 1); vis[0][0] = 1;
         </div>
 
         <div class="guide-callout guide-callout-key">
-          <strong>One sentence:</strong> Try a choice, explore deeper, then undo the choice and try the next — like walking a decision tree where you back up at dead ends.
+          <strong>One sentence:</strong> Build a solution step by step; when a path breaks a rule, undo the last choice and try the next branch.
         </div>
 
-        <h3>How it differs from DFS</h3>
-        <p class="guide-plain">Grid DFS marks cells visited permanently (sink to '0'). Backtracking <strong>un-does</strong> each pick so another branch can reuse the same slot. Classic for subsets, permutations, N-queens, Sudoku.</p>
+        <h3>Real-life analogy</h3>
+        <p class="guide-plain">A ring of unlabelled keys on a locked door. Try one key, turn it, doesn't work — pull it back out and try the next. Backtracking is that choose → explore → unchoose loop in code.</p>
 
-        <h3>Template in C</h3>
-        <pre class="guide-code"><code><span class="guide-code-kw">void</span> backtrack(<span class="guide-code-kw">int</span> start) {
-    record_answer();                    <span class="guide-code-ann">/* current partial solution counts */</span>
-    <span class="guide-code-kw">for</span> (<span class="guide-code-kw">int</span> i = start; i &lt; n; i++) {
-        choose(i);                      <span class="guide-code-ann">/* pick nums[i] */</span>
-        backtrack(i + 1);                <span class="guide-code-ann">/* explore with this pick */</span>
-        unchoose(i);                    <span class="guide-code-ann">/* often implicit when i loops */</span>
+        <h3>How it differs from grid DFS</h3>
+        <p class="guide-plain">Grid DFS marks cells permanently (sink to <code>'0'</code>). Backtracking <strong>un-does</strong> each pick so another branch can reuse the same slot. Classic for subsets, permutations, N-queens.</p>
+
+        <h3>Minimal C skeleton</h3>
+        <pre class="guide-code"><code class="language-c"><span class="guide-code-kw">void</span> backtrack(<span class="guide-code-kw">int</span> *nums, <span class="guide-code-kw">int</span> size, <span class="guide-code-kw">int</span> start,
+               <span class="guide-code-kw">int</span> *currentSet, <span class="guide-code-kw">int</span> setSize) {
+    printSubset(currentSet, setSize);   <span class="guide-code-ann">/* base: record current state */</span>
+
+    <span class="guide-code-kw">for</span> (<span class="guide-code-kw">int</span> i = start; i &lt; size; i++) {
+        currentSet[setSize] = nums[i];              <span class="guide-code-ann">/* CHOOSE */</span>
+        backtrack(nums, size, i + 1, currentSet, setSize + 1);  <span class="guide-code-ann">/* EXPLORE */</span>
+        <span class="guide-code-ann">/* UNCHOOSE — next loop overwrites slot; setSize shrinks on return */</span>
     }
 }</code></pre>
 
-        <h3>Trace — subsets of {1,2,3}</h3>
+        <h3>Line-by-line trace</h3>
         <ol class="guide-trace">
-          <li><strong>Call bt(0):</strong> count {} → try pick 1</li>
-          <li><strong>Call bt(1):</strong> count {1} → try pick 2</li>
-          <li><strong>Call bt(2):</strong> count {1,2} → try pick 3 → count {1,2,3}</li>
-          <li><strong>Unwind:</strong> also get {1,3}, {2,3}, {2}, {3}, … → 8 total</li>
+          <li><strong>Base:</strong> every call records the current subset (including empty).</li>
+          <li><strong>Start index:</strong> <code>start</code> prevents duplicates — only pick forward in the array.</li>
+          <li><strong>Branch:</strong> append <code>nums[i]</code>, recurse with <code>i+1</code>; when that returns, loop tries the next <code>i</code>.</li>
         </ol>
 
         <p class="guide-link-q"><a class="btn" href="question.html?id=q123-subsets-backtracking">Practice q123 Subsets →</a></p>
@@ -487,6 +564,19 @@ enqueue(0, 0, 1); vis[0][0] = 1;
       <section class="guide-section" id="also-know">
         <h2>Must-know patterns — full map of Lset Prep</h2>
         <p class="guide-plain">The 12 <strong>DSA Patterns</strong> questions cover the core interview toolbox. These topics are equally common — practice them in other categories:</p>
+
+        <h3>Runtime cheat sheet</h3>
+        <ul class="guide-list guide-list-runtime">
+          <li><strong>Binary search</strong> — O(log n) time, O(1) space on sorted arrays</li>
+          <li><strong>Two pointers</strong> — O(n) time, O(1) space (one pass from both ends or slow/fast)</li>
+          <li><strong>Sliding window</strong> — O(n) time, O(1) or O(k) space for frequency table</li>
+          <li><strong>Hash / frequency</strong> — O(n) time, O(n) space for count arrays</li>
+          <li><strong>Kadane (max subarray)</strong> — O(n) time, O(1) space</li>
+          <li><strong>DFS / BFS on grid</strong> — O(rows × cols) time and visit array</li>
+          <li><strong>DP tabulation</strong> — O(n) or O(n×m) time, O(n) space (often reducible)</li>
+          <li><strong>Monotonic stack</strong> — O(n) time — each index pushed/popped once</li>
+          <li><strong>Backtracking</strong> — often O(2<sup>n</sup>) or O(n!) — fine for small n in interviews</li>
+        </ul>
 
         <table class="guide-table">
           <thead>
@@ -533,6 +623,6 @@ enqueue(0, 0, 1); vis[0][0] = 1;
     </main>
   </div>
 
-  <script src="js/dsa-guide.js?v=35"></script>
+  <script src="js/dsa-guide.js?v=36"></script>
 </body>
 </html>

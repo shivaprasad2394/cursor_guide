@@ -2506,6 +2506,21 @@ a:hover {
 .guide-code-str { color: var(--green); }
 .guide-code-ann { color: var(--text-muted); font-style: italic; }
 
+.guide-list {
+  line-height: 1.65;
+  padding-left: 1.25rem;
+  font-family: var(--sans);
+}
+
+.guide-list-runtime {
+  font-size: 0.9rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.guide-list-runtime li {
+  margin-bottom: 0.4rem;
+}
+
 .guide-trace {
   margin: 1rem 0;
   padding-left: 1.25rem;
