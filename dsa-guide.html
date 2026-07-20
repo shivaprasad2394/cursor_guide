@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DSA Primer · Lset Prep</title>
-  <link rel="stylesheet" href="css/style.css?v=34">
+  <link rel="stylesheet" href="css/style.css?v=35">
 </head>
 <body data-page="guide">
   <header class="site-header">
@@ -130,7 +130,7 @@
         <div class="guide-viz" data-demo="dfs">
           <div class="guide-viz-toolbar">
             <button type="button" class="btn guide-viz-prev">← Prev</button>
-            <span class="guide-viz-step">Step <span class="guide-viz-step-num">1</span></span>
+            <span class="guide-viz-step">Step <span class="guide-viz-step-num">1</span> / <span class="guide-viz-step-total">?</span></span>
             <button type="button" class="btn guide-viz-next">Next step →</button>
             <button type="button" class="btn guide-viz-reset">Reset</button>
           </div>
@@ -190,7 +190,7 @@
         <div class="guide-viz" data-demo="bfs">
           <div class="guide-viz-toolbar">
             <button type="button" class="btn guide-viz-prev">← Prev</button>
-            <span class="guide-viz-step">Step <span class="guide-viz-step-num">1</span></span>
+            <span class="guide-viz-step">Step <span class="guide-viz-step-num">1</span> / <span class="guide-viz-step-total">?</span></span>
             <button type="button" class="btn guide-viz-next">Next step →</button>
             <button type="button" class="btn guide-viz-reset">Reset</button>
           </div>
@@ -274,7 +274,7 @@ enqueue(0, 0, 1); vis[0][0] = 1;
         <div class="guide-viz" data-demo="tree">
           <div class="guide-viz-toolbar">
             <button type="button" class="btn guide-viz-prev">← Prev</button>
-            <span class="guide-viz-step">Step <span class="guide-viz-step-num">1</span></span>
+            <span class="guide-viz-step">Step <span class="guide-viz-step-num">1</span> / <span class="guide-viz-step-total">?</span></span>
             <button type="button" class="btn guide-viz-next">Next step →</button>
             <button type="button" class="btn guide-viz-reset">Reset</button>
           </div>
@@ -318,11 +318,17 @@ enqueue(0, 0, 1); vis[0][0] = 1;
         </ol>
 
         <h3>Interactive trace — Climbing Stairs (n=5)</h3>
-        <p class="guide-plain">You can take 1 or 2 steps. Ways to reach stair <code>i</code> = ways to reach <code>i-1</code> + ways to reach <code>i-2</code> (Fibonacci).</p>
+        <p class="guide-plain">Same problem, <strong>three implementations</strong>. Switch mode, then step through each.</p>
         <div class="guide-viz" data-demo="dp">
+          <div class="guide-viz-modes">
+            <button type="button" class="btn guide-viz-mode guide-viz-mode-active" data-dp-mode="memo">Top-down + memo</button>
+            <button type="button" class="btn guide-viz-mode" data-dp-mode="tabulation">Bottom-up table</button>
+            <button type="button" class="btn guide-viz-mode" data-dp-mode="space">2 variables</button>
+          </div>
+          <p class="guide-viz-mode-label">Top-down + memo</p>
           <div class="guide-viz-toolbar">
             <button type="button" class="btn guide-viz-prev">← Prev</button>
-            <span class="guide-viz-step">Step <span class="guide-viz-step-num">1</span></span>
+            <span class="guide-viz-step">Step <span class="guide-viz-step-num">1</span> / <span class="guide-viz-step-total">?</span></span>
             <button type="button" class="btn guide-viz-next">Next step →</button>
             <button type="button" class="btn guide-viz-reset">Reset</button>
           </div>
@@ -374,7 +380,7 @@ enqueue(0, 0, 1); vis[0][0] = 1;
         <div class="guide-viz" data-demo="greedy">
           <div class="guide-viz-toolbar">
             <button type="button" class="btn guide-viz-prev">← Prev</button>
-            <span class="guide-viz-step">Step <span class="guide-viz-step-num">1</span></span>
+            <span class="guide-viz-step">Step <span class="guide-viz-step-num">1</span> / <span class="guide-viz-step-total">?</span></span>
             <button type="button" class="btn guide-viz-next">Next step →</button>
             <button type="button" class="btn guide-viz-reset">Reset</button>
           </div>
@@ -527,6 +533,6 @@ enqueue(0, 0, 1); vis[0][0] = 1;
     </main>
   </div>
 
-  <script src="js/dsa-guide.js?v=34"></script>
+  <script src="js/dsa-guide.js?v=35"></script>
 </body>
 </html>

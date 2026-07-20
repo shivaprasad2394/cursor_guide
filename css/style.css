@@ -2062,9 +2062,9 @@ a:hover {
   font-size: 0.88rem;
 }
 
-.guide-tree-canvas {
+.guide-tree-wrap {
   position: relative;
-  height: 11rem;
+  height: 12rem;
   margin: 0.5rem 0;
   border: 1px dashed var(--border);
   border-radius: 8px;
@@ -2097,6 +2097,111 @@ a:hover {
   border-color: var(--green);
   background: rgba(57, 217, 138, 0.35);
   box-shadow: 0 0 0 2px rgba(57, 217, 138, 0.25);
+}
+
+.guide-viz-modes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+}
+
+.guide-viz-mode {
+  font-size: 0.75rem;
+  padding: 0.3rem 0.65rem;
+}
+
+.guide-viz-mode-active {
+  border-color: var(--green);
+  background: rgba(57, 217, 138, 0.15);
+  color: var(--green);
+}
+
+.guide-viz-mode-label {
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0 0 0.5rem;
+}
+
+.guide-viz-meta {
+  font-size: 0.78rem;
+  color: var(--amber);
+  margin: 0 0 0.5rem;
+  font-family: var(--sans);
+}
+
+.guide-dp-mode-tag {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin: 0 0 0.5rem;
+}
+
+.guide-call-stack {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0.65rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.guide-stack-frame {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 4px;
+  background: rgba(91, 140, 255, 0.15);
+  border: 1px solid rgba(91, 140, 255, 0.35);
+}
+
+.guide-stack-arrow {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+.guide-jump-out .guide-dp-val {
+  opacity: 0.35;
+}
+
+.guide-tree-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.guide-tree-edge {
+  stroke: var(--border);
+  stroke-width: 0.6;
+  vector-effect: non-scaling-stroke;
+}
+
+.guide-tree-edge-path {
+  stroke: var(--amber);
+  stroke-width: 1.2;
+}
+
+.guide-tree-edge-fail {
+  stroke: var(--red);
+  stroke-width: 1.2;
+  stroke-dasharray: 2 1;
+}
+
+.guide-tree-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.guide-tree-fail {
+  border-color: var(--red) !important;
+  background: rgba(255, 107, 74, 0.25) !important;
 }
 
 .guide-plain {
