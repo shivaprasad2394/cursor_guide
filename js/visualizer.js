@@ -1,15 +1,15 @@
 /**
  * Execution Studio — step-through memory visualizer (Python Tutor inspired).
  */
-import { createListSession, renderListStudioRich } from "./list-viz.js?v=30";
-import { createAvlSession, renderAvlStudioRich } from "./avl-viz.js?v=30";
+import { createListSession, renderListStudioRich } from "./list-viz.js?v=31";
+import { createAvlSession, renderAvlStudioRich } from "./avl-viz.js?v=31";
 import {
   createGridDfsSession,
   createGridBfsSession,
   createIntervalSession,
   createMonotonicStackSession,
   renderDsaStudioRich,
-} from "./dsa-viz.js?v=30";
+} from "./dsa-viz.js?v=31";
 
 export function createSession(meta, opts = {}) {
   const viz = meta.visualization || "none";

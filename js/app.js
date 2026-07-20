@@ -1,5 +1,5 @@
 /**
- * C Interview Prep — static practice site (no API, no accounts).
+ * Lset Prep — C interview practice site (no API, no accounts).
  */
 (function () {
   "use strict";
@@ -353,7 +353,7 @@
   async function runInBrowser(source, stdin, onProgress) {
     if (!runnerModule) {
       if (onProgress) onProgress("Loading in-browser C compiler (first run ~60 MB, cached after)…");
-      runnerModule = await import("./runner.js?v=30");
+      runnerModule = await import("./runner.js?v=31");
     }
     if (onProgress) onProgress("Compiling & running…");
     return runnerModule.compileAndRun(source, stdin || "");
@@ -376,7 +376,7 @@
 
   async function getVisualizer() {
     if (!visualizerModule) {
-      visualizerModule = await import("./visualizer.js?v=30");
+      visualizerModule = await import("./visualizer.js?v=31");
     }
     return visualizerModule;
   }
@@ -496,7 +496,7 @@
             <div class="section-cards">${renderQuestionCards(items)}</div>
           </section>`;
       }
-      document.title = `${sectionLabel(activeSection)} · C Interview Prep`;
+      document.title = `${sectionLabel(activeSection)} · Lset Prep`;
     } else {
       if (navEl) navEl.hidden = true;
       if (listEl) listEl.hidden = true;
@@ -517,7 +517,7 @@
           .join("");
         gridEl.innerHTML = `<div class="category-grid">${cards}</div>`;
       }
-      document.title = "C Interview Prep";
+      document.title = "Lset Prep";
     }
   }
 
@@ -577,7 +577,7 @@
     const solutionCode = extractSolutionCode(body);
     const algorithmText = extractAlgorithm(body);
 
-    document.title = `${meta.title || entry.title} · C Interview Prep`;
+    document.title = `${meta.title || entry.title} · Lset Prep`;
 
     const titleEl = document.getElementById("q-title");
     const metaEl = document.getElementById("q-meta");
@@ -627,9 +627,9 @@
       let mods;
       try {
         mods = await Promise.all([
-          import("./ctracer.js?v=30"),
-          import("./tracer-view.js?v=30"),
-          import("./viz-preprocess.js?v=30"),
+          import("./ctracer.js?v=31"),
+          import("./tracer-view.js?v=31"),
+          import("./viz-preprocess.js?v=31"),
         ]);
       } catch (_) {
         return false;
