@@ -56,6 +56,26 @@
         { i: 4, farthest: 8, done: true, note: "farthest=4 ≥ last index 4 → YES, you can reach the end" },
       ],
     },
+    tree: {
+      nodes: [
+        { id: 0, val: 5, x: 50, y: 8 },
+        { id: 1, val: 4, x: 28, y: 38 },
+        { id: 2, val: 8, x: 72, y: 38 },
+        { id: 3, val: 11, x: 18, y: 68 },
+        { id: 4, val: 13, x: 58, y: 68 },
+        { id: 5, val: 4, x: 86, y: 68 },
+        { id: 6, val: 7, x: 8, y: 92 },
+        { id: 7, val: 2, x: 28, y: 92 },
+        { id: 8, val: 1, x: 92, y: 92 },
+      ],
+      steps: [
+        { path: [], remaining: 22, hot: [], note: "Target sum 22. Start at root — can any root→leaf path work?" },
+        { path: [0], remaining: 17, hot: [0], note: "Visit 5. Need 22−5 = 17 more on a path to a leaf." },
+        { path: [0, 1], remaining: 13, hot: [1], note: "Go left to 4. Need 17−4 = 13." },
+        { path: [0, 1, 3], remaining: 2, hot: [3], note: "Go to 11. Need 13−11 = 2." },
+        { path: [0, 1, 3, 7], remaining: 0, hot: [7], note: "Leaf 2: value 2 equals remaining 2 ✓ Path 5→4→11→2 sums to 22." },
+      ],
+    },
   };
 
   function renderGrid(container, demo, step, kind) {
@@ -134,6 +154,25 @@
     if (counter) counter.textContent = String((container._stepIdx ?? 0) + 1);
   }
 
+  function renderTree(container, demo, step) {
+    const onPath = new Set(step.path || []);
+    const hot = new Set(step.hot || []);
+    const nodes = demo.nodes
+      .map((nd) => {
+        let cls = "guide-tree-node";
+        if (hot.has(nd.id)) cls += " guide-tree-hot";
+        else if (onPath.has(nd.id)) cls += " guide-tree-path";
+        return `<div class="${cls}" style="left:${nd.x}%;top:${nd.y}%">${nd.val}</div>`;
+      })
+      .join("");
+    container.querySelector(".guide-viz-canvas").innerHTML = `
+      <div class="guide-tree-canvas">${nodes}</div>
+      <p class="guide-reach-label">remaining target = ${step.remaining}</p>`;
+    container.querySelector(".guide-viz-note").textContent = step.note;
+    const counter = container.querySelector(".guide-viz-step-num");
+    if (counter) counter.textContent = String((container._stepIdx ?? 0) + 1);
+  }
+
   function wireDemo(id, kind) {
     const root = document.querySelector(`[data-demo="${id}"]`);
     if (!root) return;
@@ -148,6 +187,7 @@
       if (kind === "dfs" || kind === "bfs") renderGrid(root, demo, step, kind);
       else if (kind === "dp") renderDp(root, demo, step);
       else if (kind === "greedy") renderGreedy(root, demo, step);
+      else if (kind === "tree") renderTree(root, demo, step);
       if (prev) prev.disabled = root._stepIdx === 0;
       if (next) next.disabled = root._stepIdx >= demo.steps.length - 1;
     };
@@ -193,4 +233,5 @@
   wireDemo("bfs", "bfs");
   wireDemo("dp", "dp");
   wireDemo("greedy", "greedy");
+  wireDemo("tree", "tree");
 })();

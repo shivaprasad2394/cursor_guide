@@ -951,6 +951,14 @@
       "pattern": "greedy",
       "difficulty": "medium",
       "section": "dsa patterns"
+    },
+    {
+      "id": "q123-subsets-backtracking",
+      "file": "q123-subsets-backtracking.md",
+      "title": "Subsets (Backtracking)",
+      "pattern": "backtracking",
+      "difficulty": "medium",
+      "section": "dsa patterns"
     }
   ]
 }

@@ -96,6 +96,13 @@ ENRICHMENTS = {
         "diagram": "[1,3]+[2,6] → [1,6]  then separate [8,10] [15,18]",
         "walk": "step1: Copy first interval to output\nstep2: If overlap: `out.end = max(out.end, in.end)`\nstep3: Else append new interval to output",
     },
+    "q123-subsets-backtracking.md": {
+        "guide": "#backtracking",
+        "before": "Read [Backtracking primer](dsa-guide.html#backtracking). Try a choice, recurse, then undo — like exploring a decision tree.",
+        "think": "Each element is include or skip. Recurse from `start`: count current subset, then loop `i` from start and recurse with `i+1` after picking index i.",
+        "diagram": "3 elements → 2³ = 8 subsets including empty set",
+        "walk": "step1: helper(start): increment global count\nstep2: for i from start to n-1: helper(i+1)\nstep3: return count from helper(0)",
+    },
 }
 
 

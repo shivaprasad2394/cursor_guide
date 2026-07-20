@@ -2055,6 +2055,49 @@ a:hover {
 .guide-tag-dp { background: rgba(57, 217, 138, 0.12); color: var(--green); border: 1px solid rgba(57, 217, 138, 0.35); }
 .guide-tag-greedy { background: rgba(255, 107, 74, 0.12); color: var(--red); border: 1px solid rgba(255, 107, 74, 0.35); }
 .guide-tag-stack { background: rgba(147, 112, 219, 0.15); color: #b39ddb; border: 1px solid rgba(147, 112, 219, 0.35); }
+.guide-tag-backtrack { background: rgba(255, 107, 74, 0.12); color: var(--red); border: 1px solid rgba(255, 107, 74, 0.35); }
+
+.guide-table-picker td:first-child {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+.guide-tree-canvas {
+  position: relative;
+  height: 11rem;
+  margin: 0.5rem 0;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.guide-tree-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 0.8rem;
+  background: rgba(255, 255, 255, 0.06);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.guide-tree-path {
+  border-color: var(--amber);
+  background: rgba(240, 180, 41, 0.15);
+}
+
+.guide-tree-hot {
+  border-color: var(--green);
+  background: rgba(57, 217, 138, 0.35);
+  box-shadow: 0 0 0 2px rgba(57, 217, 138, 0.25);
+}
 
 .guide-plain {
   font-family: var(--sans);

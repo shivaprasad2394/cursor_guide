@@ -42,8 +42,8 @@ def main() -> int:
     dsa = [q for q in entries if q.get("section") == "dsa patterns"]
     if len(pointers) != 8:
         errors.append(f"expected 8 pointer questions, got {len(pointers)}")
-    if len(dsa) != 11:
-        errors.append(f"expected 11 DSA questions, got {len(dsa)}")
+    if len(dsa) != 12:
+        errors.append(f"expected 12 DSA questions, got {len(dsa)}")
 
     print(f"OK: {len(entries)} questions indexed")
     print(f"OK: pointers section has {len(pointers)} questions")

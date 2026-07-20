@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DSA Primer · Lset Prep</title>
-  <link rel="stylesheet" href="css/style.css?v=33">
+  <link rel="stylesheet" href="css/style.css?v=34">
 </head>
 <body data-page="guide">
   <header class="site-header">
     <div class="brand">
       <a href="index.html" class="brand-title">← Lset Prep</a>
-      <span class="brand-sub">DSA primer · read before the 11 pattern questions</span>
+      <span class="brand-sub">DSA primer · read before the 12 pattern questions</span>
     </div>
   </header>
 
@@ -20,12 +20,16 @@
       <nav class="guide-sidebar-nav">
         <a href="#start">How to use this guide</a>
         <a href="#c-you-need">C you already know</a>
+        <a href="#pattern-picker">Pick a pattern</a>
         <a href="#dfs">DFS</a>
         <a href="#bfs">BFS</a>
         <a href="#compare">DFS vs BFS</a>
+        <a href="#trees">Trees</a>
         <a href="#dp">Dynamic programming</a>
         <a href="#greedy">Greedy</a>
         <a href="#stack">Monotonic stack</a>
+        <a href="#backtracking">Backtracking</a>
+        <a href="#also-know">Must-know map</a>
         <a href="#order">Learning order</a>
       </nav>
       <a class="guide-sidebar-cta btn btn-primary" href="index.html?section=dsa%20patterns">Open DSA questions →</a>
@@ -81,6 +85,28 @@
             <tr><td>Queue with <code>head</code>, <code>tail</code></td><td>BFS</td></tr>
             <tr><td>Stack array + <code>top</code></td><td>Monotonic stack</td></tr>
             <tr><td><code>struct Node { int val; struct Node *left, *right; }</code></td><td>Tree DFS</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ── PATTERN PICKER ── -->
+      <section class="guide-section" id="pattern-picker">
+        <h2>Pick a pattern from the problem words</h2>
+        <p class="guide-plain">Interview questions rarely say "use DP." Look for these phrases:</p>
+        <table class="guide-table guide-table-picker">
+          <thead>
+            <tr><th>You hear…</th><th>Try…</th><th>Start here</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>"Shortest steps / minimum moves" on a grid</td><td>BFS</td><td><a href="#bfs">BFS section</a> · <a href="question.html?id=q119-shortest-path-grid-bfs">q119</a></td></tr>
+            <tr><td>"Count islands / flood fill / connected"</td><td>DFS</td><td><a href="#dfs">DFS section</a> · <a href="question.html?id=q118-number-of-islands-dfs">q118</a></td></tr>
+            <tr><td>"Root-to-leaf path" on a tree</td><td>Tree DFS</td><td><a href="#trees">Trees</a> · <a href="question.html?id=q120-tree-path-sum-dfs">q120</a></td></tr>
+            <tr><td>"How many ways / min cost / max without adjacent"</td><td>DP</td><td><a href="#dp">DP section</a> · <a href="question.html?id=q111-climbing-stairs-dp">q111</a></td></tr>
+            <tr><td>"Can you reach the end / pick locally best"</td><td>Greedy</td><td><a href="#greedy">Greedy</a> · <a href="question.html?id=q116-jump-game-greedy">q116</a></td></tr>
+            <tr><td>"Next greater / days until warmer"</td><td>Monotonic stack</td><td><a href="#stack">Stack</a> · <a href="question.html?id=q114-daily-temperatures-monotonic-stack">q114</a></td></tr>
+            <tr><td>"All subsets / all combinations / place queens"</td><td>Backtracking</td><td><a href="#backtracking">Backtracking</a> · <a href="question.html?id=q123-subsets-backtracking">q123</a></td></tr>
+            <tr><td>"Sorted array, find target / rotated sorted"</td><td>Binary search</td><td><a href="#also-know">Must-know map</a> · <a href="question.html?id=q23-binary-search-iterative">q23</a></td></tr>
+            <tr><td>"Longest substring without repeat / window"</td><td>Sliding window</td><td><a href="#also-know">Must-know map</a> · <a href="question.html?id=q98-longest-substring-without-repeating-characters">q98</a></td></tr>
           </tbody>
         </table>
       </section>
@@ -230,6 +256,47 @@ enqueue(0, 0, 1); vis[0][0] = 1;
         </div>
       </section>
 
+      <!-- ── TREES ── -->
+      <section class="guide-section" id="trees">
+        <div class="guide-section-head">
+          <span class="guide-tag guide-tag-dfs">Tree DFS</span>
+          <h2>Trees — same DFS idea, different shape</h2>
+        </div>
+
+        <div class="guide-callout guide-callout-key">
+          <strong>One sentence:</strong> A binary tree is nodes with <code>left</code> and <code>right</code> pointers. DFS on a tree = recurse into children instead of grid neighbors.
+        </div>
+
+        <p class="guide-plain">Grid DFS visits 4 neighbors. Tree DFS usually visits 2 children. The base case is <code>root == NULL</code>. Leaf = both children are NULL.</p>
+
+        <h3>Interactive trace — path sum to 22</h3>
+        <p class="guide-plain">Subtract each node value from the target as you go down. At a leaf, check if remaining is 0.</p>
+        <div class="guide-viz" data-demo="tree">
+          <div class="guide-viz-toolbar">
+            <button type="button" class="btn guide-viz-prev">← Prev</button>
+            <span class="guide-viz-step">Step <span class="guide-viz-step-num">1</span></span>
+            <button type="button" class="btn guide-viz-next">Next step →</button>
+            <button type="button" class="btn guide-viz-reset">Reset</button>
+          </div>
+          <div class="guide-viz-canvas"></div>
+          <p class="guide-viz-note"></p>
+        </div>
+
+        <h3>Minimal C skeleton</h3>
+        <pre class="guide-code"><code><span class="guide-code-kw">struct</span> Node { <span class="guide-code-kw">int</span> val; <span class="guide-code-kw">struct</span> Node *left, *right; };
+
+<span class="guide-code-kw">int</span> hasPathSum(<span class="guide-code-kw">struct</span> Node *root, <span class="guide-code-kw">int</span> target) {
+    <span class="guide-code-kw">if</span> (!root) <span class="guide-code-kw">return</span> 0;
+    <span class="guide-code-kw">if</span> (!root-&gt;left &amp;&amp; !root-&gt;right)
+        <span class="guide-code-kw">return</span> root-&gt;val == target;   <span class="guide-code-ann">/* leaf */</span>
+    <span class="guide-code-kw">return</span> hasPathSum(root-&gt;left, target - root-&gt;val)
+        || hasPathSum(root-&gt;right, target - root-&gt;val);
+}</code></pre>
+
+        <p class="guide-plain">BST insert/search/traverse live in the <strong>Binary Search Tree</strong> category (q63–q70). Tree path sum is the bridge from grid DFS to pointer recursion.</p>
+        <p class="guide-link-q"><a class="btn" href="question.html?id=q120-tree-path-sum-dfs">Practice q120 →</a></p>
+      </section>
+
       <!-- ── DP ── -->
       <section class="guide-section" id="dp">
         <div class="guide-section-head">
@@ -284,9 +351,14 @@ enqueue(0, 0, 1); vis[0][0] = 1;
             <tr><td><a href="question.html?id=q113-coin-change-dp">Coin Change</a></td><td>min coins for amount a</td><td>try each coin, take min</td></tr>
           </tbody>
         </table>
-      </section>
 
-      <!-- ── GREEDY ── -->
+        <div class="guide-callout guide-callout-when">
+          <strong>Memoization vs tabulation (both are DP):</strong><br>
+          <em>Top-down</em> — recursive function + cache array: "if dp[i] already computed, return it." Feels like DFS with memory.<br>
+          <em>Bottom-up</em> — fill <code>dp[0..n]</code> in a loop (what q111–q113 use). Same math, often easier in C interviews.<br>
+          Start with tabulation; switch to memo if the recurrence is naturally recursive (e.g. tree DP).
+        </div>
+      </section>
       <section class="guide-section" id="greedy">
         <div class="guide-section-head">
           <span class="guide-tag guide-tag-greedy">One pass</span>
@@ -370,6 +442,69 @@ enqueue(0, 0, 1); vis[0][0] = 1;
         </p>
       </section>
 
+      <!-- ── BACKTRACKING ── -->
+      <section class="guide-section" id="backtracking">
+        <div class="guide-section-head">
+          <span class="guide-tag guide-tag-backtrack">Search</span>
+          <h2>Backtracking</h2>
+        </div>
+
+        <div class="guide-callout guide-callout-key">
+          <strong>One sentence:</strong> Try a choice, explore deeper, then undo the choice and try the next — like walking a decision tree where you back up at dead ends.
+        </div>
+
+        <h3>How it differs from DFS</h3>
+        <p class="guide-plain">Grid DFS marks cells visited permanently (sink to '0'). Backtracking <strong>un-does</strong> each pick so another branch can reuse the same slot. Classic for subsets, permutations, N-queens, Sudoku.</p>
+
+        <h3>Template in C</h3>
+        <pre class="guide-code"><code><span class="guide-code-kw">void</span> backtrack(<span class="guide-code-kw">int</span> start) {
+    record_answer();                    <span class="guide-code-ann">/* current partial solution counts */</span>
+    <span class="guide-code-kw">for</span> (<span class="guide-code-kw">int</span> i = start; i &lt; n; i++) {
+        choose(i);                      <span class="guide-code-ann">/* pick nums[i] */</span>
+        backtrack(i + 1);                <span class="guide-code-ann">/* explore with this pick */</span>
+        unchoose(i);                    <span class="guide-code-ann">/* often implicit when i loops */</span>
+    }
+}</code></pre>
+
+        <h3>Trace — subsets of {1,2,3}</h3>
+        <ol class="guide-trace">
+          <li><strong>Call bt(0):</strong> count {} → try pick 1</li>
+          <li><strong>Call bt(1):</strong> count {1} → try pick 2</li>
+          <li><strong>Call bt(2):</strong> count {1,2} → try pick 3 → count {1,2,3}</li>
+          <li><strong>Unwind:</strong> also get {1,3}, {2,3}, {2}, {3}, … → 8 total</li>
+        </ol>
+
+        <p class="guide-link-q"><a class="btn" href="question.html?id=q123-subsets-backtracking">Practice q123 Subsets →</a></p>
+      </section>
+
+      <!-- ── ALSO KNOW ── -->
+      <section class="guide-section" id="also-know">
+        <h2>Must-know patterns — full map of Lset Prep</h2>
+        <p class="guide-plain">The 12 <strong>DSA Patterns</strong> questions cover the core interview toolbox. These topics are equally common — practice them in other categories:</p>
+
+        <table class="guide-table">
+          <thead>
+            <tr><th>Pattern</th><th>Why it matters</th><th>Where to practice</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Two pointers</strong></td><td>Sorted pairs, in-place reverse, palindrome</td><td><a href="question.html?id=q94-two-sum-sorted-array">q94 Two Sum</a> · <a href="question.html?id=q104-reverse-array-with-pointer-walking">q104 Reverse</a></td></tr>
+            <tr><td><strong>Binary search</strong></td><td>O(log n) on sorted data</td><td><a href="question.html?id=q23-binary-search-iterative">q23 Binary Search</a> · <a href="question.html?id=q22-find-minimum-in-rotated-sorted-array-binary-search">q22 Rotated</a></td></tr>
+            <tr><td><strong>Sliding window</strong></td><td>Longest/shortest substring subarray</td><td><a href="question.html?id=q98-longest-substring-without-repeating-characters">q98 Longest substring</a></td></tr>
+            <tr><td><strong>Kadane / max subarray</strong></td><td>Running best ending here</td><td><a href="question.html?id=q17-kadane-s-algorithm-maximum-subarray-sum">q17 Kadane</a></td></tr>
+            <tr><td><strong>Hash / frequency</strong></td><td>Anagram, duplicate, count</td><td><a href="question.html?id=q02-check-for-anagram">q02 Anagram</a> · <a href="question.html?id=q95-contains-duplicate">q95 Duplicate</a></td></tr>
+            <tr><td><strong>Linked list</strong></td><td>Reverse, cycle, merge</td><td><a href="index.html?section=linked%20list">Linked list section</a></td></tr>
+            <tr><td><strong>BST / tree ops</strong></td><td>Insert, search, traverse, delete</td><td><a href="index.html?section=binary%20search%20tree">BST section</a></td></tr>
+            <tr><td><strong>Sorting</strong></td><td>Partition, merge, heap sort</td><td><a href="question.html?id=q24-quicksort-lomuto-partition">q24 Quicksort</a> · <a href="question.html?id=q26-heap-sort">q26 Heap sort</a></td></tr>
+          </tbody>
+        </table>
+
+        <div class="guide-callout guide-callout-when">
+          <strong>Advanced (know the name, study later):</strong>
+          Union-Find (disjoint sets), topological sort (DAG ordering), Dijkstra (weighted shortest path), tries (prefix trees).
+          Not in this repo yet — finish the sections above first.
+        </div>
+      </section>
+
       <!-- ── ORDER ── -->
       <section class="guide-section" id="order">
         <h2>Suggested learning order</h2>
@@ -381,6 +516,7 @@ enqueue(0, 0, 1); vis[0][0] = 1;
           <li><a href="question.html?id=q119-shortest-path-grid-bfs"><strong>Shortest Path Grid</strong></a> — BFS queue</li>
           <li><a href="question.html?id=q112-house-robber-dp"><strong>House Robber</strong></a> — DP with a choice each step</li>
           <li><a href="question.html?id=q114-daily-temperatures-monotonic-stack"><strong>Daily Temperatures</strong></a> — monotonic stack</li>
+          <li><a href="question.html?id=q123-subsets-backtracking"><strong>Subsets</strong></a> — backtracking</li>
           <li>Then coin change, intervals, tree path sum</li>
         </ol>
         <p class="guide-footer-actions">
@@ -391,6 +527,6 @@ enqueue(0, 0, 1); vis[0][0] = 1;
     </main>
   </div>
 
-  <script src="js/dsa-guide.js?v=33"></script>
+  <script src="js/dsa-guide.js?v=34"></script>
 </body>
 </html>
