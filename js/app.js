@@ -530,7 +530,7 @@
               <span class="category-icon">📖</span>
               <span class="category-title">DSA Primer</span>
               <span class="category-count">Blog-style guide</span>
-              <span class="category-blurb">DFS, BFS, DP, greedy — read before the 11 pattern questions</span>
+              <span class="category-blurb">Interactive traces · DFS, BFS, DP, greedy — read before the 11 questions</span>
             </a>${cards}</div>`;
       }
       document.title = "Lset Prep";

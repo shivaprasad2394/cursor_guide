@@ -4,123 +4,393 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DSA Primer · Lset Prep</title>
-  <link rel="stylesheet" href="css/style.css?v=32">
+  <link rel="stylesheet" href="css/style.css?v=33">
 </head>
 <body data-page="guide">
   <header class="site-header">
     <div class="brand">
       <a href="index.html" class="brand-title">← Lset Prep</a>
-      <span class="brand-sub">DSA primer · read before the pattern questions</span>
+      <span class="brand-sub">DSA primer · read before the 11 pattern questions</span>
     </div>
   </header>
 
-  <main class="guide-main">
-    <article class="guide-article">
+  <div class="guide-layout">
+    <aside class="guide-sidebar" aria-label="Table of contents">
+      <p class="guide-sidebar-title">On this page</p>
+      <nav class="guide-sidebar-nav">
+        <a href="#start">How to use this guide</a>
+        <a href="#c-you-need">C you already know</a>
+        <a href="#dfs">DFS</a>
+        <a href="#bfs">BFS</a>
+        <a href="#compare">DFS vs BFS</a>
+        <a href="#dp">Dynamic programming</a>
+        <a href="#greedy">Greedy</a>
+        <a href="#stack">Monotonic stack</a>
+        <a href="#order">Learning order</a>
+      </nav>
+      <a class="guide-sidebar-cta btn btn-primary" href="index.html?section=dsa%20patterns">Open DSA questions →</a>
+    </aside>
+
+    <main class="guide-content">
       <header class="guide-hero">
-        <p class="guide-kicker">Prerequisites</p>
-        <h1>Understand DSA patterns in plain English</h1>
+        <p class="guide-kicker">Prerequisites · ~20 min read</p>
+        <h1>Learn DSA patterns in plain English — for C programmers</h1>
         <p class="guide-lead">
-          You write <strong>C</strong> here — loops, arrays, pointers, structs. The patterns below are
-          <em>ways of thinking</em>, not magic syntax. Read one section, then open the matching question
-          in <strong>DSA Patterns</strong> and use <strong>Visualizer ⧉</strong>.
+          You said you don't know how BFS, DFS, or DP work yet. That's fine.
+          This page explains each pattern like a blog post: <strong>what it means</strong>,
+          <strong>when to use it</strong>, a <strong>step-by-step trace</strong>, and a
+          <strong>minimal C skeleton</strong>. Then open the matching question and hit
+          <strong>Visualizer ⧉</strong> on the practice page.
         </p>
-        <nav class="guide-toc">
-          <a href="#dfs">DFS</a>
-          <a href="#bfs">BFS</a>
-          <a href="#dp">Dynamic programming</a>
-          <a href="#greedy">Greedy</a>
-          <a href="#stack">Monotonic stack</a>
-          <a href="#order">Suggested order</a>
-        </nav>
       </header>
 
+      <!-- ── START ── -->
+      <section class="guide-section" id="start">
+        <h2>How to use this guide</h2>
+        <div class="guide-cards">
+          <div class="guide-card">
+            <span class="guide-card-num">1</span>
+            <h3>Read one section</h3>
+            <p>Don't skim all five patterns at once. Pick one (start with <a href="#greedy">Greedy</a> or <a href="#dp">DP</a>).</p>
+          </div>
+          <div class="guide-card">
+            <span class="guide-card-num">2</span>
+            <h3>Step through the demo</h3>
+            <p>Click <strong>Next step</strong> on the interactive trace. Watch what changes each line of logic would do.</p>
+          </div>
+          <div class="guide-card">
+            <span class="guide-card-num">3</span>
+            <h3>Open the question</h3>
+            <p>Read <em>How to think</em> on the left pane. Write the helper in C. Run, then Visualize.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── C BASICS ── -->
+      <section class="guide-section" id="c-you-need">
+        <h2>C you already know (and what each pattern adds)</h2>
+        <p class="guide-plain">Every question here gives you <code>main()</code>. You only write helper functions. Patterns reuse the same C building blocks:</p>
+        <table class="guide-table">
+          <thead>
+            <tr><th>Building block</th><th>Where you use it</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>for</code> loops over arrays</td><td>DP, greedy, monotonic stack</td></tr>
+            <tr><td><code>int g[ROWS][COLS]</code> or <code>char g[][]</code></td><td>Grid DFS / BFS</td></tr>
+            <tr><td>Function calls itself</td><td>DFS on grid or tree</td></tr>
+            <tr><td>Queue with <code>head</code>, <code>tail</code></td><td>BFS</td></tr>
+            <tr><td>Stack array + <code>top</code></td><td>Monotonic stack</td></tr>
+            <tr><td><code>struct Node { int val; struct Node *left, *right; }</code></td><td>Tree DFS</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ── DFS ── -->
       <section class="guide-section" id="dfs">
-        <h2>DFS — Depth-First Search</h2>
-        <p class="guide-plain"><strong>One sentence:</strong> Go as deep as you can, then back up and try another branch — like exploring a maze by always taking the first turn until you hit a dead end.</p>
-        <div class="guide-diagram"><pre>Grid (1 = land)     DFS from (0,0):
-1 1 1 0 0           Visit → sink to 0 (flood fill)
-1 1 0 0 0           Same connected component = 1 island
-0 0 0 1 1
-0 0 0 0 1</pre></div>
-        <h3>In C you usually write</h3>
-        <ul class="guide-list">
-          <li>A function that calls itself on neighbors: <code>dfs(g, r+1, c)</code>, <code>dfs(g, r-1, c)</code>, …</li>
-          <li>A <strong>base case</strong>: out of bounds, or already visited, or wrong cell value → return.</li>
-          <li>Mark visited (e.g. flip <code>'1'</code> to <code>'0'</code>) so you don't loop forever.</li>
-        </ul>
-        <p class="guide-link-q">Practice: <a href="question.html?id=q118-number-of-islands-dfs">Number of Islands (q118)</a> · <a href="question.html?id=q120-tree-path-sum-dfs">Tree Path Sum (q120)</a></p>
+        <div class="guide-section-head">
+          <span class="guide-tag guide-tag-dfs">Graph / tree</span>
+          <h2>DFS — Depth-First Search</h2>
+        </div>
+
+        <div class="guide-callout guide-callout-key">
+          <strong>One sentence:</strong> Go as deep as possible along one path, then backtrack and try the next branch — like walking a maze and always taking the first open turn until you hit a wall.
+        </div>
+
+        <h3>Real-life analogy</h3>
+        <p class="guide-plain">You're exploring a building floor plan with a pen. Enter a room, mark it visited, open the first door, keep going until every reachable room from that entrance is marked. That's one "connected component." Start again from any unmarked room for the next component.</p>
+
+        <h3>Interactive trace — flood fill on a grid</h3>
+        <p class="guide-plain">In <a href="question.html?id=q118-number-of-islands-dfs">Number of Islands</a>, each group of adjacent <code>'1'</code> cells is one island. DFS sinks each cell to <code>'0'</code> so you never visit twice.</p>
+        <div class="guide-viz" data-demo="dfs">
+          <div class="guide-viz-toolbar">
+            <button type="button" class="btn guide-viz-prev">← Prev</button>
+            <span class="guide-viz-step">Step <span class="guide-viz-step-num">1</span></span>
+            <button type="button" class="btn guide-viz-next">Next step →</button>
+            <button type="button" class="btn guide-viz-reset">Reset</button>
+          </div>
+          <div class="guide-viz-canvas"></div>
+          <p class="guide-viz-note"></p>
+        </div>
+
+        <h3>Minimal C skeleton</h3>
+        <pre class="guide-code"><code><span class="guide-code-ann">/* Grid DFS — 4 directions */</span>
+<span class="guide-code-kw">void</span> dfs(<span class="guide-code-kw">char</span> g[][COLS], <span class="guide-code-kw">int</span> rows, <span class="guide-code-kw">int</span> cols, <span class="guide-code-kw">int</span> r, <span class="guide-code-kw">int</span> c) {
+    <span class="guide-code-ann">/* 1. BASE CASE — stop if out of bounds or not land */</span>
+    <span class="guide-code-kw">if</span> (r &lt; 0 || r &gt;= rows || c &lt; 0 || c &gt;= cols) <span class="guide-code-kw">return</span>;
+    <span class="guide-code-kw">if</span> (g[r][c] != <span class="guide-code-str">'1'</span>) <span class="guide-code-kw">return</span>;
+
+    <span class="guide-code-ann">/* 2. MARK VISITED — sink so we don't revisit */</span>
+    g[r][c] = <span class="guide-code-str">'0'</span>;
+
+    <span class="guide-code-ann">/* 3. RECURSE — try all 4 neighbors */</span>
+    dfs(g, rows, cols, r + 1, c);
+    dfs(g, rows, cols, r - 1, c);
+    dfs(g, rows, cols, r, c + 1);
+    dfs(g, rows, cols, r, c - 1);
+}</code></pre>
+
+        <h3>Line-by-line trace (first call <code>dfs(g, 4, 5, 0, 0)</code>)</h3>
+        <ol class="guide-trace">
+          <li><strong>Enter (0,0):</strong> in bounds, <code>g[0][0]=='1'</code> → set to <code>'0'</code></li>
+          <li><strong>Recurse down:</strong> <code>dfs(1,0)</code> → same island, mark and continue</li>
+          <li><strong>Recurse right:</strong> from (0,0) also try (0,1), (0,2) … entire blob gets sunk</li>
+          <li><strong>Return:</strong> when all four recursive calls finish, this cell's DFS is done</li>
+          <li><strong>Outer loop</strong> (in <code>main</code>'s helper): scan grid; next <code>'1'</code> at (3,3) starts a <em>new</em> island count</li>
+        </ol>
+
+        <div class="guide-callout guide-callout-when">
+          <strong>Use DFS when:</strong> counting connected regions, exploring all paths, tree recursion (left/right), or mutating the grid in place.<br>
+          <strong>Tree example:</strong> <a href="question.html?id=q120-tree-path-sum-dfs">Tree Path Sum (q120)</a> — recurse <code>left</code> and <code>right</code> with a smaller target.
+        </div>
+        <p class="guide-link-q"><a class="btn" href="question.html?id=q118-number-of-islands-dfs">Practice q118 →</a></p>
       </section>
 
+      <!-- ── BFS ── -->
       <section class="guide-section" id="bfs">
-        <h2>BFS — Breadth-First Search</h2>
-        <p class="guide-plain"><strong>One sentence:</strong> Explore in layers — first all cells 1 step away, then 2 steps, then 3 — like ripples in a pond. Best for <strong>shortest path</strong> on an unweighted grid.</p>
-        <div class="guide-diagram"><pre>Start (0,0)  dist=1
-  layer 1: (1,0) (0,1)  dist=2
-  layer 2: (2,0) (1,1) (0,2)  dist=3
-  … first time you reach the goal = minimum steps</pre></div>
-        <h3>In C you usually write</h3>
-        <ul class="guide-list">
-          <li>A <strong>queue</strong> array: store <code>(row, col, distance)</code>, with <code>head</code> and <code>tail</code> indices.</li>
-          <li>A <code>vis[][]</code> array so you enqueue each cell once.</li>
-          <li>Pop front, try 4 neighbors; if open and unvisited, push back with <code>dist+1</code>.</li>
-        </ul>
-        <p class="guide-link-q">Practice: <a href="question.html?id=q119-shortest-path-grid-bfs">Shortest Path Grid (q119)</a></p>
+        <div class="guide-section-head">
+          <span class="guide-tag guide-tag-bfs">Graph / grid</span>
+          <h2>BFS — Breadth-First Search</h2>
+        </div>
+
+        <div class="guide-callout guide-callout-key">
+          <strong>One sentence:</strong> Explore in expanding rings — all cells 1 step away first, then 2 steps, then 3. The first time you reach the goal, you have the <em>shortest</em> path (on an unweighted grid).
+        </div>
+
+        <h3>Real-life analogy</h3>
+        <p class="guide-plain">Ripples in a pond. Drop a stone at the start — the wave hits nearby cells first. BFS uses a <strong>queue</strong> (FIFO: first in, first out) so cells are processed in order of distance.</p>
+
+        <h3>Interactive trace — shortest path on a grid</h3>
+        <p class="guide-plain">Open cells expand layer by layer. A wall forces the path to go around. When the goal cell is dequeued, its distance is the answer.</p>
+        <div class="guide-viz" data-demo="bfs">
+          <div class="guide-viz-toolbar">
+            <button type="button" class="btn guide-viz-prev">← Prev</button>
+            <span class="guide-viz-step">Step <span class="guide-viz-step-num">1</span></span>
+            <button type="button" class="btn guide-viz-next">Next step →</button>
+            <button type="button" class="btn guide-viz-reset">Reset</button>
+          </div>
+          <div class="guide-viz-canvas"></div>
+          <p class="guide-viz-note"></p>
+        </div>
+
+        <h3>Minimal C skeleton</h3>
+        <pre class="guide-code"><code><span class="guide-code-ann">/* Queue stores (row, col, dist). head/tail indices. */</span>
+<span class="guide-code-kw">int</span> q_r[MAX], q_c[MAX], q_d[MAX];
+<span class="guide-code-kw">int</span> head = 0, tail = 0;
+
+<span class="guide-code-kw">void</span> enqueue(<span class="guide-code-kw">int</span> r, <span class="guide-code-kw">int</span> c, <span class="guide-code-kw">int</span> d) {
+    q_r[tail] = r; q_c[tail] = c; q_d[tail] = d; tail++;
+}
+
+<span class="guide-code-ann">/* In shortest-path helper: */</span>
+<span class="guide-code-kw">int</span> vis[ROWS][COLS] = {0};
+enqueue(0, 0, 1); vis[0][0] = 1;
+
+<span class="guide-code-kw">while</span> (head &lt; tail) {
+    <span class="guide-code-kw">int</span> r = q_r[head], c = q_c[head], d = q_d[head]; head++;
+    <span class="guide-code-kw">if</span> (r == goal_r &amp;&amp; c == goal_c) <span class="guide-code-kw">return</span> d;   <span class="guide-code-ann">/* found shortest */</span>
+    <span class="guide-code-ann">/* for each open neighbor: if (!vis[nr][nc]) { vis=1; enqueue(nr,nc,d+1); } */</span>
+}</code></pre>
+
+        <h3>Line-by-line trace</h3>
+        <ol class="guide-trace">
+          <li><strong>Enqueue (0,0) dist=1</strong> — queue is not empty, so BFS can run</li>
+          <li><strong>Dequeue front</strong> — process the oldest cell first (that's what makes it "breadth" first)</li>
+          <li><strong>Push neighbors</strong> with <code>dist+1</code> only if unvisited — mark in <code>vis[][]</code></li>
+          <li><strong>Goal check</strong> when dequeuing — not when enqueueing — so distance is correct</li>
+        </ol>
+
+        <div class="guide-callout guide-callout-when">
+          <strong>Use BFS when:</strong> shortest steps on a grid, level-order traversal, or "minimum number of moves."
+        </div>
+        <p class="guide-link-q"><a class="btn" href="question.html?id=q119-shortest-path-grid-bfs">Practice q119 →</a></p>
       </section>
 
+      <!-- ── COMPARE ── -->
+      <section class="guide-section" id="compare">
+        <h2>DFS vs BFS — quick comparison</h2>
+        <div class="guide-compare">
+          <div class="guide-compare-col">
+            <h3>DFS</h3>
+            <ul>
+              <li>Stack (implicit via recursion) or explicit stack</li>
+              <li>Goes deep first</li>
+              <li>Great for: flood fill, all paths, trees</li>
+              <li>Does <em>not</em> guarantee shortest path</li>
+            </ul>
+          </div>
+          <div class="guide-compare-col">
+            <h3>BFS</h3>
+            <ul>
+              <li>Queue (<code>head</code> / <code>tail</code>)</li>
+              <li>Expands layer by layer</li>
+              <li>Great for: shortest path on unweighted grid</li>
+              <li>Uses more memory at wide layers</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── DP ── -->
       <section class="guide-section" id="dp">
-        <h2>Dynamic programming (DP)</h2>
-        <p class="guide-plain"><strong>One sentence:</strong> Break a big problem into small overlapping sub-problems; store answers in a table so you never recompute the same thing twice.</p>
-        <div class="guide-diagram"><pre>Climbing 5 stairs (1 or 2 steps at a time):
-dp[0]=1  dp[1]=1
-dp[2]=dp[1]+dp[0]=2
-dp[3]=dp[2]+dp[1]=3
-dp[4]=5  dp[5]=8  ← answer</pre></div>
-        <h3>How to recognize DP</h3>
-        <ul class="guide-list">
-          <li>“How many ways…”, “minimum cost…”, “maximum without adjacent…” → often DP.</li>
-          <li>Define <code>dp[i]</code> in plain English first (e.g. “best loot using houses 0..i”).</li>
-          <li>In C, you can use a small array or just two variables if only the last two rows matter.</li>
-        </ul>
-        <p class="guide-link-q">Practice: <a href="question.html?id=q111-climbing-stairs-dp">Climbing Stairs (q111)</a> → <a href="question.html?id=q112-house-robber-dp">House Robber (q112)</a> → <a href="question.html?id=q113-coin-change-dp">Coin Change (q113)</a></p>
+        <div class="guide-section-head">
+          <span class="guide-tag guide-tag-dp">Table / recurrence</span>
+          <h2>Dynamic programming (DP)</h2>
+        </div>
+
+        <div class="guide-callout guide-callout-key">
+          <strong>One sentence:</strong> Solve small versions of the problem, save answers in a table, and build up to the big answer — so you never solve the same sub-problem twice.
+        </div>
+
+        <h3>How to think (the part that confused you)</h3>
+        <p class="guide-plain">DP is not a special library or keyword in C. It's a <strong>recipe</strong>:</p>
+        <ol class="guide-trace">
+          <li><strong>Define</strong> <code>dp[i]</code> in English: "number of ways to reach stair i" or "best loot using houses 0..i"</li>
+          <li><strong>Find the recurrence:</strong> how does <code>dp[i]</code> relate to smaller indices?</li>
+          <li><strong>Base cases:</strong> <code>dp[0]</code>, <code>dp[1]</code> you know by hand</li>
+          <li><strong>Fill the table</strong> left to right (or nested loops for 2-D)</li>
+        </ol>
+
+        <h3>Interactive trace — Climbing Stairs (n=5)</h3>
+        <p class="guide-plain">You can take 1 or 2 steps. Ways to reach stair <code>i</code> = ways to reach <code>i-1</code> + ways to reach <code>i-2</code> (Fibonacci).</p>
+        <div class="guide-viz" data-demo="dp">
+          <div class="guide-viz-toolbar">
+            <button type="button" class="btn guide-viz-prev">← Prev</button>
+            <span class="guide-viz-step">Step <span class="guide-viz-step-num">1</span></span>
+            <button type="button" class="btn guide-viz-next">Next step →</button>
+            <button type="button" class="btn guide-viz-reset">Reset</button>
+          </div>
+          <div class="guide-viz-canvas"></div>
+          <p class="guide-viz-note"></p>
+        </div>
+
+        <h3>Minimal C — two variables instead of a full array</h3>
+        <pre class="guide-code"><code><span class="guide-code-kw">int</span> climbStairs(<span class="guide-code-kw">int</span> n) {
+    <span class="guide-code-kw">if</span> (n &lt;= 1) <span class="guide-code-kw">return</span> 1;
+    <span class="guide-code-kw">int</span> a = 1, b = 1;   <span class="guide-code-ann">/* dp[0], dp[1] */</span>
+    <span class="guide-code-kw">for</span> (<span class="guide-code-kw">int</span> i = 2; i &lt;= n; i++) {
+        <span class="guide-code-kw">int</span> c = a + b;    <span class="guide-code-ann">/* dp[i] = dp[i-1] + dp[i-2] */</span>
+        a = b;
+        b = c;            <span class="guide-code-ann">/* slide the window */</span>
+    }
+    <span class="guide-code-kw">return</span> b;
+}</code></pre>
+
+        <h3>Three DP questions in this repo (in order)</h3>
+        <table class="guide-table">
+          <thead><tr><th>Question</th><th>What dp means</th><th>Recurrence idea</th></tr></thead>
+          <tbody>
+            <tr><td><a href="question.html?id=q111-climbing-stairs-dp">Climbing Stairs</a></td><td>ways to reach stair i</td><td><code>dp[i]=dp[i-1]+dp[i-2]</code></td></tr>
+            <tr><td><a href="question.html?id=q112-house-robber-dp">House Robber</a></td><td>max loot up to house i</td><td>rob i + dp[i-2] vs skip + dp[i-1]</td></tr>
+            <tr><td><a href="question.html?id=q113-coin-change-dp">Coin Change</a></td><td>min coins for amount a</td><td>try each coin, take min</td></tr>
+          </tbody>
+        </table>
       </section>
 
+      <!-- ── GREEDY ── -->
       <section class="guide-section" id="greedy">
-        <h2>Greedy</h2>
-        <p class="guide-plain"><strong>One sentence:</strong> At each step, take the locally best choice and never look back — no table needed if the problem is designed for it.</p>
-        <div class="guide-diagram"><pre>Jump Game — index:  0  1  2  3  4
-nums[i]:           2  3  1  1  4
-farthest you can:  2  4  4  4  8  → reach index 4 ✓</pre></div>
-        <h3>In C you usually write</h3>
-        <ul class="guide-list">
-          <li>One loop, a few variables (e.g. <code>farthest</code>, <code>end</code> of interval).</li>
-          <li>Update the variable when you see a better local option.</li>
-        </ul>
-        <p class="guide-link-q">Practice: <a href="question.html?id=q116-jump-game-greedy">Jump Game (q116)</a> · <a href="question.html?id=q117-non-overlapping-intervals-greedy">Non-Overlapping Intervals (q117)</a> · <a href="question.html?id=q122-merge-intervals-greedy">Merge Intervals (q122)</a></p>
+        <div class="guide-section-head">
+          <span class="guide-tag guide-tag-greedy">One pass</span>
+          <h2>Greedy</h2>
+        </div>
+
+        <div class="guide-callout guide-callout-key">
+          <strong>One sentence:</strong> At each step, make the locally best choice and never reconsider — often just one loop and one or two variables. No table needed.
+        </div>
+
+        <h3>Interactive trace — Jump Game</h3>
+        <p class="guide-plain">From index <code>i</code> you can jump up to <code>nums[i]</code> steps. Track <code>farthest</code> — the rightmost index reachable so far.</p>
+        <div class="guide-viz" data-demo="greedy">
+          <div class="guide-viz-toolbar">
+            <button type="button" class="btn guide-viz-prev">← Prev</button>
+            <span class="guide-viz-step">Step <span class="guide-viz-step-num">1</span></span>
+            <button type="button" class="btn guide-viz-next">Next step →</button>
+            <button type="button" class="btn guide-viz-reset">Reset</button>
+          </div>
+          <div class="guide-viz-canvas"></div>
+          <p class="guide-viz-note"></p>
+        </div>
+
+        <h3>Minimal C skeleton</h3>
+        <pre class="guide-code"><code><span class="guide-code-kw">int</span> canJump(<span class="guide-code-kw">int</span> *nums, <span class="guide-code-kw">int</span> n) {
+    <span class="guide-code-kw">int</span> farthest = 0;
+    <span class="guide-code-kw">for</span> (<span class="guide-code-kw">int</span> i = 0; i &lt; n &amp;&amp; i &lt;= farthest; i++) {
+        <span class="guide-code-kw">if</span> (i + nums[i] &gt; farthest)
+            farthest = i + nums[i];
+    }
+    <span class="guide-code-kw">return</span> farthest &gt;= n - 1;
+}</code></pre>
+
+        <p class="guide-plain">Interval problems (<a href="question.html?id=q117-non-overlapping-intervals-greedy">q117</a>, <a href="question.html?id=q122-merge-intervals-greedy">q122</a>) use the same spirit: sort by end time, keep the greedy choice, one pass.</p>
+        <p class="guide-link-q"><a class="btn" href="question.html?id=q116-jump-game-greedy">Practice q116 →</a></p>
       </section>
 
+      <!-- ── STACK ── -->
       <section class="guide-section" id="stack">
-        <h2>Monotonic stack</h2>
-        <p class="guide-plain"><strong>One sentence:</strong> Keep a stack of indices whose values are in sorted order; when you see a “breaking” value, pop and answer questions about the popped items.</p>
-        <div class="guide-diagram"><pre>Temps: 73 74 75 71 69 72 76 73
-Stack holds decreasing temps → when today is warmer,
-pop yesterday and set wait = today - yesterday</pre></div>
-        <p class="guide-link-q">Practice: <a href="question.html?id=q114-daily-temperatures-monotonic-stack">Daily Temperatures (q114)</a> · <a href="question.html?id=q115-next-greater-element-monotonic-stack">Next Greater Element (q115)</a></p>
+        <div class="guide-section-head">
+          <span class="guide-tag guide-tag-stack">Stack</span>
+          <h2>Monotonic stack</h2>
+        </div>
+
+        <div class="guide-callout guide-callout-key">
+          <strong>One sentence:</strong> Walk the array once; keep a stack of indices whose values stay in sorted order. When the current value "breaks" the order, pop and answer questions about what you popped.
+        </div>
+
+        <h3>Diagram — Daily Temperatures</h3>
+        <div class="guide-diagram guide-diagram-wide">
+          <div class="guide-stack-viz">
+            <div class="guide-stack-row">
+              <span class="guide-stack-label">Day →</span>
+              <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span>
+            </div>
+            <div class="guide-stack-row">
+              <span class="guide-stack-label">Temp</span>
+              <span>73</span><span>74</span><span>75</span><span class="guide-stack-hot">71</span><span>69</span><span>72</span><span>76</span>
+            </div>
+            <div class="guide-stack-row guide-stack-meta">
+              <span class="guide-stack-label">Stack</span>
+              <span class="guide-stack-note">Indices with decreasing temps. Day 3 (71) is warmer than stack top → pop day 2, wait[2]=1</span>
+            </div>
+          </div>
+        </div>
+
+        <h3>Minimal C skeleton</h3>
+        <pre class="guide-code"><code><span class="guide-code-kw">int</span> stack[MAX], top = -1;
+
+<span class="guide-code-kw">for</span> (<span class="guide-code-kw">int</span> i = 0; i &lt; n; i++) {
+    <span class="guide-code-kw">while</span> (top &gt;= 0 &amp;&amp; T[i] &gt; T[stack[top]]) {
+        <span class="guide-code-kw">int</span> prev = stack[top--];
+        wait[prev] = i - prev;   <span class="guide-code-ann">/* warmer day found */</span>
+    }
+    stack[++top] = i;
+}</code></pre>
+
+        <p class="guide-link-q">
+          <a class="btn" href="question.html?id=q114-daily-temperatures-monotonic-stack">q114 Daily Temperatures</a>
+          <a class="btn" href="question.html?id=q115-next-greater-element-monotonic-stack">q115 Next Greater</a>
+        </p>
       </section>
 
+      <!-- ── ORDER ── -->
       <section class="guide-section" id="order">
         <h2>Suggested learning order</h2>
-        <ol class="guide-order">
-          <li><a href="question.html?id=q116-jump-game-greedy">Jump Game</a> — one array, greedy</li>
-          <li><a href="question.html?id=q111-climbing-stairs-dp">Climbing Stairs</a> — simplest DP</li>
-          <li><a href="question.html?id=q118-number-of-islands-dfs">Number of Islands</a> — grid DFS</li>
-          <li><a href="question.html?id=q119-shortest-path-grid-bfs">Shortest Path Grid</a> — grid BFS</li>
-          <li><a href="question.html?id=q112-house-robber-dp">House Robber</a> — DP choice</li>
-          <li><a href="question.html?id=q114-daily-temperatures-monotonic-stack">Daily Temperatures</a> — stack</li>
+        <p class="guide-plain">Easiest first — each step adds one new idea:</p>
+        <ol class="guide-order guide-order-big">
+          <li><a href="question.html?id=q116-jump-game-greedy"><strong>Jump Game</strong></a> — one array, one variable (greedy)</li>
+          <li><a href="question.html?id=q111-climbing-stairs-dp"><strong>Climbing Stairs</strong></a> — simplest DP recurrence</li>
+          <li><a href="question.html?id=q118-number-of-islands-dfs"><strong>Number of Islands</strong></a> — grid DFS flood fill</li>
+          <li><a href="question.html?id=q119-shortest-path-grid-bfs"><strong>Shortest Path Grid</strong></a> — BFS queue</li>
+          <li><a href="question.html?id=q112-house-robber-dp"><strong>House Robber</strong></a> — DP with a choice each step</li>
+          <li><a href="question.html?id=q114-daily-temperatures-monotonic-stack"><strong>Daily Temperatures</strong></a> — monotonic stack</li>
           <li>Then coin change, intervals, tree path sum</li>
         </ol>
-        <p><a class="btn btn-primary" href="index.html">← Back to all categories</a></p>
+        <p class="guide-footer-actions">
+          <a class="btn btn-primary" href="index.html?section=dsa%20patterns">Open all DSA questions →</a>
+          <a class="btn" href="index.html">← Home</a>
+        </p>
       </section>
-    </article>
-  </main>
+    </main>
+  </div>
+
+  <script src="js/dsa-guide.js?v=33"></script>
 </body>
 </html>
