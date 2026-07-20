@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DSA Primer · Lset Prep</title>
-  <link rel="stylesheet" href="css/style.css?v=36">
+  <link rel="stylesheet" href="css/style.css?v=37">
 </head>
 <body data-page="guide">
   <header class="site-header">
     <div class="brand">
       <a href="index.html" class="brand-title">← Lset Prep</a>
-      <span class="brand-sub">DSA primer · read before the 12 pattern questions</span>
+      <span class="brand-sub">DSA + systems primer · read before the pattern questions</span>
     </div>
   </header>
 
@@ -30,6 +30,11 @@
         <a href="#stack">Monotonic stack</a>
         <a href="#backtracking">Backtracking</a>
         <a href="#also-know">Must-know map</a>
+        <a href="#systems">Systems &amp; low-level</a>
+        <a href="#systems-zero-copy" class="guide-sidebar-sub">↳ Zero-copy parse</a>
+        <a href="#systems-bitwise" class="guide-sidebar-sub">↳ Bitwise flags</a>
+        <a href="#systems-ring" class="guide-sidebar-sub">↳ Ring buffers</a>
+        <a href="#systems-cache" class="guide-sidebar-sub">↳ Cache-friendly heaps</a>
         <a href="#order">Learning order</a>
       </nav>
       <a class="guide-sidebar-cta btn btn-primary" href="index.html?section=dsa%20patterns">Open DSA questions →</a>
@@ -590,6 +595,7 @@
             <tr><td><strong>Hash / frequency</strong></td><td>Anagram, duplicate, count</td><td><a href="question.html?id=q02-check-for-anagram">q02 Anagram</a> · <a href="question.html?id=q95-contains-duplicate">q95 Duplicate</a></td></tr>
             <tr><td><strong>Linked list</strong></td><td>Reverse, cycle, merge</td><td><a href="index.html?section=linked%20list">Linked list section</a></td></tr>
             <tr><td><strong>BST / tree ops</strong></td><td>Insert, search, traverse, delete</td><td><a href="index.html?section=binary%20search%20tree">BST section</a></td></tr>
+            <tr><td><strong>Systems / embedded</strong></td><td>Ring buffers, DMA, bit flags, zero-copy parse</td><td><a href="#systems">Systems section</a> · <a href="index.html?section=buffers%20%26%20driver%20patterns">Buffers</a></td></tr>
             <tr><td><strong>Sorting</strong></td><td>Partition, merge, heap sort</td><td><a href="question.html?id=q24-quicksort-lomuto-partition">q24 Quicksort</a> · <a href="question.html?id=q26-heap-sort">q26 Heap sort</a></td></tr>
           </tbody>
         </table>
@@ -599,6 +605,192 @@
           Union-Find (disjoint sets), topological sort (DAG ordering), Dijkstra (weighted shortest path), tries (prefix trees).
           Not in this repo yet — finish the sections above first.
         </div>
+      </section>
+
+      <!-- ── SYSTEMS-LEVEL ── -->
+      <section class="guide-section" id="systems">
+        <div class="guide-section-head">
+          <span class="guide-tag guide-tag-systems">Firmware / drivers</span>
+          <h2>Systems-level &amp; low-level algorithmic patterns</h2>
+        </div>
+
+        <p class="guide-plain">
+          Classic DSA assumes heap freedom and pointer-heavy structures. In kernel, driver, and firmware work,
+          algorithms run under tighter rules: <strong>no malloc in hot paths</strong>, predictable latency,
+          and memory that sits next to hardware (DMA rings, UART FIFOs, GPIO registers).
+        </p>
+
+        <!-- 6.1 Zero-copy -->
+        <article class="guide-chapter" id="systems-zero-copy">
+          <h3>6.1 Zero-copy stream parsing</h3>
+          <div class="guide-callout guide-callout-key">
+            <strong>One sentence:</strong> Walk a fixed byte buffer with a cursor — expose slices as pointers and lengths instead of copying into new arrays.
+          </div>
+          <p class="guide-plain">
+            Sliding window on strings is the interview version. On UART/SPI/Wi-Fi/BLE you parse frame headers,
+            length fields, and CRC bytes <em>in place</em> over a DMA or ring buffer. No <code>memcpy</code> per field.
+          </p>
+          <p class="guide-plain"><strong>Core mechanics:</strong> dual pointers over static storage — sync word hunt, length check, advance cursor past frame boundary.</p>
+
+          <pre class="guide-code"><code class="language-c">#include &lt;stdint.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;stddef.h&gt;
+
+typedef struct {
+    uint16_t preamble;
+    uint8_t payload_len;
+    const uint8_t *payload;  /* points into DMA/ring buffer — no copy */
+    uint8_t crc;
+} zero_copy_frame_t;
+
+bool parse_next_frame(const uint8_t *buffer, size_t buffer_len,
+                      size_t *cursor, zero_copy_frame_t *out) {
+    while (*cursor + 4 &lt;= buffer_len) {
+        uint16_t sync = (buffer[*cursor] &lt;&lt; 8) | buffer[*cursor + 1];
+        if (sync == 0xAA55) {
+            uint8_t len = buffer[*cursor + 2];
+            if (*cursor + 4 + len &lt;= buffer_len) {
+                out-&gt;preamble = sync;
+                out-&gt;payload_len = len;
+                out-&gt;payload = &amp;buffer[*cursor + 3];
+                out-&gt;crc = buffer[*cursor + 3 + len];
+                *cursor += 4 + len;
+                return true;
+            }
+            return false;  /* incomplete frame — wait for more bytes */
+        }
+        (*cursor)++;  /* slide 1 byte and hunt sync again */
+    }
+    return false;
+}</code></pre>
+
+          <p class="guide-link-q">
+            Practice:
+            <a class="btn" href="question.html?id=q76-dma-descriptor-ring-nic-hardware-driver-style">q76 DMA ring</a>
+            <a class="btn" href="question.html?id=q82-parse-three-integers-from-a-string-sscanf-basics">q82 Parse ints</a>
+            <a class="btn" href="question.html?id=q97-implement-atoi-string-to-integer">q97 atoi</a>
+          </p>
+        </article>
+
+        <!-- 6.2 Bitwise -->
+        <article class="guide-chapter" id="systems-bitwise">
+          <h3>6.2 Bitwise invariants &amp; combinatorial state</h3>
+          <div class="guide-callout guide-callout-key">
+            <strong>One sentence:</strong> Replace fat lookup tables with bitmasks — one <code>uint32_t</code> can hold dozens of on/off flags.
+          </div>
+          <p class="guide-plain">Interviewers use this to test whether you think about cycles and RAM, not just big-O on paper.</p>
+          <ul class="guide-list">
+            <li><strong>Clear lowest set bit:</strong> <code>x &amp; (x - 1)</code> — loop runs once per set bit, not per bit width.</li>
+            <li><strong>GPIO / IRQ masks:</strong> enable, disable, or test groups of pins with OR/AND in one instruction.</li>
+            <li><strong>Subset enumeration:</strong> iterate <code>mask</code> from 0 to (1&lt;&lt;n)-1 for small n instead of recursion.</li>
+          </ul>
+
+          <pre class="guide-code"><code class="language-c">#include &lt;stdint.h&gt;
+
+/* Count set bits in O(number of set bits) — Brian Kernighan */
+uint32_t count_active_flags(uint32_t status_register) {
+    uint32_t count = 0;
+    while (status_register &gt; 0) {
+        status_register &amp;= (status_register - 1);
+        count++;
+    }
+    return count;
+}</code></pre>
+
+          <p class="guide-link-q">
+            Practice:
+            <a class="btn" href="question.html?id=q32-count-set-bits-brian-kernighan-s-trick">q32 Kernighan</a>
+            <a class="btn" href="question.html?id=q27-set-clear-toggle-check-bit">q27 Set/clear bit</a>
+            <a class="btn" href="question.html?id=q39-bit-range-operations-set-clear-write-bits-in-start-end">q39 Bit ranges</a>
+          </p>
+        </article>
+
+        <!-- 6.3 Ring buffer -->
+        <article class="guide-chapter" id="systems-ring">
+          <h3>6.3 Fixed-size circular ring buffers</h3>
+          <div class="guide-callout guide-callout-key">
+            <strong>One sentence:</strong> FIFO with a fixed array — head/tail wrap with modulo (or bitmask when size is power of 2).
+          </div>
+          <p class="guide-plain">
+            Linked-list queues call <code>malloc</code> per node — bad for ISRs and long-running firmware (fragmentation + jitter).
+            A ring buffer is O(1) push/pop with predictable memory.
+          </p>
+          <p class="guide-plain"><strong>Power-of-2 trick:</strong> if <code>SIZE = 256</code>, use <code>(idx + 1) &amp; (SIZE - 1)</code> instead of <code>% SIZE</code> — cheaper in interrupt handlers.</p>
+
+          <pre class="guide-code"><code class="language-c">#include &lt;stdint.h&gt;
+#include &lt;stdbool.h&gt;
+
+#define BUFFER_SIZE 256       /* must be power of 2 */
+#define BUFFER_MASK (BUFFER_SIZE - 1)
+
+typedef struct {
+    uint8_t storage[BUFFER_SIZE];
+    volatile uint32_t head;
+    volatile uint32_t tail;
+} lockless_ring_buffer_t;
+
+bool ring_buffer_push(lockless_ring_buffer_t *buf, uint8_t data) {
+    uint32_t next_head = (buf-&gt;head + 1) &amp; BUFFER_MASK;
+    if (next_head == buf-&gt;tail) return false;  /* full */
+    buf-&gt;storage[buf-&gt;head] = data;
+    buf-&gt;head = next_head;
+    return true;
+}
+
+bool ring_buffer_pop(lockless_ring_buffer_t *buf, uint8_t *out_data) {
+    if (buf-&gt;tail == buf-&gt;head) return false;  /* empty */
+    *out_data = buf-&gt;storage[buf-&gt;tail];
+    buf-&gt;tail = (buf-&gt;tail + 1) &amp; BUFFER_MASK;
+    return true;
+}</code></pre>
+
+          <p class="guide-link-q">
+            Practice:
+            <a class="btn" href="question.html?id=q75-circular-ring-buffer">q75 Ring buffer</a>
+            <a class="btn" href="question.html?id=q77-ring-buffer-queue">q77 Ring queue</a>
+            <a class="btn" href="index.html?section=queues%20%26%20stacks">Queues section</a>
+          </p>
+        </article>
+
+        <!-- 6.4 Cache layout -->
+        <article class="guide-chapter" id="systems-cache">
+          <h3>6.4 Cache-conscious layouts (array heaps)</h3>
+          <div class="guide-callout guide-callout-key">
+            <strong>One sentence:</strong> Store trees and heaps in flat arrays so child nodes sit in contiguous cache lines — fewer pointer chases.
+          </div>
+          <p class="guide-plain">
+            Pointer-based BST nodes scatter across the heap → cache misses dominate at scale.
+            A binary heap (or level-order tree) in <code>int heap[]</code> uses index math only:
+          </p>
+          <ul class="guide-list">
+            <li>Left child of <code>i</code> → <code>2*i + 1</code></li>
+            <li>Right child of <code>i</code> → <code>2*i + 2</code></li>
+            <li>Parent of <code>i</code> → <code>(i - 1) / 2</code></li>
+          </ul>
+          <p class="guide-plain">Same idea as heap sort and priority queues in embedded schedulers — no <code>struct Node *</code> required in the hot path.</p>
+
+          <p class="guide-link-q">
+            Practice:
+            <a class="btn" href="question.html?id=q26-heap-sort">q26 Heap sort</a>
+            <a class="btn" href="question.html?id=q63-bstinsert-recursive-return-root-pattern">q63 BST (pointer form)</a>
+            — compare with array indexing when you need speed.
+          </p>
+        </article>
+
+        <div class="guide-callout guide-callout-checklist">
+          <h3>Systems DSA interview checklist</h3>
+          <p class="guide-plain">State these out loud before you code — interviewers notice:</p>
+          <ol class="guide-trace">
+            <li><strong>No heap in hot path:</strong> "I'll avoid <code>malloc</code>/<code>free</code> here for deterministic timing and no fragmentation."</li>
+            <li><strong>Prefer iteration:</strong> "I'll use a loop instead of deep recursion so stack usage stays bounded in kernel/ISR context."</li>
+            <li><strong>Concurrency:</strong> "If this runs in an ISR, I'll use a lock-free ring or document where a memory fence is needed."</li>
+          </ol>
+        </div>
+
+        <p class="guide-footer-actions">
+          <a class="btn btn-primary" href="index.html?section=buffers%20%26%20driver%20patterns">Buffers &amp; drivers →</a>
+          <a class="btn" href="index.html?section=bit%20manipulation">Bit manipulation →</a>
+        </p>
       </section>
 
       <!-- ── ORDER ── -->
@@ -623,6 +815,6 @@
     </main>
   </div>
 
-  <script src="js/dsa-guide.js?v=36"></script>
+  <script src="js/dsa-guide.js?v=37"></script>
 </body>
 </html>

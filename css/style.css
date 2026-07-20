@@ -1976,12 +1976,10 @@ a:hover {
   background: rgba(57, 217, 138, 0.08);
 }
 
-.guide-sidebar-cta {
-  display: block;
-  margin-top: 1.25rem;
-  text-align: center;
-  font-size: 0.8rem;
-  text-decoration: none;
+.guide-sidebar-nav a.guide-sidebar-sub {
+  padding-left: 1.25rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
 }
 
 .guide-content {
@@ -2056,6 +2054,35 @@ a:hover {
 .guide-tag-greedy { background: rgba(255, 107, 74, 0.12); color: var(--red); border: 1px solid rgba(255, 107, 74, 0.35); }
 .guide-tag-stack { background: rgba(147, 112, 219, 0.15); color: #b39ddb; border: 1px solid rgba(147, 112, 219, 0.35); }
 .guide-tag-backtrack { background: rgba(255, 107, 74, 0.12); color: var(--red); border: 1px solid rgba(255, 107, 74, 0.35); }
+.guide-tag-systems { background: rgba(255, 180, 41, 0.12); color: #ffb84d; border: 1px solid rgba(255, 180, 41, 0.35); }
+
+.guide-chapter {
+  margin: 2rem 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  scroll-margin-top: 5rem;
+}
+
+.guide-chapter:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+
+.guide-chapter h3 {
+  font-size: 1.05rem;
+  margin: 0 0 0.75rem;
+}
+
+.guide-callout-checklist {
+  border: 1px solid rgba(255, 180, 41, 0.35);
+  background: rgba(255, 180, 41, 0.06);
+  margin-top: 2rem;
+}
+
+.guide-callout-checklist h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+}
 
 .guide-table-picker td:first-child {
   color: var(--text-muted);
