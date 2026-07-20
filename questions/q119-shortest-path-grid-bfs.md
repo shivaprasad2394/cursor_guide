@@ -16,6 +16,30 @@ expectedOutput: "shortest=5\n"
 - **Pattern:** Breadth-First Search
 - **Expected output:** `shortest=5`
 
+## Before you start
+
+Read [BFS primer](dsa-guide.html#bfs). Empty grid — count steps from top-left to bottom-right.
+
+Full guide: [DSA Primer](dsa-guide.html#bfs)
+
+## How to think
+
+BFS explores in order of distance. First time you dequeue the goal cell, you have the **minimum** steps. Use a queue + `vis` array.
+
+## Diagram
+
+```text
+Queue expands in rings: dist 1, then 2, then 3…
+```
+
+## C walkthrough
+
+```text
+step1: Enqueue (0,0) with dist=1, mark visited
+step2: Dequeue front; if at goal return dist
+step3: Enqueue unvisited open neighbors with dist+1
+```
+
 ## Description
 
 Shortest path from top-left to bottom-right in a grid with no obstacles (`0` = open). BFS guarantees minimum steps.

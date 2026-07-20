@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DSA Primer · Lset Prep</title>
+  <link rel="stylesheet" href="css/style.css?v=32">
+</head>
+<body data-page="guide">
+  <header class="site-header">
+    <div class="brand">
+      <a href="index.html" class="brand-title">← Lset Prep</a>
+      <span class="brand-sub">DSA primer · read before the pattern questions</span>
+    </div>
+  </header>
+
+  <main class="guide-main">
+    <article class="guide-article">
+      <header class="guide-hero">
+        <p class="guide-kicker">Prerequisites</p>
+        <h1>Understand DSA patterns in plain English</h1>
+        <p class="guide-lead">
+          You write <strong>C</strong> here — loops, arrays, pointers, structs. The patterns below are
+          <em>ways of thinking</em>, not magic syntax. Read one section, then open the matching question
+          in <strong>DSA Patterns</strong> and use <strong>Visualizer ⧉</strong>.
+        </p>
+        <nav class="guide-toc">
+          <a href="#dfs">DFS</a>
+          <a href="#bfs">BFS</a>
+          <a href="#dp">Dynamic programming</a>
+          <a href="#greedy">Greedy</a>
+          <a href="#stack">Monotonic stack</a>
+          <a href="#order">Suggested order</a>
+        </nav>
+      </header>
+
+      <section class="guide-section" id="dfs">
+        <h2>DFS — Depth-First Search</h2>
+        <p class="guide-plain"><strong>One sentence:</strong> Go as deep as you can, then back up and try another branch — like exploring a maze by always taking the first turn until you hit a dead end.</p>
+        <div class="guide-diagram"><pre>Grid (1 = land)     DFS from (0,0):
+1 1 1 0 0           Visit → sink to 0 (flood fill)
+1 1 0 0 0           Same connected component = 1 island
+0 0 0 1 1
+0 0 0 0 1</pre></div>
+        <h3>In C you usually write</h3>
+        <ul class="guide-list">
+          <li>A function that calls itself on neighbors: <code>dfs(g, r+1, c)</code>, <code>dfs(g, r-1, c)</code>, …</li>
+          <li>A <strong>base case</strong>: out of bounds, or already visited, or wrong cell value → return.</li>
+          <li>Mark visited (e.g. flip <code>'1'</code> to <code>'0'</code>) so you don't loop forever.</li>
+        </ul>
+        <p class="guide-link-q">Practice: <a href="question.html?id=q118-number-of-islands-dfs">Number of Islands (q118)</a> · <a href="question.html?id=q120-tree-path-sum-dfs">Tree Path Sum (q120)</a></p>
+      </section>
+
+      <section class="guide-section" id="bfs">
+        <h2>BFS — Breadth-First Search</h2>
+        <p class="guide-plain"><strong>One sentence:</strong> Explore in layers — first all cells 1 step away, then 2 steps, then 3 — like ripples in a pond. Best for <strong>shortest path</strong> on an unweighted grid.</p>
+        <div class="guide-diagram"><pre>Start (0,0)  dist=1
+  layer 1: (1,0) (0,1)  dist=2
+  layer 2: (2,0) (1,1) (0,2)  dist=3
+  … first time you reach the goal = minimum steps</pre></div>
+        <h3>In C you usually write</h3>
+        <ul class="guide-list">
+          <li>A <strong>queue</strong> array: store <code>(row, col, distance)</code>, with <code>head</code> and <code>tail</code> indices.</li>
+          <li>A <code>vis[][]</code> array so you enqueue each cell once.</li>
+          <li>Pop front, try 4 neighbors; if open and unvisited, push back with <code>dist+1</code>.</li>
+        </ul>
+        <p class="guide-link-q">Practice: <a href="question.html?id=q119-shortest-path-grid-bfs">Shortest Path Grid (q119)</a></p>
+      </section>
+
+      <section class="guide-section" id="dp">
+        <h2>Dynamic programming (DP)</h2>
+        <p class="guide-plain"><strong>One sentence:</strong> Break a big problem into small overlapping sub-problems; store answers in a table so you never recompute the same thing twice.</p>
+        <div class="guide-diagram"><pre>Climbing 5 stairs (1 or 2 steps at a time):
+dp[0]=1  dp[1]=1
+dp[2]=dp[1]+dp[0]=2
+dp[3]=dp[2]+dp[1]=3
+dp[4]=5  dp[5]=8  ← answer</pre></div>
+        <h3>How to recognize DP</h3>
+        <ul class="guide-list">
+          <li>“How many ways…”, “minimum cost…”, “maximum without adjacent…” → often DP.</li>
+          <li>Define <code>dp[i]</code> in plain English first (e.g. “best loot using houses 0..i”).</li>
+          <li>In C, you can use a small array or just two variables if only the last two rows matter.</li>
+        </ul>
+        <p class="guide-link-q">Practice: <a href="question.html?id=q111-climbing-stairs-dp">Climbing Stairs (q111)</a> → <a href="question.html?id=q112-house-robber-dp">House Robber (q112)</a> → <a href="question.html?id=q113-coin-change-dp">Coin Change (q113)</a></p>
+      </section>
+
+      <section class="guide-section" id="greedy">
+        <h2>Greedy</h2>
+        <p class="guide-plain"><strong>One sentence:</strong> At each step, take the locally best choice and never look back — no table needed if the problem is designed for it.</p>
+        <div class="guide-diagram"><pre>Jump Game — index:  0  1  2  3  4
+nums[i]:           2  3  1  1  4
+farthest you can:  2  4  4  4  8  → reach index 4 ✓</pre></div>
+        <h3>In C you usually write</h3>
+        <ul class="guide-list">
+          <li>One loop, a few variables (e.g. <code>farthest</code>, <code>end</code> of interval).</li>
+          <li>Update the variable when you see a better local option.</li>
+        </ul>
+        <p class="guide-link-q">Practice: <a href="question.html?id=q116-jump-game-greedy">Jump Game (q116)</a> · <a href="question.html?id=q117-non-overlapping-intervals-greedy">Non-Overlapping Intervals (q117)</a> · <a href="question.html?id=q122-merge-intervals-greedy">Merge Intervals (q122)</a></p>
+      </section>
+
+      <section class="guide-section" id="stack">
+        <h2>Monotonic stack</h2>
+        <p class="guide-plain"><strong>One sentence:</strong> Keep a stack of indices whose values are in sorted order; when you see a “breaking” value, pop and answer questions about the popped items.</p>
+        <div class="guide-diagram"><pre>Temps: 73 74 75 71 69 72 76 73
+Stack holds decreasing temps → when today is warmer,
+pop yesterday and set wait = today - yesterday</pre></div>
+        <p class="guide-link-q">Practice: <a href="question.html?id=q114-daily-temperatures-monotonic-stack">Daily Temperatures (q114)</a> · <a href="question.html?id=q115-next-greater-element-monotonic-stack">Next Greater Element (q115)</a></p>
+      </section>
+
+      <section class="guide-section" id="order">
+        <h2>Suggested learning order</h2>
+        <ol class="guide-order">
+          <li><a href="question.html?id=q116-jump-game-greedy">Jump Game</a> — one array, greedy</li>
+          <li><a href="question.html?id=q111-climbing-stairs-dp">Climbing Stairs</a> — simplest DP</li>
+          <li><a href="question.html?id=q118-number-of-islands-dfs">Number of Islands</a> — grid DFS</li>
+          <li><a href="question.html?id=q119-shortest-path-grid-bfs">Shortest Path Grid</a> — grid BFS</li>
+          <li><a href="question.html?id=q112-house-robber-dp">House Robber</a> — DP choice</li>
+          <li><a href="question.html?id=q114-daily-temperatures-monotonic-stack">Daily Temperatures</a> — stack</li>
+          <li>Then coin change, intervals, tree path sum</li>
+        </ol>
+        <p><a class="btn btn-primary" href="index.html">← Back to all categories</a></p>
+      </section>
+    </article>
+  </main>
+</body>
+</html>

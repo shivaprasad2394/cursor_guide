@@ -3,16 +3,42 @@ id: "q112-house-robber-dp"
 title: "House Robber (DP)"
 pattern: "dynamic programming"
 difficulty: "medium"
-visualization: "generic"
+visualization: "dp-robber"
 vizCategory: "dsa"
 stdin: ""
 expectedOutput: "maxLoot=12\n"
+tape: 2,7,9,3,1
 ---
 ## At a glance
 
 - **Goal:** House Robber (DP)
 - **Pattern:** Dynamic Programming
 - **Expected output:** `maxLoot=12`
+
+## Before you start
+
+Read [DP primer](dsa-guide.html#dp). Each house has money; you **cannot rob two neighbors**.
+
+Full guide: [DSA Primer](dsa-guide.html#dp)
+
+## How to think
+
+At house `i`, either **rob it** (money[i] + best up to i-2) or **skip it** (best up to i-1). Track two running totals — no full array required in C.
+
+## Diagram
+
+```text
+Houses: $2  $7  $9  $3  $1
+Pick:   ✓      ✗   ✓      ✗   ✓  → total $12
+```
+
+## C walkthrough
+
+```text
+step1: `prev2=0`, `prev1=0` — best loot ending two back / one back
+step2: `cur = max(prev1, nums[i]+prev2)` — rob or skip
+step3: Shift window: `prev2=prev1`, `prev1=cur`
+```
 
 ## Description
 

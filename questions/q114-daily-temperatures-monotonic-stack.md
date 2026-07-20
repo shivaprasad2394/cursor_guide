@@ -15,6 +15,30 @@ expectedOutput: "wait: 1 1 4 2 1 1 0 0\n"
 - **Pattern:** Monotonic Stack
 - **Expected output:** `wait: 1 1 4 2 1 1 0 0`
 
+## Before you start
+
+Read [Monotonic stack primer](dsa-guide.html#stack). Stack stores **indices** where temperatures are decreasing.
+
+Full guide: [DSA Primer](dsa-guide.html#stack)
+
+## How to think
+
+Scan left to right. While today is warmer than stack top, pop and set `wait[popped] = i - popped`. Push current index.
+
+## Diagram
+
+```text
+Warmer day resolves "how many days until warmer" for past colder days sitting in the stack.
+```
+
+## C walkthrough
+
+```text
+step1: Stack array + `top = -1`
+step2: While stack not empty and T[i] > T[stack[top]]: pop, set answer
+step3: Push i onto stack
+```
+
 ## Description
 
 For each day, days until a warmer temperature. Decreasing monotonic stack of indices.

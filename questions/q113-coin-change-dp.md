@@ -3,16 +3,43 @@ id: "q113-coin-change-dp"
 title: "Coin Change (DP)"
 pattern: "dynamic programming"
 difficulty: "medium"
-visualization: "generic"
+visualization: "dp-coin"
 vizCategory: "dsa"
 stdin: ""
 expectedOutput: "minCoins(11)=3\n"
+vizAmount: 11
+tape: 1,2,5
 ---
 ## At a glance
 
 - **Goal:** Coin Change (DP)
 - **Pattern:** Dynamic Programming
 - **Expected output:** `minCoins(11)=3`
+
+## Before you start
+
+Read [DP primer](dsa-guide.html#dp). Classic "unbounded knapsack" — each coin can be used many times.
+
+Full guide: [DSA Primer](dsa-guide.html#dp)
+
+## How to think
+
+`dp[amount]` = minimum coins to make that amount. Try every coin: `dp[a] = min(dp[a], dp[a-coin]+1)`. Fill from small amounts up to 11.
+
+## Diagram
+
+```text
+Coins {1,2,5}  target 11
+ dp[11]=3  because 5+5+1
+```
+
+## C walkthrough
+
+```text
+step1: Fill `dp[0..amount]` with a big number; `dp[0]=0`
+step2: Double loop: each coin, each amount from coin to target
+step3: If `dp[a-coin]+1` is smaller, update `dp[a]`
+```
 
 ## Description
 

@@ -316,4 +316,248 @@ export function renderDsaStudioRich(body, session, step) {
   if (session.kind === "grid-dfs" || session.kind === "grid-bfs") renderGrid(body, step, session);
   else if (session.kind === "intervals") renderIntervals(body, step);
   else if (session.kind === "monotonic-stack") renderStack(body, step);
+  else if (session.kind === "dp-table") renderDpTable(body, step);
+  else if (session.kind === "jump-game") renderJumpGame(body, step);
+  else if (session.kind === "tree-path") renderTreePath(body, step, session);
+}
+
+/* ── DP simulators ────────────────────────────────────────── */
+
+export function createDpStairsSession(meta) {
+  const n = Number(meta.vizN || meta.tape || 5);
+  const dp = [];
+  const steps = [];
+  const push = (patch) =>
+    steps.push(
+      snap({
+        kind: "dp-table",
+        labels: dp.map((_, i) => `dp[${i}]`),
+        values: [...dp],
+        hot: patch.hot ?? [],
+        note: patch.note,
+        phaseLabel: patch.phaseLabel || "",
+        func: "climbStairs",
+      })
+    );
+  dp[0] = 1;
+  dp[1] = 1;
+  push({ hot: [0, 1], note: "Base cases: 1 way to stay at start (0 steps) or 1 step", phaseLabel: "Base" });
+  for (let i = 2; i <= n; i++) {
+    dp[i] = dp[i - 1] + dp[i - 2];
+    push({
+      hot: [i],
+      note: `dp[${i}] = dp[${i - 1}] + dp[${i - 2}] = ${dp[i - 1]} + ${dp[i - 2]} = ${dp[i]}`,
+      phaseLabel: `Step ${i}`,
+    });
+  }
+  push({ hot: [n], note: `Answer: ${dp[n]} distinct ways to climb ${n} stairs`, phaseLabel: "Done" });
+  return { kind: "dp-table", steps };
+}
+
+export function createDpRobberSession(meta) {
+  const nums = parseTape(meta, "2,7,9,3,1").map(Number);
+  const n = nums.length;
+  const pick = Array(n).fill(false);
+  let prev2 = 0;
+  let prev1 = 0;
+  const steps = [];
+  const push = (patch) =>
+    steps.push(
+      snap({
+        kind: "dp-table",
+        houses: [...nums],
+        pick: [...pick],
+        prev1,
+        prev2,
+        hot: patch.hot ?? [],
+        note: patch.note,
+        phaseLabel: patch.phaseLabel || "",
+        func: "rob",
+      })
+    );
+  push({ note: "Walk houses left→right. At each house: rob it (+ prev2) or skip (keep prev1).", phaseLabel: "Init" });
+  for (let i = 0; i < n; i++) {
+    const robIt = nums[i] + prev2;
+    const skip = prev1;
+    const cur = robIt > skip ? robIt : skip;
+    pick[i] = robIt > skip;
+    push({
+      hot: [i],
+      note: pick[i]
+        ? `House ${i} ($${nums[i]}): ROB → ${nums[i]}+${prev2}=${robIt} beats skip ${skip}`
+        : `House ${i} ($${nums[i]}): SKIP → keep ${skip}`,
+      phaseLabel: `House ${i}`,
+    });
+    prev2 = prev1;
+    prev1 = cur;
+  }
+  push({ hot: [], note: `Best total loot = ${prev1}`, phaseLabel: "Done" });
+  return { kind: "dp-table", steps, robber: true };
+}
+
+export function createDpCoinSession(meta) {
+  const coins = parseTape(meta, "1,2,5").map(Number);
+  const amount = Number(meta.vizAmount || 11);
+  const dp = Array(amount + 1).fill(amount + 1);
+  dp[0] = 0;
+  const steps = [];
+  const push = (patch) =>
+    steps.push(
+      snap({
+        kind: "dp-table",
+        labels: dp.map((_, i) => `${i}`),
+        values: [...dp],
+        coins: [...coins],
+        amount,
+        hot: patch.hot ?? [],
+        note: patch.note,
+        phaseLabel: patch.phaseLabel || "",
+        func: "coinChange",
+      })
+    );
+  push({ note: `dp[a] = min coins to make amount a. Start dp[0]=0, rest=INF`, phaseLabel: "Init" });
+  for (const c of coins) {
+    for (let a = c; a <= amount; a++) {
+      const cand = dp[a - c] + 1;
+      if (cand < dp[a]) {
+        dp[a] = cand;
+        push({
+          hot: [a],
+          note: `Use coin ${c}: dp[${a}] = dp[${a - c}]+1 = ${cand}`,
+          phaseLabel: `Coin ${c}`,
+        });
+      }
+    }
+  }
+  push({ hot: [amount], note: `Min coins for ${amount} = ${dp[amount]}`, phaseLabel: "Done" });
+  return { kind: "dp-table", steps, coin: true };
+}
+
+export function createJumpGameSession(meta) {
+  const nums = parseTape(meta, "2,3,1,1,4").map(Number);
+  const n = nums.length;
+  let farthest = 0;
+  const steps = [];
+  const push = (patch) =>
+    steps.push(
+      snap({
+        kind: "jump-game",
+        nums: [...nums],
+        farthest,
+        i: patch.i ?? 0,
+        hot: patch.hot ?? [],
+        note: patch.note,
+        phaseLabel: patch.phaseLabel || "",
+        func: "canJump",
+      })
+    );
+  push({ note: "farthest = rightmost index reachable so far", phaseLabel: "Init", i: 0 });
+  for (let i = 0; i <= farthest && i < n; i++) {
+    const reach = i + nums[i];
+    if (reach > farthest) {
+      farthest = reach;
+      push({
+        i,
+        hot: Array.from({ length: farthest + 1 }, (_, k) => k),
+        note: `At i=${i}, jump ${nums[i]} → farthest=${farthest}`,
+        phaseLabel: `Index ${i}`,
+      });
+    } else {
+      push({ i, hot: [i], note: `At i=${i}, farthest stays ${farthest}`, phaseLabel: `Index ${i}` });
+    }
+  }
+  push({
+    note: farthest >= n - 1 ? `farthest=${farthest} ≥ last index ${n - 1} → can reach end` : "cannot reach",
+    phaseLabel: "Done",
+    i: n - 1,
+    hot: Array.from({ length: n }, (_, k) => k),
+  });
+  return { kind: "jump-game", steps };
+}
+
+export function createTreePathSession(meta) {
+  const target = Number(meta.vizTarget || 22);
+  const tree = [
+    { id: 0, val: 5, l: 1, r: 2, x: 50, y: 10 },
+    { id: 1, val: 4, l: 3, r: null, x: 28, y: 35 },
+    { id: 2, val: 8, l: 4, r: 5, x: 72, y: 35 },
+    { id: 3, val: 11, l: 6, r: 7, x: 18, y: 60 },
+    { id: 4, val: 13, l: null, r: null, x: 58, y: 60 },
+    { id: 5, val: 4, l: null, r: 8, x: 86, y: 60 },
+    { id: 6, val: 7, l: null, r: null, x: 8, y: 85 },
+    { id: 7, val: 2, l: null, r: null, x: 28, y: 85 },
+    { id: 8, val: 1, l: null, r: null, x: 92, y: 85 },
+  ];
+  const path = [0, 1, 3, 7];
+  const steps = [];
+  const remainings = [22, 17, 6, -5];
+  const push = (patch) =>
+    steps.push(
+      snap({
+        kind: "tree-path",
+        tree,
+        path: patch.path ?? [],
+        remaining: patch.remaining ?? target,
+        hot: patch.hot ?? [],
+        note: patch.note,
+        phaseLabel: patch.phaseLabel || "",
+        func: "hasPathSum",
+      })
+    );
+  push({ note: `Does any root→leaf path sum to ${target}?`, phaseLabel: "Start", path: [], remaining: target });
+  push({ path: [0], remaining: 17, hot: [0], note: "Visit 5 → need 22-5=17 more", phaseLabel: "DFS" });
+  push({ path: [0, 1], remaining: 13, hot: [1], note: "Go left to 4 → need 17-4=13", phaseLabel: "DFS" });
+  push({ path: [0, 1, 3], remaining: 2, hot: [3], note: "Go to 11 → need 13-11=2", phaseLabel: "DFS" });
+  push({
+    path: [0, 1, 3, 7],
+    remaining: 0,
+    hot: [7],
+    note: "Leaf 2: 2==2 remaining → path 5→4→11→2 sums to 22 ✓",
+    phaseLabel: "Found",
+  });
+  return { kind: "tree-path", steps, target };
+}
+
+function renderDpTable(body, step) {
+  if (step.houses) {
+    const cells = step.houses
+      .map(
+        (v, i) =>
+          `<div class="viz-house ${step.pick[i] ? "viz-house-pick" : ""} ${(step.hot || []).includes(i) ? "viz-cell-mid" : ""}"><span class="viz-house-val">$${v}</span><small>${step.pick[i] ? "rob" : "skip"}</small></div>`
+      )
+      .join("");
+    body.innerHTML = `<div class="viz-split"><div class="viz-memory"><div class="viz-frame-head">${escapeHtml(step.func)}()</div><div class="viz-house-row">${cells}</div><p class="viz-dp-vars">prev2=${step.prev2} · prev1=${step.prev1}</p><p class="viz-focus-text">${escapeHtml(step.note || "")}</p></div></div>`;
+    return;
+  }
+  const labels = step.labels || step.values.map((_, i) => String(i));
+  const cols = (step.values || []).map((v, i) => {
+    const hot = (step.hot || []).includes(i);
+    return `<div class="viz-array-col"><span class="viz-idx">${escapeHtml(labels[i])}</span><span class="viz-cell ${hot ? "viz-cell-mid" : ""}">${v >= 1000 ? "∞" : v}</span></div>`;
+  }).join("");
+  body.innerHTML = `<div class="viz-split"><div class="viz-memory"><div class="viz-frame-head">${escapeHtml(step.func)}()</div><div class="viz-array-block"><div class="viz-array-caption">DP table</div><div class="viz-array-grid">${cols}</div></div><p class="viz-focus-text">${escapeHtml(step.note || "")}</p></div></div>`;
+}
+
+function renderJumpGame(body, step) {
+  const n = step.nums.length;
+  const cells = step.nums
+    .map((v, i) => {
+      const inReach = (step.hot || []).includes(i);
+      const cur = i === step.i;
+      return `<div class="viz-array-col"><span class="viz-idx">${i}</span><span class="viz-cell ${cur ? "viz-cell-mid" : inReach ? "viz-cell-low" : ""}">${v}</span></div>`;
+    })
+    .join("");
+  const bar = `<div class="viz-reach-bar" style="width:${Math.min(100, ((step.farthest + 1) / n) * 100)}%"></div>`;
+  body.innerHTML = `<div class="viz-split"><div class="viz-memory"><div class="viz-frame-head">${escapeHtml(step.func)}()</div><div class="viz-array-block"><div class="viz-array-caption">nums · farthest=${step.farthest}</div><div class="viz-reach-wrap">${bar}<div class="viz-array-grid">${cells}</div></div></div><p class="viz-focus-text">${escapeHtml(step.note || "")}</p></div></div>`;
+}
+
+function renderTreePath(body, step, session) {
+  const hot = new Set(step.hot || []);
+  const onPath = new Set(step.path || []);
+  const nodes = (step.tree || session.tree || [])
+    .map((nd) => {
+      const cls = hot.has(nd.id) ? "viz-tree-node viz-tree-hot" : onPath.has(nd.id) ? "viz-tree-node viz-tree-path" : "viz-tree-node";
+      return `<div class="${cls}" style="left:${nd.x}%;top:${nd.y}%">${nd.val}</div>`;
+    })
+    .join("");
+  body.innerHTML = `<div class="viz-split"><div class="viz-memory"><div class="viz-frame-head">${escapeHtml(step.func)}(target=${session.target})</div><div class="viz-tree-canvas">${nodes}</div><p class="viz-dp-vars">remaining=${step.remaining}</p><p class="viz-focus-text">${escapeHtml(step.note || "")}</p></div></div>`;
 }

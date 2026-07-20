@@ -1,15 +1,20 @@
 /**
  * Execution Studio — step-through memory visualizer (Python Tutor inspired).
  */
-import { createListSession, renderListStudioRich } from "./list-viz.js?v=31";
-import { createAvlSession, renderAvlStudioRich } from "./avl-viz.js?v=31";
+import { createListSession, renderListStudioRich } from "./list-viz.js?v=32";
+import { createAvlSession, renderAvlStudioRich } from "./avl-viz.js?v=32";
 import {
   createGridDfsSession,
   createGridBfsSession,
   createIntervalSession,
   createMonotonicStackSession,
+  createDpStairsSession,
+  createDpRobberSession,
+  createDpCoinSession,
+  createJumpGameSession,
+  createTreePathSession,
   renderDsaStudioRich,
-} from "./dsa-viz.js?v=31";
+} from "./dsa-viz.js?v=32";
 
 export function createSession(meta, opts = {}) {
   const viz = meta.visualization || "none";
@@ -55,6 +60,21 @@ export function createSession(meta, opts = {}) {
   }
   if (viz === "monotonic-stack") {
     return createMonotonicStackSession(meta);
+  }
+  if (viz === "dp-stairs") {
+    return createDpStairsSession(meta);
+  }
+  if (viz === "dp-robber") {
+    return createDpRobberSession(meta);
+  }
+  if (viz === "dp-coin") {
+    return createDpCoinSession(meta);
+  }
+  if (viz === "jump-game") {
+    return createJumpGameSession(meta);
+  }
+  if (viz === "tree-path") {
+    return createTreePathSession(meta);
   }
   if (viz === "array-cells") {
     const cells = String(meta.tape || "0,1,2,3,4,5,6,7").split(",").map((s) => s.trim());
@@ -106,7 +126,10 @@ export function renderStudio(container, session, stepIndex) {
     session.kind === "grid-dfs" ||
     session.kind === "grid-bfs" ||
     session.kind === "intervals" ||
-    session.kind === "monotonic-stack"
+    session.kind === "monotonic-stack" ||
+    session.kind === "dp-table" ||
+    session.kind === "jump-game" ||
+    session.kind === "tree-path"
   ) {
     renderDsaStudioRich(body, session, step);
   } else if (session.kind === "generic") {

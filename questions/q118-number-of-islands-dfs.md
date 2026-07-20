@@ -17,6 +17,30 @@ expectedOutput: "islands=3\n"
 - **Pattern:** Depth-First Search
 - **Expected output:** `islands=3`
 
+## Before you start
+
+Read [DFS primer](dsa-guide.html#dfs) — grid version. `'1'` = land, `'0'` = water.
+
+Full guide: [DSA Primer](dsa-guide.html#dfs)
+
+## How to think
+
+Each time you see `'1'`, increment island count, then **sink** the whole connected component by flipping `'1'`→`'0'` via recursive DFS.
+
+## Diagram
+
+```text
+Four-direction flood fill from each unvisited land cell.
+```
+
+## C walkthrough
+
+```text
+step1: Double `for` over every cell
+step2: If `g[r][c]=='1'`: count++, call `dfs`
+step3: In dfs: bounds check, if not '1' return; set '0'; recurse 4 neighbors
+```
+
 ## Description
 
 Count connected `'1'` regions in a binary grid using DFS flood-fill.

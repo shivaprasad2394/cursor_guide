@@ -3,16 +3,42 @@ id: "q111-climbing-stairs-dp"
 title: "Climbing Stairs (DP)"
 pattern: "dynamic programming"
 difficulty: "easy"
-visualization: "generic"
+visualization: "dp-stairs"
 vizCategory: "dsa"
 stdin: ""
 expectedOutput: "ways(5)=8\n"
+vizN: 5
 ---
 ## At a glance
 
 - **Goal:** Climbing Stairs (DP)
 - **Pattern:** Dynamic Programming
 - **Expected output:** `ways(5)=8`
+
+## Before you start
+
+Read [DP primer](dsa-guide.html#dp) first. You only need a `for` loop and two integers — no pointer tricks.
+
+Full guide: [DSA Primer](dsa-guide.html#dp)
+
+## How to think
+
+Ask: "How many ways to reach stair `i`?" You can arrive from `i-1` (one step) or `i-2` (two steps). So `ways(i) = ways(i-1) + ways(i-2)` — same as Fibonacci.
+
+## Diagram
+
+```text
+Stair 5: ways = ways(4)+ways(3)
+ dp: [1, 1, 2, 3, 5, 8]
+```
+
+## C walkthrough
+
+```text
+step1: `int a=1, b=1` — ways for stair 0 and 1
+step2: Loop `i` from 2 to n: `c = a+b`, then shift `a=b`, `b=c`
+step3: Return `b` — ways to reach stair n
+```
 
 ## Description
 

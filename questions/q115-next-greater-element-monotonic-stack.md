@@ -15,6 +15,31 @@ expectedOutput: "nge: 4 2 4 8 -1 8\n"
 - **Pattern:** Monotonic Stack
 - **Expected output:** `nge: 4 2 4 8 -1 8`
 
+## Before you start
+
+Read [Monotonic stack primer](dsa-guide.html#stack). Scan **right to left** for this variant.
+
+Full guide: [DSA Primer](dsa-guide.html#stack)
+
+## How to think
+
+Stack holds indices with increasing values from bottom to top. For each i, pop smaller values; stack top (if any) is next greater.
+
+## Diagram
+
+```text
+Array: 2 1 2 4 3 8
+ nge:  4 2 4 8 -1 8
+```
+
+## C walkthrough
+
+```text
+step1: Loop i from n-1 down to 0
+step2: Pop while stack top value <= nums[i]
+step3: out[i] = stack empty ? -1 : nums[stack[top]]; push i
+```
+
 ## Description
 
 For each element, find the next greater element to the right. Classic monotonic decreasing stack.

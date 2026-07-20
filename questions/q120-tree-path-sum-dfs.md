@@ -3,16 +3,48 @@ id: "q120-tree-path-sum-dfs"
 title: "Path Sum on Binary Tree (DFS)"
 pattern: "depth-first search"
 difficulty: "medium"
-visualization: "generic"
+visualization: "tree-path"
 vizCategory: "dsa"
 stdin: ""
 expectedOutput: "hasPathSum(22)=1\n"
+vizTarget: 22
 ---
 ## At a glance
 
 - **Goal:** Path Sum on Binary Tree (DFS)
 - **Pattern:** Depth-First Search
 - **Expected output:** `hasPathSum(22)=1`
+
+## Before you start
+
+Read [DFS primer](dsa-guide.html#dfs). A tree is just nodes with `left` and `right` pointers — DFS means recurse into children.
+
+Full guide: [DSA Primer](dsa-guide.html#dfs)
+
+## How to think
+
+Pass down **remaining sum**. At each node subtract `val`. At a **leaf**, check if remaining is 0. Recurse left OR right — either path working means yes.
+
+## Diagram
+
+```text
+        5
+       / \
+      4   8
+     /   / \
+   11  13  4
+  / \       \
+ 7   2       1
+Path 5→4→11→2 = 22
+```
+
+## C walkthrough
+
+```text
+step1: `if (!root) return 0` — empty tree fails
+step2: Leaf check: no children → `return val == target`
+step3: Recurse: `hasPathSum(left, target-val) || hasPathSum(right, target-val)`
+```
 
 ## Description
 

@@ -1920,3 +1920,183 @@ a:hover {
   background: rgba(100, 149, 237, 0.2);
   text-align: center;
 }
+
+/* DSA primer page */
+.guide-main {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+}
+.guide-hero { margin-bottom: 2rem; }
+.guide-kicker {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin: 0 0 0.5rem;
+}
+.guide-lead { color: var(--muted); line-height: 1.6; }
+.guide-toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+.guide-toc a {
+  font-size: 0.85rem;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  text-decoration: none;
+}
+.guide-toc a:hover { border-color: var(--green); color: var(--green); }
+.guide-section {
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+.guide-section:last-child { border-bottom: none; }
+.guide-plain { font-size: 1.05rem; line-height: 1.65; }
+.guide-diagram pre {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  overflow-x: auto;
+}
+.guide-list { line-height: 1.65; padding-left: 1.25rem; }
+.guide-link-q { margin-top: 1rem; font-size: 0.9rem; }
+.guide-order { counter-reset: guide-step; list-style: none; padding: 0; }
+.guide-order li {
+  counter-increment: guide-step;
+  margin-bottom: 0.75rem;
+  padding-left: 2rem;
+  position: relative;
+}
+.guide-order li::before {
+  content: counter(guide-step);
+  position: absolute;
+  left: 0;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  background: rgba(57, 217, 138, 0.2);
+  border: 1px solid var(--green);
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* DSA learning sections on question pages */
+.dsa-primer-banner {
+  display: block;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(100, 149, 237, 0.45);
+  background: rgba(100, 149, 237, 0.12);
+  text-decoration: none;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.dsa-primer-banner:hover { border-color: var(--green); }
+.dsa-primer-banner-inline { margin-bottom: 0.75rem; }
+.category-card-guide {
+  border-color: rgba(100, 149, 237, 0.5);
+  background: rgba(100, 149, 237, 0.08);
+}
+.spec-section-prereq {
+  border-left: 3px solid #6495ed;
+  padding-left: 0.85rem;
+  background: rgba(100, 149, 237, 0.06);
+  border-radius: 0 6px 6px 0;
+}
+.spec-section-think {
+  border-left: 3px solid var(--amber);
+  padding-left: 0.85rem;
+  background: rgba(240, 180, 41, 0.06);
+  border-radius: 0 6px 6px 0;
+}
+.spec-section-diagram .trace-block,
+.spec-section-walk .trace-block {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+/* DP / jump / tree pattern demos */
+.viz-house-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+.viz-house {
+  min-width: 3.5rem;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.04);
+}
+.viz-house-pick {
+  border-color: var(--green);
+  background: rgba(57, 217, 138, 0.2);
+}
+.viz-house-val { display: block; font-weight: 700; font-family: var(--mono); }
+.viz-house small { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; }
+.viz-dp-vars {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 0.5rem 0;
+}
+.viz-reach-wrap {
+  position: relative;
+  padding-top: 0.75rem;
+}
+.viz-reach-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 0.35rem;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(57, 217, 138, 0.35), rgba(57, 217, 138, 0.7));
+  transition: width 0.25s ease;
+}
+.viz-tree-canvas {
+  position: relative;
+  height: 14rem;
+  margin: 1rem 0;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.viz-tree-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 0.85rem;
+  background: rgba(255, 255, 255, 0.06);
+}
+.viz-tree-path {
+  border-color: var(--amber);
+  background: rgba(240, 180, 41, 0.15);
+}
+.viz-tree-hot {
+  border-color: var(--green);
+  background: rgba(57, 217, 138, 0.35);
+  box-shadow: 0 0 0 2px rgba(57, 217, 138, 0.25);
+}

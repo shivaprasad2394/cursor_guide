@@ -16,6 +16,30 @@ expectedOutput: "merged: [1,6] [8,10] [15,18]\n"
 - **Pattern:** Greedy
 - **Expected output:** `merged: [1,6] [8,10] [15,18]`
 
+## Before you start
+
+Read [Greedy primer](dsa-guide.html#greedy). Sort by start (sorted in main). Merge overlapping intervals into one.
+
+Full guide: [DSA Primer](dsa-guide.html#greedy)
+
+## How to think
+
+If next interval starts inside current merged interval, extend the end. Otherwise start a new merged interval.
+
+## Diagram
+
+```text
+[1,3]+[2,6] → [1,6]  then separate [8,10] [15,18]
+```
+
+## C walkthrough
+
+```text
+step1: Copy first interval to output
+step2: If overlap: `out.end = max(out.end, in.end)`
+step3: Else append new interval to output
+```
+
 ## Description
 
 Merge all overlapping intervals. Sort by start, then greedily extend the current interval or push a new one.

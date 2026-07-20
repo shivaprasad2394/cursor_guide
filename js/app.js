@@ -233,7 +233,17 @@
 
       let content = nl === -1 ? "" : part.slice(nl + 1).trim();
       const sectionClass =
-        /^at a glance$/i.test(heading) ? "spec-section spec-section-glance" : "spec-section";
+        /^at a glance$/i.test(heading)
+          ? "spec-section spec-section-glance"
+          : /^before you start$/i.test(heading)
+            ? "spec-section spec-section-prereq"
+            : /^how to think$/i.test(heading)
+              ? "spec-section spec-section-think"
+              : /^diagram$/i.test(heading)
+                ? "spec-section spec-section-diagram"
+                : /^c walkthrough$/i.test(heading)
+                  ? "spec-section spec-section-walk"
+                  : "spec-section";
 
       content = content
         .replace(/```c\n([\s\S]*?)```/g, (_, code) =>
@@ -353,7 +363,7 @@
   async function runInBrowser(source, stdin, onProgress) {
     if (!runnerModule) {
       if (onProgress) onProgress("Loading in-browser C compiler (first run ~60 MB, cached after)…");
-      runnerModule = await import("./runner.js?v=31");
+      runnerModule = await import("./runner.js?v=32");
     }
     if (onProgress) onProgress("Compiling & running…");
     return runnerModule.compileAndRun(source, stdin || "");
@@ -376,7 +386,7 @@
 
   async function getVisualizer() {
     if (!visualizerModule) {
-      visualizerModule = await import("./visualizer.js?v=31");
+      visualizerModule = await import("./visualizer.js?v=32");
     }
     return visualizerModule;
   }
@@ -419,7 +429,7 @@
     "bit manipulation": { label: "Bit Manipulation", icon: "01", blurb: "XOR tricks, masks, shifts" },
     "math / number": { label: "Math & Numbers", icon: "π", blurb: "Primes, GCD, Fibonacci, digits" },
     "linked list": { label: "Linked Lists", icon: "→", blurb: "Reverse, merge, cycle detection" },
-    "dsa patterns": { label: "DSA Patterns", icon: "DP", blurb: "DP, greedy, monotonic stack, BFS/DFS" },
+    "dsa patterns": { label: "DSA Patterns", icon: "DP", blurb: "DP, greedy, monotonic stack, BFS/DFS — start with the primer" },
     "binary search tree": { label: "Binary Search Tree", icon: "BST", blurb: "Insert, search, delete, traverse" },
     "avl tree": { label: "AVL Tree", icon: "AVL", blurb: "Rotations and rebalancing" },
     "queues & stacks": { label: "Queues & Stacks", icon: "⊟", blurb: "Ring buffer, valid parentheses" },
@@ -491,6 +501,7 @@
         listEl.hidden = false;
         const items = bySection.get(activeSection);
         listEl.innerHTML = `
+          ${activeSection === "dsa patterns" ? `<a class="dsa-primer-banner" href="dsa-guide.html"><strong>DSA Primer</strong> — plain-English DFS, BFS, DP, greedy with diagrams (read this first)</a>` : ""}
           <section class="section-group section-group-single">
             <h2 class="section-heading">${escapeHtml(sectionLabel(activeSection))}</h2>
             <div class="section-cards">${renderQuestionCards(items)}</div>
@@ -515,7 +526,12 @@
             </a>`;
           })
           .join("");
-        gridEl.innerHTML = `<div class="category-grid">${cards}</div>`;
+        gridEl.innerHTML = `<div class="category-grid"><a class="category-card category-card-guide" href="dsa-guide.html">
+              <span class="category-icon">📖</span>
+              <span class="category-title">DSA Primer</span>
+              <span class="category-count">Blog-style guide</span>
+              <span class="category-blurb">DFS, BFS, DP, greedy — read before the 11 pattern questions</span>
+            </a>${cards}</div>`;
       }
       document.title = "Lset Prep";
     }
@@ -605,7 +621,13 @@
         <span class="tag diff-${escapeHtml(meta.difficulty || entry.difficulty)}">${escapeHtml(meta.difficulty || entry.difficulty)}</span>
         <span class="tag muted">${escapeHtml(meta.complexity || "")}</span>`;
     }
-    if (specEl) specEl.innerHTML = renderMarkdownSections(body);
+    if (specEl) {
+      const dsaBanner =
+        entry.section === "dsa patterns"
+          ? `<a class="dsa-primer-banner dsa-primer-banner-inline" href="dsa-guide.html"><strong>DSA Primer</strong> — how to think about ${escapeHtml(meta.pattern || "this pattern")}</a>`
+          : "";
+      specEl.innerHTML = dsaBanner + renderMarkdownSections(body);
+    }
     if (editor) editor.value = starterCode;
     if (revealSolBtn) revealSolBtn.hidden = !solutionCode;
 
@@ -627,9 +649,9 @@
       let mods;
       try {
         mods = await Promise.all([
-          import("./ctracer.js?v=31"),
-          import("./tracer-view.js?v=31"),
-          import("./viz-preprocess.js?v=31"),
+          import("./ctracer.js?v=32"),
+          import("./tracer-view.js?v=32"),
+          import("./viz-preprocess.js?v=32"),
         ]);
       } catch (_) {
         return false;

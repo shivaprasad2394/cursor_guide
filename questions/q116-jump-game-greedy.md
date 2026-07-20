@@ -3,16 +3,43 @@ id: "q116-jump-game-greedy"
 title: "Jump Game (Greedy)"
 pattern: "greedy"
 difficulty: "medium"
-visualization: "generic"
+visualization: "jump-game"
 vizCategory: "dsa"
 stdin: ""
 expectedOutput: "canReachEnd=1\n"
+tape: 2,3,1,1,4
 ---
 ## At a glance
 
 - **Goal:** Jump Game (Greedy)
 - **Pattern:** Greedy
 - **Expected output:** `canReachEnd=1`
+
+## Before you start
+
+Read [Greedy primer](dsa-guide.html#greedy). One pass, one variable — easiest DSA question to start with.
+
+Full guide: [DSA Primer](dsa-guide.html#greedy)
+
+## How to think
+
+From index `i` you can jump up to `nums[i]` steps. Track **farthest** index reachable. If `farthest` ever passes the last index, answer is yes.
+
+## Diagram
+
+```text
+Index: 0  1  2  3  4
+nums:  2  3  1  1  4
+farthest grows: 2 → 4 → … → past end
+```
+
+## C walkthrough
+
+```text
+step1: `farthest = 0`
+step2: Loop while `i <= farthest` — if `i + nums[i] > farthest`, update farthest
+step3: Return `farthest >= n-1`
+```
 
 ## Description
 

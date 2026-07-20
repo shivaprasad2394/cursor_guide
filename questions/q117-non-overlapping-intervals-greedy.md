@@ -16,6 +16,31 @@ expectedOutput: "minRemove=1\n"
 - **Pattern:** Greedy
 - **Expected output:** `minRemove=1`
 
+## Before you start
+
+Read [Greedy primer](dsa-guide.html#greedy). Intervals `[start, end]` — sort by **end time** first (already sorted in main).
+
+Full guide: [DSA Primer](dsa-guide.html#greedy)
+
+## How to think
+
+Keep the interval that finishes earliest. If next interval starts before current end → overlap → count a removal. Else extend end.
+
+## Diagram
+
+```text
+[1,2] [2,3] [3,4] keep all
+ [1,3] overlaps → remove 1 interval
+```
+
+## C walkthrough
+
+```text
+step1: `end = iv[0].e`, `removed = 0`
+step2: If `iv[i].s < end` → overlap → `removed++`
+step3: Else `end = iv[i].e` — greedy keep
+```
+
 ## Description
 
 Minimum intervals to remove so none overlap. Sort by end time, greedily keep earliest-finishing.
