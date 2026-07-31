@@ -2253,6 +2253,81 @@ body[data-guide-track="deep"] .guide-track-quick-only {
   border-top: 1px solid var(--border);
 }
 
+/* DP demo: visual + live C skeleton */
+.guide-io-box {
+  margin: 1rem 0 1.5rem;
+  padding: 1rem 1.15rem;
+  border: 1px solid rgba(57, 217, 138, 0.35);
+  border-radius: 10px;
+  background: rgba(57, 217, 138, 0.06);
+}
+
+.guide-io-box .guide-diagram {
+  margin: 0.75rem 0;
+}
+
+.guide-io-box .guide-diagram pre {
+  margin: 0;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  line-height: 1.55;
+  overflow-x: auto;
+}
+
+.guide-viz-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  align-items: start;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 860px) {
+  .guide-viz-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+.guide-viz-code-panel {
+  min-width: 0;
+}
+
+.guide-viz-code-caption {
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0 0 0.4rem;
+}
+
+.guide-viz-code-hint {
+  color: var(--amber);
+}
+
+.guide-code-live {
+  margin: 0;
+  max-height: 18rem;
+  overflow: auto;
+}
+
+.guide-code-live .guide-code-line {
+  display: block;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  border-left: 3px solid transparent;
+  white-space: pre;
+}
+
+.guide-code-live .guide-code-line-hot {
+  background: rgba(240, 180, 41, 0.22);
+  border-left-color: var(--amber);
+  color: var(--text);
+  font-weight: 600;
+}
+
 .guide-table-picker td:first-child {
   color: var(--text-muted);
   font-size: 0.88rem;

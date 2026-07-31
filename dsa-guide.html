@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DSA Handbook · Lset Prep</title>
-  <link rel="stylesheet" href="css/style.css?v=39">
+  <link rel="stylesheet" href="css/style.css?v=42">
 </head>
 <body data-page="guide" data-guide-track="quick">
   <header class="site-header">
@@ -166,8 +166,31 @@
         <h3>Real-life analogy</h3>
         <p class="guide-plain">You're exploring a building floor plan with a pen. Enter a room, mark it visited, open the first door, keep going until every reachable room from that entrance is marked. That's one "connected component." Start again from any unmarked room for the next component.</p>
 
-        <h3>Interactive trace — flood fill on a grid</h3>
-        <p class="guide-plain">In <a href="question.html?id=q118-number-of-islands-dfs">Number of Islands</a>, each group of adjacent <code>'1'</code> cells is one island. DFS sinks each cell to <code>'0'</code> so you never visit twice.</p>
+        <h3>Worked example — Number of Islands</h3>
+        <div class="guide-io-box">
+          <p class="guide-plain"><strong>Problem in one line:</strong> Count how many separate land blobs (<code>'1'</code> cells connected up/down/left/right) are on the grid.</p>
+          <table class="guide-table">
+            <thead><tr><th></th><th>What</th><th>In this demo</th><th>What it means</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Input</strong></td>
+                <td>2D grid of <code>'1'</code>/<code>'0'</code></td>
+                <td>4×5 grid with two land blobs</td>
+                <td>Land cells to explore; water is ignored</td>
+              </tr>
+              <tr>
+                <td><strong>Output</strong></td>
+                <td>one integer — island count</td>
+                <td><code>2</code></td>
+                <td>Two disconnected land regions (not cell count)</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="guide-plain"><strong>What the output is <em>not</em>:</strong> not the number of land cells, not a path. Each DFS flood fill = one island.</p>
+        </div>
+
+        <h3>Interactive trace — flood fill (visual + C)</h3>
+        <p class="guide-plain"><strong>Next step</strong> advances the grid <em>and</em> highlights the matching C line. In <a href="question.html?id=q118-number-of-islands-dfs">Number of Islands</a>, DFS sinks each cell to <code>'0'</code> so you never visit twice.</p>
         <div class="guide-viz" data-demo="dfs">
           <div class="guide-viz-toolbar">
             <button type="button" class="btn guide-viz-prev">← Prev</button>
@@ -175,11 +198,17 @@
             <button type="button" class="btn guide-viz-next">Next step →</button>
             <button type="button" class="btn guide-viz-reset">Reset</button>
           </div>
-          <div class="guide-viz-canvas"></div>
+          <div class="guide-viz-split">
+            <div class="guide-viz-canvas"></div>
+            <div class="guide-viz-code-panel">
+              <p class="guide-viz-code-caption">C code <span class="guide-viz-code-hint">(highlight follows Next)</span></p>
+              <pre class="guide-code guide-code-live"><code class="language-c" data-skeleton></code></pre>
+            </div>
+          </div>
           <p class="guide-viz-note"></p>
         </div>
 
-        <h3>Minimal C skeleton</h3>
+        <h3>Annotated C reference</h3>
         <pre class="guide-code"><code class="language-c"><span class="guide-code-ann">/* Grid DFS — 4 directions */</span>
 <span class="guide-code-kw">void</span> dfs(<span class="guide-code-kw">char</span> g[][COLS], <span class="guide-code-kw">int</span> rows, <span class="guide-code-kw">int</span> cols, <span class="guide-code-kw">int</span> r, <span class="guide-code-kw">int</span> c) {
     <span class="guide-code-ann">/* 1. BASE CASE — stop if out of bounds or not land */</span>
@@ -249,8 +278,31 @@
         <h3>Real-life analogy</h3>
         <p class="guide-plain">Ripples in a pond. Drop a stone at the start — the wave hits nearby cells first. BFS uses a <strong>queue</strong> (FIFO: first in, first out) so cells are processed in order of distance.</p>
 
-        <h3>Interactive trace — shortest path on a grid</h3>
-        <p class="guide-plain">Open cells expand layer by layer. A wall forces the path to go around. When the goal cell is dequeued, its distance is the answer.</p>
+        <h3>Worked example — Shortest Path in Grid</h3>
+        <div class="guide-io-box">
+          <p class="guide-plain"><strong>Problem in one line:</strong> From top-left to a goal cell, move to open neighbors only — what is the fewest steps?</p>
+          <table class="guide-table">
+            <thead><tr><th></th><th>What</th><th>In this demo</th><th>What it means</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Input</strong></td>
+                <td>grid, start, goal, walls</td>
+                <td>5×5, start (0,0), goal (4,4), wall column</td>
+                <td>Where you can walk; walls block</td>
+              </tr>
+              <tr>
+                <td><strong>Output</strong></td>
+                <td>one integer — distance</td>
+                <td>distance when goal is first dequeued</td>
+                <td><strong>Shortest</strong> step count (BFS guarantee on unweighted grid)</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="guide-plain"><strong>What the output is <em>not</em>:</strong> not “any path length,” not number of cells visited. First time you dequeue the goal = answer.</p>
+        </div>
+
+        <h3>Interactive trace — shortest path (visual + C)</h3>
+        <p class="guide-plain">Open cells expand layer by layer. <strong>Next</strong> highlights the C queue / dequeue lines.</p>
         <div class="guide-viz" data-demo="bfs">
           <div class="guide-viz-toolbar">
             <button type="button" class="btn guide-viz-prev">← Prev</button>
@@ -258,11 +310,17 @@
             <button type="button" class="btn guide-viz-next">Next step →</button>
             <button type="button" class="btn guide-viz-reset">Reset</button>
           </div>
-          <div class="guide-viz-canvas"></div>
+          <div class="guide-viz-split">
+            <div class="guide-viz-canvas"></div>
+            <div class="guide-viz-code-panel">
+              <p class="guide-viz-code-caption">C code <span class="guide-viz-code-hint">(highlight follows Next)</span></p>
+              <pre class="guide-code guide-code-live"><code class="language-c" data-skeleton></code></pre>
+            </div>
+          </div>
           <p class="guide-viz-note"></p>
         </div>
 
-        <h3>Minimal C skeleton</h3>
+        <h3>Annotated C reference</h3>
         <pre class="guide-code"><code class="language-c"><span class="guide-code-ann">/* Queue arrays live outside or as static — but head/tail reset EACH call */</span>
 <span class="guide-code-kw">int</span> q_r[MAX_CELLS], q_c[MAX_CELLS], q_d[MAX_CELLS];
 
@@ -364,8 +422,31 @@
 
         <p class="guide-plain">Grid DFS visits 4 neighbors. Tree DFS usually visits 2 children. The base case is <code>root == NULL</code>. Leaf = both children are NULL.</p>
 
-        <h3>Interactive trace — path sum to 22</h3>
-        <p class="guide-plain">Subtract each node value from the target as you go down. At a leaf, check if remaining is 0.</p>
+        <h3>Worked example — Path Sum</h3>
+        <div class="guide-io-box">
+          <p class="guide-plain"><strong>Problem in one line:</strong> Does any root-to-leaf path’s values add up to a given target?</p>
+          <table class="guide-table">
+            <thead><tr><th></th><th>What</th><th>In this demo</th><th>What it means</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Input</strong></td>
+                <td>binary tree + <code>target</code></td>
+                <td>tree shown below, <code>target = 22</code></td>
+                <td>Node values to subtract as you descend</td>
+              </tr>
+              <tr>
+                <td><strong>Output</strong></td>
+                <td><code>1</code> or <code>0</code> (true/false)</td>
+                <td><code>1</code> — path 5→4→11→2</td>
+                <td>At least one root→leaf sums to 22</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="guide-plain"><strong>What the output is <em>not</em>:</strong> not the path itself, not the sum. Boolean: exists / doesn’t.</p>
+        </div>
+
+        <h3>Interactive trace — path sum to 22 (visual + C)</h3>
+        <p class="guide-plain">Subtract each node from the target. At a leaf, check equality. <strong>Next</strong> highlights recurse / leaf check.</p>
         <div class="guide-viz" data-demo="tree">
           <div class="guide-viz-toolbar">
             <button type="button" class="btn guide-viz-prev">← Prev</button>
@@ -373,11 +454,17 @@
             <button type="button" class="btn guide-viz-next">Next step →</button>
             <button type="button" class="btn guide-viz-reset">Reset</button>
           </div>
-          <div class="guide-viz-canvas"></div>
+          <div class="guide-viz-split">
+            <div class="guide-viz-canvas"></div>
+            <div class="guide-viz-code-panel">
+              <p class="guide-viz-code-caption">C code <span class="guide-viz-code-hint">(highlight follows Next)</span></p>
+              <pre class="guide-code guide-code-live"><code class="language-c" data-skeleton></code></pre>
+            </div>
+          </div>
           <p class="guide-viz-note"></p>
         </div>
 
-        <h3>Minimal C skeleton</h3>
+        <h3>Annotated C reference</h3>
         <pre class="guide-code"><code class="language-c"><span class="guide-code-kw">struct</span> Node { <span class="guide-code-kw">int</span> val; <span class="guide-code-kw">struct</span> Node *left, *right; };
 
 <span class="guide-code-kw">int</span> hasPathSum(<span class="guide-code-kw">struct</span> Node *root, <span class="guide-code-kw">int</span> target) {
@@ -545,8 +632,37 @@
           <li>If recurrence only needs last few answers → <strong>space-optimize</strong>.</li>
         </ol>
 
-        <h3>Interactive trace — Climbing Stairs (n=5)</h3>
-        <p class="guide-plain">Same problem, <strong>all three types</strong>. Switch mode, then step through each.</p>
+        <h3>Worked example — Climbing Stairs</h3>
+        <div class="guide-io-box">
+          <p class="guide-plain"><strong>Problem in one line:</strong> You can climb 1 or 2 stairs at a time. How many distinct sequences reach the top?</p>
+          <table class="guide-table">
+            <thead><tr><th></th><th>What</th><th>In this demo</th><th>What it means</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Input</strong></td>
+                <td><code>n</code> — number of stairs</td>
+                <td><code>n = 5</code></td>
+                <td>There are 5 steps from ground to top</td>
+              </tr>
+              <tr>
+                <td><strong>Output</strong></td>
+                <td>one integer — number of ways</td>
+                <td><code>8</code></td>
+                <td>There are <strong>8 different step sequences</strong> that sum to 5</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="guide-plain"><strong>What the output is <em>not</em>:</strong> not the number of stairs, not the min steps (that would be 3 via 2+2+1). It is a <em>count of sequences</em>.</p>
+          <p class="guide-plain"><strong>All 8 ways for n=5</strong> (1 = single step, 2 = double):</p>
+          <div class="guide-diagram"><pre>1+1+1+1+1
+1+1+1+2   ·  1+1+2+1  ·  1+2+1+1  ·  2+1+1+1
+1+2+2     ·  2+1+2    ·  2+2+1
+→ 8 sequences. Order matters: 1+2+2 ≠ 2+1+2.</pre></div>
+          <p class="guide-plain">Why DP? Because ways(5) = ways(4)+ways(3): last step was either a 1 (came from stair 4) or a 2 (came from stair 3).</p>
+        </div>
+
+        <h3>Interactive trace — step the visual <em>and</em> the C code</h3>
+        <p class="guide-plain">Same problem, <strong>all three types</strong>. Switch mode, then <strong>Next step</strong> — the yellow line is the C statement that runs at this step.</p>
         <div class="guide-viz" data-demo="dp">
           <div class="guide-viz-modes">
             <button type="button" class="btn guide-viz-mode guide-viz-mode-active" data-dp-mode="memo">Top-down + memo</button>
@@ -560,42 +676,15 @@
             <button type="button" class="btn guide-viz-next">Next step →</button>
             <button type="button" class="btn guide-viz-reset">Reset</button>
           </div>
-          <div class="guide-viz-canvas"></div>
+          <div class="guide-viz-split">
+            <div class="guide-viz-canvas"></div>
+            <div class="guide-viz-code-panel">
+              <p class="guide-viz-code-caption">C code <span class="guide-viz-code-hint">(highlight follows Next)</span></p>
+              <pre class="guide-code guide-code-live"><code class="language-c" data-skeleton></code></pre>
+            </div>
+          </div>
           <p class="guide-viz-note"></p>
         </div>
-
-        <h3>Minimal C skeleton (bottom-up table)</h3>
-        <pre class="guide-code"><code class="language-c"><span class="guide-code-kw">int</span> climbStairs(<span class="guide-code-kw">int</span> n) {
-    <span class="guide-code-kw">if</span> (n &lt;= 2) <span class="guide-code-kw">return</span> n;
-
-    <span class="guide-code-kw">int</span> dp[n + 1];
-    dp[1] = 1;
-    dp[2] = 2;
-
-    <span class="guide-code-kw">for</span> (<span class="guide-code-kw">int</span> i = 3; i &lt;= n; i++) {
-        dp[i] = dp[i - 1] + dp[i - 2];   <span class="guide-code-ann">/* past answers, no recompute */</span>
-    }
-    <span class="guide-code-kw">return</span> dp[n];
-}</code></pre>
-
-        <h3>Line-by-line trace</h3>
-        <ol class="guide-trace">
-          <li><strong>Small n:</strong> return 1 or 2 directly for 0–2 steps (base cases).</li>
-          <li><strong>Allocate table:</strong> <code>dp[n+1]</code> holds every sub-answer up to stair <code>n</code>.</li>
-          <li><strong>Fill upward:</strong> loop from 3 to n; each <code>dp[i]</code> reads only <code>dp[i-1]</code> and <code>dp[i-2]</code> — no deep recursion tree.</li>
-        </ol>
-
-        <h3>Space-saving variant (2 variables)</h3>
-        <pre class="guide-code"><code class="language-c"><span class="guide-code-kw">int</span> climbStairs(<span class="guide-code-kw">int</span> n) {
-    <span class="guide-code-kw">if</span> (n &lt;= 1) <span class="guide-code-kw">return</span> 1;
-    <span class="guide-code-kw">int</span> a = 1, b = 1;   <span class="guide-code-ann">/* dp[0], dp[1] */</span>
-    <span class="guide-code-kw">for</span> (<span class="guide-code-kw">int</span> i = 2; i &lt;= n; i++) {
-        <span class="guide-code-kw">int</span> c = a + b;
-        a = b;
-        b = c;
-    }
-    <span class="guide-code-kw">return</span> b;
-}</code></pre>
 
         <h3>Three DP questions in this repo (in order)</h3>
         <table class="guide-table">
@@ -663,8 +752,31 @@
         <h3>Real-life analogy</h3>
         <p class="guide-plain">Climbing a hill in pitch-black fog. You can't see the summit — only your feet. Each step, pick the direction that goes steepest upward right now. Greedy never reconsiders past choices.</p>
 
-        <h3>Interactive trace — Jump Game</h3>
-        <p class="guide-plain">From index <code>i</code> you can jump up to <code>nums[i]</code> steps. Track <code>farthest</code> — the rightmost index reachable so far.</p>
+        <h3>Worked example — Jump Game</h3>
+        <div class="guide-io-box">
+          <p class="guide-plain"><strong>Problem in one line:</strong> From index 0, each cell says how far you may jump — can you reach the last index?</p>
+          <table class="guide-table">
+            <thead><tr><th></th><th>What</th><th>In this demo</th><th>What it means</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Input</strong></td>
+                <td>array <code>nums</code></td>
+                <td><code>[2,3,1,1,4]</code></td>
+                <td><code>nums[i]</code> = max jump length from i</td>
+              </tr>
+              <tr>
+                <td><strong>Output</strong></td>
+                <td><code>1</code> or <code>0</code></td>
+                <td><code>1</code> (yes)</td>
+                <td>Last index is reachable by some jump sequence</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="guide-plain"><strong>What the output is <em>not</em>:</strong> not minimum jumps (that’s a harder variant), not the path. Just yes/no.</p>
+        </div>
+
+        <h3>Interactive trace — Jump Game (visual + C)</h3>
+        <p class="guide-plain">Track <code>farthest</code> — rightmost reachable index. <strong>Next</strong> highlights extend / early return.</p>
         <div class="guide-viz" data-demo="greedy">
           <div class="guide-viz-toolbar">
             <button type="button" class="btn guide-viz-prev">← Prev</button>
@@ -672,11 +784,17 @@
             <button type="button" class="btn guide-viz-next">Next step →</button>
             <button type="button" class="btn guide-viz-reset">Reset</button>
           </div>
-          <div class="guide-viz-canvas"></div>
+          <div class="guide-viz-split">
+            <div class="guide-viz-canvas"></div>
+            <div class="guide-viz-code-panel">
+              <p class="guide-viz-code-caption">C code <span class="guide-viz-code-hint">(highlight follows Next)</span></p>
+              <pre class="guide-code guide-code-live"><code class="language-c" data-skeleton></code></pre>
+            </div>
+          </div>
           <p class="guide-viz-note"></p>
         </div>
 
-        <h3>Minimal C skeleton</h3>
+        <h3>Annotated C reference</h3>
         <pre class="guide-code"><code class="language-c"><span class="guide-code-kw">int</span> canJump(<span class="guide-code-kw">int</span> *nums, <span class="guide-code-kw">int</span> numsSize) {
     <span class="guide-code-kw">int</span> maxReachable = 0;
 
@@ -739,25 +857,49 @@
         <h3>Real-life analogy</h3>
         <p class="guide-plain">People in a single-file line. A tall person joins at the back — they block the view of everyone shorter in front of them from a back-to-front perspective. The stack holds who still "matters" when scanning backward.</p>
 
-        <h3>Diagram — Daily Temperatures</h3>
-        <div class="guide-diagram guide-diagram-wide">
-          <div class="guide-stack-viz">
-            <div class="guide-stack-row">
-              <span class="guide-stack-label">Day →</span>
-              <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span>
-            </div>
-            <div class="guide-stack-row">
-              <span class="guide-stack-label">Temp</span>
-              <span>73</span><span>74</span><span>75</span><span class="guide-stack-hot">71</span><span>69</span><span>72</span><span>76</span>
-            </div>
-            <div class="guide-stack-row guide-stack-meta">
-              <span class="guide-stack-label">Stack</span>
-              <span class="guide-stack-note">Indices with decreasing temps. Day 3 (71) is warmer than stack top → pop day 2, wait[2]=1</span>
-            </div>
-          </div>
+        <h3>Worked example — Daily Temperatures</h3>
+        <div class="guide-io-box">
+          <p class="guide-plain"><strong>Problem in one line:</strong> For each day, how many days until a warmer temperature? (0 if none.)</p>
+          <table class="guide-table">
+            <thead><tr><th></th><th>What</th><th>In this demo</th><th>What it means</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Input</strong></td>
+                <td>array of daily temps</td>
+                <td><code>[73,74,75,71,69,72,76]</code></td>
+                <td>One number per day</td>
+              </tr>
+              <tr>
+                <td><strong>Output</strong></td>
+                <td>array <code>wait[]</code> same length</td>
+                <td><code>[1,1,4,2,1,1,0]</code></td>
+                <td><code>wait[i]</code> = days until warmer than day i</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="guide-plain"><strong>What the output is <em>not</em>:</strong> not the warmer temperature itself — the <em>distance in days</em>.</p>
         </div>
 
-        <h3>Minimal C skeleton (next greater — scan right to left)</h3>
+        <h3>Interactive trace — Daily Temperatures (visual + C)</h3>
+        <p class="guide-plain">Stack holds indices waiting for a warmer day. <strong>Next</strong> highlights pop / assign / push.</p>
+        <div class="guide-viz" data-demo="stack">
+          <div class="guide-viz-toolbar">
+            <button type="button" class="btn guide-viz-prev">← Prev</button>
+            <span class="guide-viz-step">Step <span class="guide-viz-step-num">1</span> / <span class="guide-viz-step-total">?</span></span>
+            <button type="button" class="btn guide-viz-next">Next step →</button>
+            <button type="button" class="btn guide-viz-reset">Reset</button>
+          </div>
+          <div class="guide-viz-split">
+            <div class="guide-viz-canvas"></div>
+            <div class="guide-viz-code-panel">
+              <p class="guide-viz-code-caption">C code <span class="guide-viz-code-hint">(highlight follows Next)</span></p>
+              <pre class="guide-code guide-code-live"><code class="language-c" data-skeleton></code></pre>
+            </div>
+          </div>
+          <p class="guide-viz-note"></p>
+        </div>
+
+        <h3>Annotated C reference (next greater — scan right to left)</h3>
         <pre class="guide-code"><code class="language-c"><span class="guide-code-kw">void</span> nextGreaterElement(<span class="guide-code-kw">int</span> *nums, <span class="guide-code-kw">int</span> size, <span class="guide-code-kw">int</span> *result) {
     <span class="guide-code-kw">int</span> stack[size];
     <span class="guide-code-kw">int</span> top = -1;
@@ -833,7 +975,49 @@
         <h3>How it differs from grid DFS</h3>
         <p class="guide-plain">Grid DFS marks cells permanently (sink to <code>'0'</code>). Backtracking <strong>un-does</strong> each pick so another branch can reuse the same slot. Classic for subsets, permutations, N-queens.</p>
 
-        <h3>Minimal C skeleton</h3>
+        <h3>Worked example — Subsets</h3>
+        <div class="guide-io-box">
+          <p class="guide-plain"><strong>Problem in one line:</strong> List every subset of an array (the power set), including empty and full.</p>
+          <table class="guide-table">
+            <thead><tr><th></th><th>What</th><th>In this demo</th><th>What it means</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Input</strong></td>
+                <td>array of numbers</td>
+                <td><code>[1, 2, 3]</code></td>
+                <td>Elements you may include or skip</td>
+              </tr>
+              <tr>
+                <td><strong>Output</strong></td>
+                <td>list of all subsets</td>
+                <td>8 subsets (<code>2³</code>)</td>
+                <td>Every combination: {}, {1}, {1,2}, … {1,2,3}</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="guide-plain"><strong>What the output is <em>not</em>:</strong> not permutations (order of picks is fixed by index). Choose → explore → unchoose builds each set.</p>
+        </div>
+
+        <h3>Interactive trace — Subsets (visual + C)</h3>
+        <p class="guide-plain"><strong>Next</strong> walks choose / explore / unchoose and highlights those lines.</p>
+        <div class="guide-viz" data-demo="backtrack">
+          <div class="guide-viz-toolbar">
+            <button type="button" class="btn guide-viz-prev">← Prev</button>
+            <span class="guide-viz-step">Step <span class="guide-viz-step-num">1</span> / <span class="guide-viz-step-total">?</span></span>
+            <button type="button" class="btn guide-viz-next">Next step →</button>
+            <button type="button" class="btn guide-viz-reset">Reset</button>
+          </div>
+          <div class="guide-viz-split">
+            <div class="guide-viz-canvas"></div>
+            <div class="guide-viz-code-panel">
+              <p class="guide-viz-code-caption">C code <span class="guide-viz-code-hint">(highlight follows Next)</span></p>
+              <pre class="guide-code guide-code-live"><code class="language-c" data-skeleton></code></pre>
+            </div>
+          </div>
+          <p class="guide-viz-note"></p>
+        </div>
+
+        <h3>Annotated C reference</h3>
         <pre class="guide-code"><code class="language-c"><span class="guide-code-kw">void</span> backtrack(<span class="guide-code-kw">int</span> *nums, <span class="guide-code-kw">int</span> size, <span class="guide-code-kw">int</span> start,
                <span class="guide-code-kw">int</span> *currentSet, <span class="guide-code-kw">int</span> setSize) {
     printSubset(currentSet, setSize);   <span class="guide-code-ann">/* base: record current state */</span>
@@ -1138,7 +1322,7 @@ bool ring_buffer_pop(lockless_ring_buffer_t *buf, uint8_t *out_data) {
     </main>
   </div>
 
-  <script src="js/guide-common.js?v=39"></script>
-  <script src="js/dsa-guide.js?v=39"></script>
+  <script src="js/guide-common.js?v=42"></script>
+  <script src="js/dsa-guide.js?v=42"></script>
 </body>
 </html>

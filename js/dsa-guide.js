@@ -1,7 +1,137 @@
 /**
  * Step-through demos on dsa-guide.html — plain-English traces for beginners.
+ * Live panels show real C (not pseudo). Each step sets `hl: [lineIndexes]`.
+ * Assumed macros/arrays (ROWS, COLS, q_r/…) match the annotated reference below each demo.
  */
 (function () {
+  /* ── Live C panels (0-based line indexes for hl) ── */
+  const skeletons = {
+    dfs: [
+      "int numIslands(char g[][COLS], int R, int C) {",
+      "    int count = 0;",
+      "    for (int r = 0; r < R; r++)",
+      "        for (int c = 0; c < C; c++)",
+      "            if (g[r][c] == '1') {",
+      "                count++;",
+      "                dfs(g, R, C, r, c);",
+      "            }",
+      "    return count;",
+      "}",
+      "void dfs(char g[][COLS], int R, int C, int r, int c) {",
+      "    if (r < 0 || r >= R || c < 0 || c >= C) return;",
+      "    if (g[r][c] != '1') return;",
+      "    g[r][c] = '0';",
+      "    dfs(g, R, C, r + 1, c);",
+      "    dfs(g, R, C, r - 1, c);",
+      "    dfs(g, R, C, r, c + 1);",
+      "    dfs(g, R, C, r, c - 1);",
+      "}",
+    ],
+    bfs: [
+      "int q_r[MAX_CELLS], q_c[MAX_CELLS], q_d[MAX_CELLS];",
+      "int shortestPath(char g[ROWS][COLS], int gr, int gc) {",
+      "    int head = 0, tail = 0;",
+      "    int vis[ROWS][COLS] = {0};",
+      "    q_r[tail] = 0; q_c[tail] = 0; q_d[tail] = 1;",
+      "    tail++;",
+      "    vis[0][0] = 1;",
+      "    while (head < tail) {",
+      "        int r = q_r[head], c = q_c[head], d = q_d[head];",
+      "        head++;",
+      "        if (r == gr && c == gc) return d;",
+      "        int dr[4] = {1, -1, 0, 0};",
+      "        int dc[4] = {0, 0, 1, -1};",
+      "        for (int k = 0; k < 4; k++) {",
+      "            int nr = r + dr[k], nc = c + dc[k];",
+      "            if (nr < 0 || nr >= ROWS || nc < 0 || nc >= COLS) continue;",
+      "            if (g[nr][nc] == '#' || vis[nr][nc]) continue;",
+      "            vis[nr][nc] = 1;",
+      "            q_r[tail] = nr; q_c[tail] = nc; q_d[tail] = d + 1;",
+      "            tail++;",
+      "        }",
+      "    }",
+      "    return -1;",
+      "}",
+    ],
+    tree: [
+      "struct Node { int val; struct Node *left, *right; };",
+      "int hasPathSum(struct Node *root, int target) {",
+      "    if (!root) return 0;",
+      "    if (!root->left && !root->right)",
+      "        return root->val == target;",
+      "    return hasPathSum(root->left, target - root->val)",
+      "        || hasPathSum(root->right, target - root->val);",
+      "}",
+    ],
+    greedy: [
+      "int canJump(int *nums, int n) {",
+      "    int farthest = 0;",
+      "    for (int i = 0; i < n; i++) {",
+      "        if (i > farthest) return 0;",
+      "        if (i + nums[i] > farthest)",
+      "            farthest = i + nums[i];",
+      "        if (farthest >= n - 1) return 1;",
+      "    }",
+      "    return 0;",
+      "}",
+    ],
+    stack: [
+      "void dailyTemps(int *T, int n, int *wait) {",
+      "    int stack[256];",
+      "    int top = -1;",
+      "    for (int i = 0; i < n; i++) {",
+      "        while (top >= 0 && T[i] > T[stack[top]]) {",
+      "            int prev = stack[top--];",
+      "            wait[prev] = i - prev;",
+      "        }",
+      "        stack[++top] = i;",
+      "    }",
+      "}",
+    ],
+    backtrack: [
+      "void print_subset(int *cur, int sz); /* your collector / printer */",
+      "void backtrack(int *nums, int n, int start, int *cur, int sz) {",
+      "    print_subset(cur, sz);",
+      "    for (int i = start; i < n; i++) {",
+      "        cur[sz] = nums[i];",
+      "        backtrack(nums, n, i + 1, cur, sz + 1);",
+      "    }",
+      "}",
+    ],
+    "dp-memo": [
+      "int ways(int i, int *memo) {",
+      "    if (i <= 1) return 1;",
+      "    if (memo[i] != -1) return memo[i];",
+      "    memo[i] = ways(i - 1, memo) + ways(i - 2, memo);",
+      "    return memo[i];",
+      "}",
+      "/* caller: memset(memo,-1,…); memo[0]=memo[1]=1; return ways(5,memo); */",
+    ],
+    "dp-tabulation": [
+      "int climbStairs(int n) {",
+      "    if (n <= 2) return n;",
+      "    int dp[n + 1];",
+      "    dp[0] = 1;",
+      "    dp[1] = 1;",
+      "    for (int i = 2; i <= n; i++)",
+      "        dp[i] = dp[i - 1] + dp[i - 2];",
+      "    return dp[n];",
+      "}",
+    ],
+    "dp-space": [
+      "int climbStairs(int n) {",
+      "    if (n <= 1) return 1;",
+      "    int a = 1, b = 1;",
+      "    for (int i = 2; i <= n; i++) {",
+      "        int c = a + b;",
+      "        a = b;",
+      "        b = c;",
+      "    }",
+      "    return b;",
+      "}",
+    ],
+  };
+
   /* ── Build DFS steps from grid (complete flood fill) ── */
   function buildDfsSteps(grid) {
     const g = grid.map((row) => row.map((v) => v));
@@ -16,36 +146,49 @@
         visit: visitTrail.map(([r, c]) => [r, c]),
         sink: sunk.map(([r, c]) => [r, c]),
         islands: extra.islands ?? null,
+        hl: extra.hl || [],
         note,
       });
     };
 
-    function dfs(r, c) {
+    function dfs(r, c, islandNum) {
       if (r < 0 || r >= rows || c < 0 || c >= cols || g[r][c] !== 1) return;
       visitTrail.push([r, c]);
-      snap(`Enter (${r},${c}) — land found. Mark it (sink to 0) so we never revisit.`);
+      snap(`Enter (${r},${c}) — land found. Pass base checks.`, { hl: [11, 12], islands: islandNum });
       g[r][c] = 0;
       sunk.push([r, c]);
-      snap(`Sunk (${r},${c}). Try 4 neighbors recursively (down, up, right, left).`);
-      dfs(r + 1, c);
-      dfs(r - 1, c);
-      dfs(r, c + 1);
-      dfs(r, c - 1);
+      snap(`Sunk (${r},${c}) to 0. Recurse 4 neighbors (down, up, right, left).`, {
+        hl: [13, 14, 15, 16, 17],
+        islands: islandNum,
+      });
+      dfs(r + 1, c, islandNum);
+      dfs(r - 1, c, islandNum);
+      dfs(r, c + 1, islandNum);
+      dfs(r, c - 1, islandNum);
     }
 
     let count = 0;
-    snap("Scan grid for '1'. When found, run DFS — each run = one island.");
+    snap("INPUT: grid of 0/1. Scan every cell for land ('1').", { hl: [2, 3] });
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         if (g[r][c] !== 1) continue;
         count++;
         visitTrail = [];
-        snap(`Found land at (${r},${c}) — island #${count}. Start DFS flood fill.`, { islands: count });
-        dfs(r, c);
-        snap(`DFS finished — entire connected blob sunk. Continue scanning…`, { islands: count });
+        snap(`Found land at (${r},${c}) — island #${count}. count++ then call dfs.`, {
+          islands: count,
+          hl: [5, 6],
+        });
+        dfs(r, c, count);
+        snap(`DFS finished — entire connected blob sunk. Continue scanning…`, {
+          islands: count,
+          hl: [2, 3],
+        });
       }
     }
-    snap(`Scan done. Total islands = ${count}.`, { islands: count });
+    snap(`OUTPUT: return count = ${count} islands. Meaning: ${count} separate land blobs.`, {
+      islands: count,
+      hl: [8],
+    });
     return { grid, steps };
   }
 
@@ -64,19 +207,23 @@
       [0, -1],
     ];
 
-    const snap = (note, goalHit = false) => {
+    const snap = (note, goalHit = false, hl = []) => {
       const cells = [...dist.keys()].map((k) => k.split(",").map(Number));
       const maxLayer = Math.max(...dist.values());
-      steps.push({ layer: maxLayer, cells, goal: goalHit, note });
+      steps.push({ layer: maxLayer, cells, goal: goalHit, hl, note });
     };
 
-    snap("Enqueue (0,0) with distance 1. Queue processes front-to-back = nearest cells first.");
+    snap("INPUT: grid + start (0,0) + goal. Enqueue start with distance 1.", false, [4, 5, 6]);
 
     let head = 0;
     while (head < q.length) {
       const [r, c, d] = q[head++];
       if (r === goal[0] && c === goal[1]) {
-        snap(`Dequeue (${r},${c}) with d=${d} — GOAL. First arrival = shortest path (${d} steps).`, true);
+        snap(
+          `Dequeue goal (${r},${c}) with d=${d}. OUTPUT = ${d} (shortest steps). Not “any path” — first arrival wins.`,
+          true,
+          [8, 9, 10]
+        );
         break;
       }
       const added = [];
@@ -91,9 +238,9 @@
         added.push([nr, nc]);
       }
       if (added.length) {
-        snap(`Dequeue (${r},${c}) at d=${d}. Enqueue ${added.length} new cell(s) at d=${d + 1}.`);
+        snap(`Dequeue (${r},${c}) at d=${d}. Enqueue ${added.length} neighbor(s) at d=${d + 1}.`, false, [8, 9, 13, 17, 18, 19]);
       } else {
-        snap(`Dequeue (${r},${c}) at d=${d}. No new neighbors (wall or visited).`);
+        snap(`Dequeue (${r},${c}) at d=${d}. No new neighbors (wall or visited).`, false, [8, 9, 13, 15, 16]);
       }
     }
     return {
@@ -126,36 +273,39 @@
   const dpModes = {
     memo: {
       label: "Top-down + memo",
+      skeleton: "dp-memo",
       steps: [
-        { kind: "memo", memo: [1, 1, -1, -1, -1, -1], stack: [5], hot: [5], note: "ways(5): memo[] unknown (−1). Recurse before computing." },
-        { kind: "memo", memo: [1, 1, -1, -1, -1, -1], stack: [5, 4], hot: [4], note: "ways(5) = ways(4) + ways(3). Call ways(4) first." },
-        { kind: "memo", memo: [1, 1, -1, -1, -1, -1], stack: [5, 4, 3, 2], hot: [2], note: "ways(2) = ways(1)+ways(0) = 1+1. Base cases already known." },
-        { kind: "memo", memo: [1, 1, 2, -1, -1, -1], stack: [5, 4, 3], hot: [2], note: "Store memo[2]=2. Return to ways(3)." },
-        { kind: "memo", memo: [1, 1, 2, 3, -1, -1], stack: [5, 4, 3], hot: [3], note: "ways(3)=ways(2)+ways(1)=2+1=3 → memo[3]=3." },
-        { kind: "memo", memo: [1, 1, 2, 3, 5, -1], stack: [5, 4], hot: [4], note: "ways(4)=ways(3)+ways(2)=3+2=5 → memo[4]=5." },
-        { kind: "memo", memo: [1, 1, 2, 3, 5, -1], stack: [5, 3], hot: [3], note: "ways(3) already in memo → reuse 3 (no recompute!)." },
-        { kind: "memo", memo: [1, 1, 2, 3, 5, 8], stack: [5], hot: [5], note: "ways(5)=5+3=8 → memo[5]=8. Answer = 8." },
+        { kind: "memo", memo: [1, 1, -1, -1, -1, -1], stack: [5], hot: [5], hl: [0, 6], note: "INPUT n=5. Call ways(5). Output will be memo[5] = number of sequences." },
+        { kind: "memo", memo: [1, 1, -1, -1, -1, -1], stack: [5, 4], hot: [4], hl: [3], note: "ways(5)=ways(4)+ways(3). Recurse into ways(4) first (line: compute)." },
+        { kind: "memo", memo: [1, 1, -1, -1, -1, -1], stack: [5, 4, 3, 2], hot: [2], hl: [1], note: "At ways(2): base / near-base — ways(1)+ways(0) known as 1." },
+        { kind: "memo", memo: [1, 1, 2, -1, -1, -1], stack: [5, 4, 3], hot: [2], hl: [3, 4], note: "Store memo[2]=2, return. OUTPUT of this subproblem = 2 ways to climb 2 stairs." },
+        { kind: "memo", memo: [1, 1, 2, 3, -1, -1], stack: [5, 4, 3], hot: [3], hl: [3, 4], note: "memo[3]=3 — three sequences sum to 3 (1+1+1, 1+2, 2+1)." },
+        { kind: "memo", memo: [1, 1, 2, 3, 5, -1], stack: [5, 4], hot: [4], hl: [3, 4], note: "memo[4]=5. Climbing 4 stairs has 5 sequences." },
+        { kind: "memo", memo: [1, 1, 2, 3, 5, -1], stack: [5, 3], hot: [3], hl: [2], note: "ways(3) already in memo → cache hit, no recompute." },
+        { kind: "memo", memo: [1, 1, 2, 3, 5, 8], stack: [5], hot: [5], hl: [4, 6], note: "OUTPUT: ways(5)=8. Meaning: 8 distinct ways to climb 5 stairs." },
       ],
     },
     tabulation: {
       label: "Bottom-up table",
+      skeleton: "dp-tabulation",
       steps: [
-        { kind: "table", table: [1, 1, null, null, null, null], hot: [0, 1], note: "Tabulation: fill dp[0..5] left to right. Bases dp[0]=dp[1]=1." },
-        { kind: "table", table: [1, 1, 2, null, null, null], hot: [2], note: "dp[2] = dp[1]+dp[0] = 2" },
-        { kind: "table", table: [1, 1, 2, 3, null, null], hot: [3], note: "dp[3] = dp[2]+dp[1] = 3" },
-        { kind: "table", table: [1, 1, 2, 3, 5, null], hot: [4], note: "dp[4] = dp[3]+dp[2] = 5" },
-        { kind: "table", table: [1, 1, 2, 3, 5, 8], hot: [5], note: "dp[5] = dp[4]+dp[3] = 8 ← answer" },
+        { kind: "table", table: [1, 1, null, null, null, null], hot: [0, 1], hl: [2, 3, 4], note: "INPUT n=5. Allocate dp[]. Set bases: 1 way for 0 steps, 1 way for 1 stair." },
+        { kind: "table", table: [1, 1, 2, null, null, null], hot: [2], hl: [5, 6], note: "dp[2]=2 → two sequences for 2 stairs: 1+1 and 2." },
+        { kind: "table", table: [1, 1, 2, 3, null, null], hot: [3], hl: [5, 6], note: "dp[3]=3 → three sequences for 3 stairs." },
+        { kind: "table", table: [1, 1, 2, 3, 5, null], hot: [4], hl: [5, 6], note: "dp[4]=5 → five sequences for 4 stairs." },
+        { kind: "table", table: [1, 1, 2, 3, 5, 8], hot: [5], hl: [7], note: "OUTPUT return dp[5]=8 → eight sequences reach the top of 5 stairs." },
       ],
     },
     space: {
       label: "2 variables (space O(1))",
+      skeleton: "dp-space",
       steps: [
-        { kind: "space", i: null, a: 1, b: 1, c: null, hot: ["a", "b"], note: "Only need last two values: a=dp[i−2], b=dp[i−1]. Start a=1, b=1." },
-        { kind: "space", i: 2, a: 1, b: 1, c: 2, hot: ["c"], note: "i=2: c=a+b=2. Then slide: a←b, b←c." },
-        { kind: "space", i: 2, a: 1, b: 2, c: 2, hot: ["a", "b"], note: "After slide: a=1, b=2 (same as dp[1], dp[2])." },
-        { kind: "space", i: 3, a: 2, b: 3, c: 3, hot: ["c"], note: "i=3: c=2+1=3 → a=2, b=3" },
-        { kind: "space", i: 4, a: 3, b: 5, c: 5, hot: ["c"], note: "i=4: c=3+2=5 → a=3, b=5" },
-        { kind: "space", i: 5, a: 5, b: 8, c: 8, hot: ["b"], note: "i=5: c=5+3=8 → b=8. Return b." },
+        { kind: "space", i: null, a: 1, b: 1, c: null, hot: ["a", "b"], hl: [2], note: "INPUT n=5. a,b hold last two answers (ways for smaller stairs)." },
+        { kind: "space", i: 2, a: 1, b: 1, c: 2, hot: ["c"], hl: [3, 4], note: "i=2: c=a+b=2 — same meaning as dp[2]=2 ways." },
+        { kind: "space", i: 2, a: 1, b: 2, c: 2, hot: ["a", "b"], hl: [5, 6], note: "Slide: a←b, b←c so b always = ways(i)." },
+        { kind: "space", i: 3, a: 2, b: 3, c: 3, hot: ["c"], hl: [4, 5, 6], note: "i=3: b becomes 3 — three ways for 3 stairs." },
+        { kind: "space", i: 4, a: 3, b: 5, c: 5, hot: ["c"], hl: [4, 5, 6], note: "i=4: b=5 ways for 4 stairs." },
+        { kind: "space", i: 5, a: 5, b: 8, c: 8, hot: ["b"], hl: [8], note: "OUTPUT return b=8 — eight ways to climb n=5." },
       ],
     },
   };
@@ -167,12 +317,12 @@
     greedy: {
       nums: [2, 3, 1, 1, 4],
       steps: [
-        { i: 0, farthest: 0, note: "Init farthest=0. Loop while i ≤ farthest (still reachable)." },
-        { i: 0, farthest: 2, note: "i=0: nums[0]=2 → can reach index 2. farthest=2." },
-        { i: 1, farthest: 4, note: "i=1: nums[1]=3 → reach 1+3=4. farthest=4 ≥ last index 4 ✓ (can finish)." },
-        { i: 2, farthest: 4, note: "i=2: 2+1=3 ≤ farthest — no update. Still reachable." },
-        { i: 3, farthest: 4, note: "i=3: 3+1=4 ≤ farthest — no update." },
-        { i: 4, farthest: 8, done: true, note: "i=4: 4+4=8 — extends farthest but end was already reachable. Return 1." },
+        { i: 0, farthest: 0, hl: [1], note: "INPUT nums=[2,3,1,1,4]. farthest=0. Can we reach last index?" },
+        { i: 0, farthest: 2, hl: [4, 5], note: "i=0: nums[0]=2 → farthest=2. Green = still reachable." },
+        { i: 1, farthest: 4, hl: [4, 5, 6], note: "i=1: 1+3=4 ≥ last index → OUTPUT will be 1 (yes)." },
+        { i: 2, farthest: 4, hl: [2, 4], note: "i=2 still reachable; 2+1=3 does not extend farthest." },
+        { i: 3, farthest: 4, hl: [2, 4], note: "i=3: no extend. End already reachable." },
+        { i: 4, farthest: 8, done: true, hl: [6], note: "OUTPUT return 1. Meaning: yes, some jump sequence reaches the end (not “how many jumps”)." },
       ],
     },
     tree: {
@@ -198,16 +348,70 @@
         [5, 8],
       ],
       steps: [
-        { path: [], edgePath: [], remaining: 22, hot: [], note: "Target 22. DFS from root — try left subtree first." },
-        { path: [0], edgePath: [], remaining: 17, hot: [0], note: "At root 5: need 22−5=17. Choose left child (edge 5→4)." },
-        { path: [0, 1], edgePath: [[0, 1]], remaining: 13, hot: [1], note: "At 4: need 17−4=13. Go to 11." },
-        { path: [0, 1, 3], edgePath: [[0, 1], [1, 3]], remaining: 2, hot: [3], note: "At 11: need 13−11=2. Try left child 7." },
-        { path: [0, 1, 3, 6], edgePath: [[0, 1], [1, 3], [3, 6]], remaining: -5, hot: [6], fail: true, note: "Leaf 7: need −5 at leaf — fail. Backtrack (↑ return)." },
-        { path: [0, 1, 3, 7], edgePath: [[0, 1], [1, 3], [3, 7]], remaining: 0, hot: [7], note: "Try right child 2: leaf with remaining 0 ✓ Path 5→4→11→2 = 22." },
-        { path: [0, 1, 3, 7], edgePath: [[0, 1], [1, 3], [3, 7]], remaining: 0, hot: [7], done: true, note: "Return true up the call stack — no need to explore 8, 13, … once found." },
+        { path: [], edgePath: [], remaining: 22, hot: [], hl: [1], note: "INPUT: tree + target=22. OUTPUT: 1 if any root→leaf sums to 22, else 0." },
+        { path: [0], edgePath: [], remaining: 17, hot: [0], hl: [5], note: "At root 5: recurse left with target−5 = 17." },
+        { path: [0, 1], edgePath: [[0, 1]], remaining: 13, hot: [1], hl: [5], note: "At 4: need 13 more. Go left to 11." },
+        { path: [0, 1, 3], edgePath: [[0, 1], [1, 3]], remaining: 2, hot: [3], hl: [5], note: "At 11: need 2. Try left child 7." },
+        { path: [0, 1, 3, 6], edgePath: [[0, 1], [1, 3], [3, 6]], remaining: -5, hot: [6], fail: true, hl: [3, 4], note: "Leaf 7: 7==−5? No. Backtrack and try right." },
+        { path: [0, 1, 3, 7], edgePath: [[0, 1], [1, 3], [3, 7]], remaining: 0, hot: [7], hl: [3, 4], note: "Leaf 2: remaining 0 ✓ Path 5→4→11→2 sums to 22." },
+        { path: [0, 1, 3, 7], edgePath: [[0, 1], [1, 3], [3, 7]], remaining: 0, hot: [7], done: true, hl: [5, 6], note: "OUTPUT return 1 (true) up the stack. Meaning: at least one valid path exists." },
+      ],
+    },
+    stack: {
+      temps: [73, 74, 75, 71, 69, 72, 76],
+      steps: [
+        { i: 0, stack: [0], wait: [0, 0, 0, 0, 0, 0, 0], hl: [1, 2, 8], note: "INPUT T=[73,74,75,71,69,72,76]. OUTPUT wait[i]=days until warmer (0 if none)." },
+        { i: 1, stack: [1], wait: [1, 0, 0, 0, 0, 0, 0], hl: [4, 5, 6, 8], note: "Day 1 (74)>73 → pop 0, wait[0]=1. Push 1." },
+        { i: 2, stack: [2], wait: [1, 1, 0, 0, 0, 0, 0], hl: [4, 5, 6, 8], note: "Day 2 (75)>74 → wait[1]=1. Push 2." },
+        { i: 3, stack: [2, 3], wait: [1, 1, 0, 0, 0, 0, 0], hl: [8], note: "71 < 75 — no pop. Push 3 (cooler days wait)." },
+        { i: 4, stack: [2, 3, 4], wait: [1, 1, 0, 0, 0, 0, 0], hl: [8], note: "69 cooler still — stack grows: [2,3,4]." },
+        { i: 5, stack: [2, 5], wait: [1, 1, 0, 2, 1, 0, 0], hl: [4, 5, 6, 8], note: "72 > 69 and 71 → wait[4]=1, wait[3]=2. Push 5." },
+        { i: 6, stack: [6], wait: [1, 1, 4, 2, 1, 1, 0], hl: [4, 5, 6, 8], note: "76 clears stack. wait[5]=1, wait[2]=4. OUTPUT array filled." },
+      ],
+    },
+    backtrack: {
+      nums: [1, 2, 3],
+      steps: [
+        { cur: [], start: 0, hl: [2], note: "INPUT nums=[1,2,3]. OUTPUT: every subset (power set). print_subset({}) first." },
+        { cur: [1], start: 1, hl: [4, 5], note: "CHOOSE 1 → explore with start=1. print_subset({1})." },
+        { cur: [1, 2], start: 2, hl: [4, 5], note: "CHOOSE 2 → {1,2}. print_subset." },
+        { cur: [1, 2, 3], start: 3, hl: [2, 4, 5], note: "CHOOSE 3 → {1,2,3}. No more picks from start=3." },
+        { cur: [1, 3], start: 3, hl: [4, 5], note: "Return unchooses 2; CHOOSE 3 → {1,3}." },
+        { cur: [2], start: 2, hl: [4, 5], note: "Back to root branch: CHOOSE 2 alone → {2}." },
+        { cur: [2, 3], start: 3, hl: [4, 5], note: "{2,3} printed." },
+        { cur: [3], start: 3, hl: [2, 4, 5], note: "Last branch {3}. Done — 8 subsets total (= 2³)." },
       ],
     },
   };
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  function skeletonKey(kind, container) {
+    if (kind === "dp") {
+      const mode = container._dpMode || demos.dp.defaultMode;
+      return demos.dp.modes[mode].skeleton;
+    }
+    return kind;
+  }
+
+  function renderSkeleton(container, kind, hlLines) {
+    const el = container.querySelector("[data-skeleton]");
+    if (!el) return;
+    const key = skeletonKey(kind, container);
+    const lines = skeletons[key] || [];
+    const hot = new Set(hlLines || []);
+    el.innerHTML = lines
+      .map((line, i) => {
+        const cls = hot.has(i) ? "guide-code-line guide-code-line-hot" : "guide-code-line";
+        return `<span class="${cls}" data-line="${i}">${escapeHtml(line)}</span>`;
+      })
+      .join("\n");
+  }
 
   function renderGrid(container, demo, step, kind) {
     const g = demo.grid;
@@ -254,12 +458,14 @@
     html += "</div>";
     container.querySelector(".guide-viz-canvas").innerHTML = html;
     container.querySelector(".guide-viz-note").textContent = step.note;
+    renderSkeleton(container, kind, step.hl);
     updateStepCounter(container);
   }
 
   function renderDp(container, demo, step) {
+    const mode = container._dpMode || demo.defaultMode;
     const modeLabel = container.querySelector(".guide-viz-mode-label");
-    if (modeLabel) modeLabel.textContent = demo.modes[container._dpMode].label;
+    if (modeLabel) modeLabel.textContent = demo.modes[mode].label;
 
     if (step.kind === "memo") {
       const cols = step.memo
@@ -271,7 +477,7 @@
         .join("");
       const stack = step.stack.map((s) => `<span class="guide-stack-frame">ways(${s})</span>`).join('<span class="guide-stack-arrow">→</span>');
       container.querySelector(".guide-viz-canvas").innerHTML = `
-        <p class="guide-dp-mode-tag">Top-down — recursive calls + cache</p>
+        <p class="guide-dp-mode-tag">Top-down — recursive calls + cache · input n=5 → output 8 ways</p>
         <div class="guide-call-stack">${stack || "<span class='muted'>done</span>"}</div>
         <div class="guide-dp-row">${cols}</div>`;
     } else if (step.kind === "space") {
@@ -289,7 +495,7 @@
         .join("");
       const iLine = step.i == null ? "loop not started" : `i = ${step.i}`;
       container.querySelector(".guide-viz-canvas").innerHTML = `
-        <p class="guide-dp-mode-tag">Space O(1) — two rolling variables</p>
+        <p class="guide-dp-mode-tag">Space O(1) — two rolling variables · output = b when done</p>
         <p class="guide-reach-label">${iLine}</p>
         <div class="guide-dp-row">${chips}</div>`;
     } else {
@@ -301,9 +507,10 @@
         })
         .join("");
       container.querySelector(".guide-viz-canvas").innerHTML = `
-        <p class="guide-dp-mode-tag">Bottom-up — fill table left to right</p>
+        <p class="guide-dp-mode-tag">Bottom-up — fill table · final output = dp[5]</p>
         <div class="guide-dp-row">${cols}</div>`;
     }
+    renderSkeleton(container, "dp", step.hl);
     container.querySelector(".guide-viz-note").textContent = step.note;
     updateStepCounter(container);
   }
@@ -322,8 +529,9 @@
     container.querySelector(".guide-viz-canvas").innerHTML = `
       <div class="guide-reach-track"><div class="guide-reach-fill" style="width:${pct}%"></div></div>
       <div class="guide-jump-row">${cells}</div>
-      <p class="guide-reach-label">farthest = ${step.farthest}${step.done ? " · canReachEnd = YES" : ""}</p>`;
+      <p class="guide-reach-label">farthest = ${step.farthest}${step.done ? " · OUTPUT = 1 (yes)" : ""}</p>`;
     container.querySelector(".guide-viz-note").textContent = step.note;
+    renderSkeleton(container, "greedy", step.hl);
     updateStepCounter(container);
   }
 
@@ -360,8 +568,49 @@
         <svg class="guide-tree-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${lines}</svg>
         <div class="guide-tree-canvas">${nodes}</div>
       </div>
-      <p class="guide-reach-label">remaining target = ${step.remaining}${step.done ? " ✓" : step.fail ? " ✗ backtrack" : ""}</p>`;
+      <p class="guide-reach-label">remaining target = ${step.remaining}${step.done ? " ✓ OUTPUT=1" : step.fail ? " ✗ backtrack" : ""}</p>`;
     container.querySelector(".guide-viz-note").textContent = step.note;
+    renderSkeleton(container, "tree", step.hl);
+    updateStepCounter(container);
+  }
+
+  function renderStack(container, demo, step) {
+    const temps = demo.temps;
+    const wait = step.wait || [];
+    const stackSet = new Set(step.stack || []);
+    const cells = temps
+      .map((t, i) => {
+        let cls = "guide-jump-col";
+        if (i === step.i) cls += " guide-jump-cur";
+        else if (stackSet.has(i)) cls += " guide-jump-reach";
+        return `<div class="${cls}"><span class="guide-dp-label">d${i}</span><span class="guide-dp-val">${t}</span><span class="guide-dp-label">w=${wait[i]}</span></div>`;
+      })
+      .join("");
+    const stk = (step.stack || []).map((i) => i).join(", ") || "∅";
+    container.querySelector(".guide-viz-canvas").innerHTML = `
+      <div class="guide-jump-row">${cells}</div>
+      <p class="guide-reach-label">stack indices = [${stk}] · wait[] fills as warmer days arrive</p>`;
+    container.querySelector(".guide-viz-note").textContent = step.note;
+    renderSkeleton(container, "stack", step.hl);
+    updateStepCounter(container);
+  }
+
+  function renderBacktrack(container, demo, step) {
+    const nums = demo.nums;
+    const cur = step.cur || [];
+    const chips = nums
+      .map((n, i) => {
+        const used = cur.includes(n);
+        return `<div class="guide-jump-col ${used ? "guide-jump-cur" : ""}"><span class="guide-dp-label">i=${i}</span><span class="guide-dp-val">${n}</span></div>`;
+      })
+      .join("");
+    const setText = cur.length ? `{${cur.join(", ")}}` : "{}";
+    container.querySelector(".guide-viz-canvas").innerHTML = `
+      <p class="guide-dp-mode-tag">nums = [${nums.join(", ")}]</p>
+      <div class="guide-jump-row">${chips}</div>
+      <p class="guide-reach-label">current subset = ${setText} · start = ${step.start}</p>`;
+    container.querySelector(".guide-viz-note").textContent = step.note;
+    renderSkeleton(container, "backtrack", step.hl);
     updateStepCounter(container);
   }
 
@@ -410,6 +659,8 @@
       else if (kind === "dp") renderDp(root, demo, step);
       else if (kind === "greedy") renderGreedy(root, demo, step);
       else if (kind === "tree") renderTree(root, demo, step);
+      else if (kind === "stack") renderStack(root, demo, step);
+      else if (kind === "backtrack") renderBacktrack(root, demo, step);
       if (prev) prev.disabled = root._stepIdx === 0;
       if (next) next.disabled = root._stepIdx >= steps.length - 1;
     };
@@ -439,4 +690,6 @@
   wireDemo("dp", "dp");
   wireDemo("greedy", "greedy");
   wireDemo("tree", "tree");
+  wireDemo("stack", "stack");
+  wireDemo("backtrack", "backtrack");
 })();
