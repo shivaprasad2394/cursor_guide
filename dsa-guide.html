@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DSA Handbook · Lset Prep</title>
-  <link rel="stylesheet" href="css/style.css?v=38">
+  <link rel="stylesheet" href="css/style.css?v=39">
 </head>
 <body data-page="guide" data-guide-track="quick">
   <header class="site-header">
@@ -437,8 +437,116 @@
           <li><strong>Fill the table</strong> left to right (or nested loops for 2-D)</li>
         </ol>
 
+        <h3>The 3 ways to implement DP (all covered in the demo)</h3>
+        <p class="guide-plain">Same math — three coding styles. Names people mix up:</p>
+        <table class="guide-table">
+          <thead>
+            <tr><th>Type</th><th>Also called</th><th>How it runs</th><th>C shape</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>1. Top-down + memo</strong></td>
+              <td>Memoization</td>
+              <td>Ask for big answer → recurse to smaller → <em>cache</em> each answer in an array</td>
+              <td><code>int memo[N];</code> recursive <code>f(i)</code> with <code>if (memo[i]!=-1) return</code></td>
+            </tr>
+            <tr>
+              <td><strong>2. Bottom-up table</strong></td>
+              <td>Tabulation</td>
+              <td>Start at base cases → loop fills <code>dp[0..n]</code></td>
+              <td><code>for (i=…) dp[i] = …</code></td>
+            </tr>
+            <tr>
+              <td><strong>3. Space-optimized</strong></td>
+              <td>Rolling variables / O(1) DP</td>
+              <td>Same as bottom-up, but only keep the last 1–2 rows/values</td>
+              <td><code>int a,b,c;</code> slide window each step</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="guide-plain"><strong>Note:</strong> “Top-down” without a cache is just recursion — usually exponential. <em>Memoization = top-down + cache</em>. Bottom-up is the same recurrence filled with a loop.</p>
+
+        <h3>How to recognize “this is a DP question”</h3>
+        <p class="guide-plain">Look for overlapping choices you would recompute. Checklist:</p>
+        <table class="guide-table">
+          <thead>
+            <tr><th>Signal in the problem</th><th>Why it smells like DP</th><th>Example</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>“How many ways…” / “count distinct…”</td><td>Sum of ways of smaller states</td><td>Climbing Stairs</td></tr>
+            <tr><td>“Minimum / maximum …” with choices</td><td>Optimal substructure — best of smaller decisions</td><td>Coin Change, House Robber</td></tr>
+            <tr><td>“Cannot take adjacent / with constraint”</td><td>State needs previous decisions encoded</td><td>House Robber</td></tr>
+            <tr><td>Brute force = try all subsets / recursions that repeat work</td><td>Overlapping subproblems</td><td>Naive fib / coin recurse</td></tr>
+            <tr><td>Answer for <code>n</code> depends only on answers for smaller <code>n</code></td><td>You can fill a table in order</td><td>All classic 1-D DP</td></tr>
+          </tbody>
+        </table>
+        <div class="guide-callout guide-callout-when">
+          <strong>Not DP when:</strong> a single greedy pass is enough (Jump Game farthest), or you only need any path / flood fill (DFS), or shortest unweighted steps (BFS). If sorting + one pass solves it, try greedy first.
+        </div>
+
+        <h3>Which DP type should I pick?</h3>
+        <p class="guide-plain">Key decision: <strong>write the recurrence first</strong>, then pick the implementation style.</p>
+        <table class="guide-table">
+          <thead>
+            <tr><th>Question / pattern</th><th>Key thing that decides</th><th>Prefer</th><th>Why</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><a href="question.html?id=q111-climbing-stairs-dp">Climbing Stairs</a></td>
+              <td>Only needs last 2 values; linear order clear</td>
+              <td><strong>Space-opt</strong> (or bottom-up)</td>
+              <td>Interview favorite: two ints, no array</td>
+            </tr>
+            <tr>
+              <td><a href="question.html?id=q112-house-robber-dp">House Robber</a></td>
+              <td>Choice at i uses best of i−1 and i−2</td>
+              <td><strong>Space-opt</strong> / bottom-up</td>
+              <td>Same rolling window as stairs</td>
+            </tr>
+            <tr>
+              <td><a href="question.html?id=q113-coin-change-dp">Coin Change</a></td>
+              <td>Need all amounts 0…amount; nested coin loop</td>
+              <td><strong>Bottom-up table</strong></td>
+              <td>Natural fill order; memo recurse works but messier in C</td>
+            </tr>
+            <tr>
+              <td>Tree / graph DP (path counts on trees)</td>
+              <td>Structure is recursive, not a flat index</td>
+              <td><strong>Top-down + memo</strong></td>
+              <td>Follow tree shape; cache by node id / state</td>
+            </tr>
+            <tr>
+              <td>Hard state (subset mask, multi params)</td>
+              <td>Only some states reachable</td>
+              <td><strong>Top-down + memo</strong></td>
+              <td>Don’t allocate huge unused tables</td>
+            </tr>
+            <tr>
+              <td>Small n, need full table for debug</td>
+              <td>You want to print <code>dp[]</code></td>
+              <td><strong>Bottom-up</strong></td>
+              <td>Easiest to trace in interviews</td>
+            </tr>
+            <tr>
+              <td>Memory tight / embedded</td>
+              <td>Recurrence only depends on last k rows</td>
+              <td><strong>Space-opt</strong></td>
+              <td>O(1) or O(k) instead of O(n)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Decision flow (say this in an interview)</h3>
+        <ol class="guide-trace">
+          <li>Is there optimal substructure + overlapping subproblems? → DP.</li>
+          <li>Write <code>dp[state]</code> in one English sentence.</li>
+          <li>Write the recurrence + bases.</li>
+          <li>If states are a simple 0…n (or 2-D grid) → <strong>bottom-up</strong>. If tree/sparse → <strong>top-down memo</strong>.</li>
+          <li>If recurrence only needs last few answers → <strong>space-optimize</strong>.</li>
+        </ol>
+
         <h3>Interactive trace — Climbing Stairs (n=5)</h3>
-        <p class="guide-plain">Same problem, <strong>three implementations</strong>. Switch mode, then step through each.</p>
+        <p class="guide-plain">Same problem, <strong>all three types</strong>. Switch mode, then step through each.</p>
         <div class="guide-viz" data-demo="dp">
           <div class="guide-viz-modes">
             <button type="button" class="btn guide-viz-mode guide-viz-mode-active" data-dp-mode="memo">Top-down + memo</button>
@@ -491,19 +599,33 @@
 
         <h3>Three DP questions in this repo (in order)</h3>
         <table class="guide-table">
-          <thead><tr><th>Question</th><th>What dp means</th><th>Recurrence idea</th></tr></thead>
+          <thead><tr><th>Question</th><th>What dp means</th><th>Recurrence</th><th>Best type here</th></tr></thead>
           <tbody>
-            <tr><td><a href="question.html?id=q111-climbing-stairs-dp">Climbing Stairs</a></td><td>ways to reach stair i</td><td><code>dp[i]=dp[i-1]+dp[i-2]</code></td></tr>
-            <tr><td><a href="question.html?id=q112-house-robber-dp">House Robber</a></td><td>max loot up to house i</td><td>rob i + dp[i-2] vs skip + dp[i-1]</td></tr>
-            <tr><td><a href="question.html?id=q113-coin-change-dp">Coin Change</a></td><td>min coins for amount a</td><td>try each coin, take min</td></tr>
+            <tr>
+              <td><a href="question.html?id=q111-climbing-stairs-dp">Climbing Stairs</a></td>
+              <td>ways to reach stair i</td>
+              <td><code>dp[i]=dp[i-1]+dp[i-2]</code></td>
+              <td>Space-opt (demo has all 3)</td>
+            </tr>
+            <tr>
+              <td><a href="question.html?id=q112-house-robber-dp">House Robber</a></td>
+              <td>max loot using houses 0..i</td>
+              <td>max(skip=dp[i-1], rob=nums[i]+dp[i-2])</td>
+              <td>Space-opt / bottom-up</td>
+            </tr>
+            <tr>
+              <td><a href="question.html?id=q113-coin-change-dp">Coin Change</a></td>
+              <td>min coins for amount a</td>
+              <td><code>dp[a]=min(dp[a], dp[a-coin]+1)</code></td>
+              <td>Bottom-up table</td>
+            </tr>
           </tbody>
         </table>
 
         <div class="guide-callout guide-callout-when">
-          <strong>Memoization vs tabulation (both are DP):</strong><br>
-          <em>Top-down</em> — recursive function + cache array: "if dp[i] already computed, return it." Feels like DFS with memory.<br>
-          <em>Bottom-up</em> — fill <code>dp[0..n]</code> in a loop (what q111–q113 use). Same math, often easier in C interviews.<br>
-          Start with tabulation; switch to memo if the recurrence is naturally recursive (e.g. tree DP).
+          <strong>Default for C interviews:</strong> start with <em>bottom-up</em> (clear loop, easy to debug).
+          Compress to <em>space-opt</em> if you only need the last row/values.
+          Use <em>top-down + memo</em> when the state space is a tree or sparse (“only recurse what you need”).
         </div>
 
         <div class="guide-track-deep">
@@ -1016,7 +1138,7 @@ bool ring_buffer_pop(lockless_ring_buffer_t *buf, uint8_t *out_data) {
     </main>
   </div>
 
-  <script src="js/guide-common.js?v=38"></script>
-  <script src="js/dsa-guide.js?v=38"></script>
+  <script src="js/guide-common.js?v=39"></script>
+  <script src="js/dsa-guide.js?v=39"></script>
 </body>
 </html>
