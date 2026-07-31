@@ -501,7 +501,8 @@
         listEl.hidden = false;
         const items = bySection.get(activeSection);
         listEl.innerHTML = `
-          ${activeSection === "dsa patterns" ? `<a class="dsa-primer-banner" href="dsa-guide.html"><strong>DSA Primer</strong> — plain-English DFS, BFS, DP, greedy with diagrams (read this first)</a>` : ""}
+          ${activeSection === "dsa patterns" ? `<a class="dsa-primer-banner" href="dsa-guide.html"><strong>DSA Handbook</strong> — Quick demos + Deep invariants (read this first)</a>` : ""}
+          ${activeSection === "pointers" || activeSection === "bit manipulation" || activeSection === "memory, dma, mmap & reimplementing libc" ? `<a class="dsa-primer-banner" href="c-guide.html"><strong>C Handbook</strong> — pointers, memory layout, UB, systems insights</a>` : ""}
           <section class="section-group section-group-single">
             <h2 class="section-heading">${escapeHtml(sectionLabel(activeSection))}</h2>
             <div class="section-cards">${renderQuestionCards(items)}</div>
@@ -527,10 +528,15 @@
           })
           .join("");
         gridEl.innerHTML = `<div class="category-grid"><a class="category-card category-card-guide" href="dsa-guide.html">
-              <span class="category-icon">📖</span>
-              <span class="category-title">DSA Primer</span>
-              <span class="category-count">Blog-style guide</span>
-              <span class="category-blurb">Interactive traces · 12 pattern questions + full must-know map</span>
+              <span class="category-icon">DP</span>
+              <span class="category-title">DSA Handbook</span>
+              <span class="category-count">Quick + Deep tracks</span>
+              <span class="category-blurb">Demos, invariants, complexity — 12 pattern questions</span>
+            </a><a class="category-card category-card-guide" href="c-guide.html">
+              <span class="category-icon">C</span>
+              <span class="category-title">C Handbook</span>
+              <span class="category-count">Systems interview depth</span>
+              <span class="category-blurb">Pipeline, pointers, memory, UB, bit tricks — IIT/MIT style</span>
             </a>${cards}</div>`;
       }
       document.title = "Lset Prep";

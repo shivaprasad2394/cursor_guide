@@ -2092,6 +2092,167 @@ a:hover {
   font-size: 0.95rem;
 }
 
+/* Quick / Deep learning tracks */
+.guide-track-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0 1.5rem;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-panel);
+}
+
+.guide-track-bar-label {
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-right: 0.25rem;
+}
+
+.guide-track-btn {
+  font-size: 0.78rem;
+  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: var(--sans);
+}
+
+.guide-track-btn:hover {
+  border-color: var(--blue);
+  color: var(--text);
+}
+
+.guide-track-btn.guide-track-active {
+  border-color: var(--green);
+  background: rgba(57, 217, 138, 0.15);
+  color: var(--green);
+  font-weight: 600;
+}
+
+.guide-track-deep {
+  display: none;
+  margin-top: 1.25rem;
+  padding: 1rem 1.15rem;
+  border: 1px solid rgba(91, 140, 255, 0.35);
+  border-radius: 8px;
+  background: rgba(91, 140, 255, 0.06);
+}
+
+body[data-guide-track="deep"] .guide-track-deep {
+  display: block;
+}
+
+body[data-guide-track="deep"] .guide-track-quick-only {
+  opacity: 0.85;
+}
+
+.guide-track-deep h4 {
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  margin: 1rem 0 0.4rem;
+  color: var(--blue);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.guide-track-deep h4:first-child {
+  margin-top: 0;
+}
+
+.guide-track-deep p,
+.guide-track-deep li {
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+.guide-track-deep ul {
+  margin: 0.35rem 0 0.75rem;
+  padding-left: 1.2rem;
+}
+
+.guide-sidebar-group {
+  font-family: var(--sans);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin: 0.85rem 0 0.35rem;
+  padding-left: 0.5rem;
+}
+
+.guide-qa {
+  margin: 0.75rem 0;
+  padding: 0.75rem 0.9rem;
+  border-left: 3px solid var(--amber);
+  background: rgba(240, 180, 41, 0.06);
+  border-radius: 0 6px 6px 0;
+}
+
+.guide-qa strong {
+  color: var(--amber);
+}
+
+.guide-takeaway {
+  margin: 1rem 0;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(57, 217, 138, 0.3);
+  border-radius: 8px;
+  background: rgba(57, 217, 138, 0.06);
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.guide-pipeline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+  margin: 1rem 0;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+}
+
+.guide-pipeline-step {
+  padding: 0.4rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-panel);
+}
+
+.guide-pipeline-arrow {
+  color: var(--text-muted);
+}
+
+.guide-mem-layout {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #0a0e14;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.guide-cross-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
 .guide-table-picker td:first-child {
   color: var(--text-muted);
   font-size: 0.88rem;

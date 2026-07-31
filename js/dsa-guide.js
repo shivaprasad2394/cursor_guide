@@ -434,22 +434,6 @@
     render();
   }
 
-  const tocLinks = document.querySelectorAll(".guide-sidebar a[href^='#']");
-  const sections = [...document.querySelectorAll(".guide-section[id]")];
-  if (tocLinks.length && sections.length) {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            tocLinks.forEach((a) => a.classList.toggle("guide-toc-active", a.getAttribute("href") === `#${e.target.id}`));
-          }
-        });
-      },
-      { rootMargin: "-20% 0px -60% 0px", threshold: 0 }
-    );
-    sections.forEach((s) => observer.observe(s));
-  }
-
   wireDemo("dfs", "dfs");
   wireDemo("bfs", "bfs");
   wireDemo("dp", "dp");

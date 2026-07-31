@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DSA Primer · Lset Prep</title>
-  <link rel="stylesheet" href="css/style.css?v=37">
+  <title>DSA Handbook · Lset Prep</title>
+  <link rel="stylesheet" href="css/style.css?v=38">
 </head>
-<body data-page="guide">
+<body data-page="guide" data-guide-track="quick">
   <header class="site-header">
     <div class="brand">
       <a href="index.html" class="brand-title">← Lset Prep</a>
-      <span class="brand-sub">DSA + systems primer · read before the pattern questions</span>
+      <span class="brand-sub">DSA handbook · Quick learn + Deep rigor</span>
     </div>
   </header>
 
@@ -18,9 +18,12 @@
     <aside class="guide-sidebar" aria-label="Table of contents">
       <p class="guide-sidebar-title">On this page</p>
       <nav class="guide-sidebar-nav">
-        <a href="#start">How to use this guide</a>
-        <a href="#c-you-need">C you already know</a>
+        <p class="guide-sidebar-group">Start</p>
+        <a href="#start">How to use</a>
+        <a href="#primer">Complexity primer</a>
+        <a href="#c-you-need">C building blocks</a>
         <a href="#pattern-picker">Pick a pattern</a>
+        <p class="guide-sidebar-group">Patterns</p>
         <a href="#dfs">DFS</a>
         <a href="#bfs">BFS</a>
         <a href="#compare">DFS vs BFS</a>
@@ -29,6 +32,7 @@
         <a href="#greedy">Greedy</a>
         <a href="#stack">Monotonic stack</a>
         <a href="#backtracking">Backtracking</a>
+        <p class="guide-sidebar-group">Map &amp; systems</p>
         <a href="#also-know">Must-know map</a>
         <a href="#systems">Systems &amp; low-level</a>
         <a href="#systems-zero-copy" class="guide-sidebar-sub">↳ Zero-copy parse</a>
@@ -38,19 +42,24 @@
         <a href="#order">Learning order</a>
       </nav>
       <a class="guide-sidebar-cta btn btn-primary" href="index.html?section=dsa%20patterns">Open DSA questions →</a>
+      <a class="guide-sidebar-cta btn" href="c-guide.html" style="margin-top:0.5rem">C Handbook →</a>
     </aside>
 
     <main class="guide-content">
       <header class="guide-hero">
-        <p class="guide-kicker">Prerequisites · ~20 min read</p>
-        <h1>Learn DSA patterns in plain English — for C programmers</h1>
+        <p class="guide-kicker">Interview handbook · Quick + Deep tracks</p>
+        <h1>DSA patterns for C programmers</h1>
         <p class="guide-lead">
-          You said you don't know how BFS, DFS, or DP work yet. That's fine.
-          This page explains each pattern like a blog post: <strong>what it means</strong>,
-          <strong>when to use it</strong>, a <strong>step-by-step trace</strong>, and a
-          <strong>minimal C skeleton</strong>. Then open the matching question and hit
-          <strong>Visualizer ⧉</strong> on the practice page.
+          <strong>Quick path</strong> — demos, diagrams, and C skeletons so you can learn the classic algorithms
+          (flood fill, shortest path, Fibonacci DP, greedy reach).
+          <strong>Deep path</strong> — invariants, complexity, correctness sketches, and interview traps at
+          the level of a rigorous systems interview. Toggle anytime; preference is saved.
         </p>
+        <div class="guide-track-bar">
+          <span class="guide-track-bar-label">Reading track</span>
+          <button type="button" class="guide-track-btn guide-track-active" data-track-set="quick">Quick</button>
+          <button type="button" class="guide-track-btn" data-track-set="deep">Deep</button>
+        </div>
       </header>
 
       <!-- ── START ── -->
@@ -72,6 +81,33 @@
             <h3>Open the question</h3>
             <p>Read <em>How to think</em> on the left pane. Write the helper in C. Run, then Visualize.</p>
           </div>
+        </div>
+      </section>
+
+      <!-- ── COMPLEXITY PRIMER ── -->
+      <section class="guide-section" id="primer">
+        <h2>Complexity &amp; correctness primer</h2>
+        <p class="guide-plain">Before patterns: three habits that separate a working solution from an interview-grade one.</p>
+        <table class="guide-table">
+          <thead><tr><th>Habit</th><th>What to say out loud</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Invariant</strong></td><td>"After each step, property P still holds" (e.g. every dequeued BFS cell has min distance).</td></tr>
+            <tr><td><strong>Complexity</strong></td><td>Time and space in terms of input size — grid <code>R×C</code>, graph <code>V+E</code>, array <code>n</code>.</td></tr>
+            <tr><td><strong>Tradeoff</strong></td><td>When you'd pick DFS vs BFS, DP table vs two variables, recursion vs iteration.</td></tr>
+          </tbody>
+        </table>
+        <div class="guide-track-deep">
+          <h4>Big-O refresher (tight bounds)</h4>
+          <ul>
+            <li><strong>O(1)</strong> — constant work (hash lookup, stack push).</li>
+            <li><strong>O(log n)</strong> — binary search / tree height on balanced data.</li>
+            <li><strong>O(n)</strong> — one pass; monotonic stack each index push/pop once.</li>
+            <li><strong>O(n log n)</strong> — sorting-based greedy / merge sort.</li>
+            <li><strong>O(n²)</strong> / <strong>O(RC)</strong> — nested loops or full grid scan.</li>
+            <li><strong>O(2ⁿ)</strong> — naive backtracking over subsets (fine for small n).</li>
+          </ul>
+          <h4>Proof habit (short)</h4>
+          <p>State the invariant → show it holds at init → show one step preserves it → conclude at termination. Interviewers want the sketch, not a textbook proof.</p>
         </div>
       </section>
 
@@ -173,6 +209,29 @@
           <strong>Use DFS when:</strong> counting connected regions, exploring all paths, tree recursion (left/right), or mutating the grid in place.<br>
           <strong>Tree example:</strong> <a href="question.html?id=q120-tree-path-sum-dfs">Tree Path Sum (q120)</a> — recurse <code>left</code> and <code>right</code> with a smaller target.
         </div>
+
+        <div class="guide-track-deep">
+          <h4>Invariant</h4>
+          <p>Every cell that is currently <code>'0'</code> (after sinking) was land that already belongs to a counted island; DFS never revisits a sunk cell.</p>
+          <h4>Complexity</h4>
+          <p>Time <strong>O(R·C)</strong> — each cell entered at most once. Space <strong>O(R·C)</strong> worst-case recursion depth on a snake-shaped island (use explicit stack if stack depth is a concern).</p>
+          <h4>Correctness sketch</h4>
+          <p>Connected components under 4-adjacency partition the land cells. Flood fill from an unmarked land cell marks exactly one component; the outer scan counts how many times a new component starts.</p>
+          <h4>Edge cases</h4>
+          <ul>
+            <li>Empty grid / all water → 0 islands</li>
+            <li>Single cell land → 1</li>
+            <li>Diagonal-only neighbors are <em>not</em> connected (unless problem says 8-dir)</li>
+          </ul>
+          <h4>Interview traps</h4>
+          <ul>
+            <li>Forgetting the base case → infinite recursion</li>
+            <li>Using BFS when you only need a count (works, but DFS is shorter in C)</li>
+            <li>Marking visited <em>after</em> enqueueing neighbors incorrectly in iterative variants</li>
+          </ul>
+          <h4>Related classic algorithms</h4>
+          <p><strong>Flood fill</strong> (paint bucket), <strong>connected components</strong> in graphs, Union-Find as an alternative when merges matter.</p>
+        </div>
         <p class="guide-link-q"><a class="btn" href="question.html?id=q118-number-of-islands-dfs">Practice q118 →</a></p>
       </section>
 
@@ -241,6 +300,29 @@
         <div class="guide-callout guide-callout-when">
           <strong>Use BFS when:</strong> shortest steps on a grid, level-order traversal, or "minimum number of moves."
         </div>
+
+        <div class="guide-track-deep">
+          <h4>Invariant</h4>
+          <p>When a cell is <em>dequeued</em>, its distance is the minimum number of steps from the start on an unweighted grid (edges cost 1).</p>
+          <h4>Complexity</h4>
+          <p>Time/space <strong>O(R·C)</strong>. Queue holds at most O(R·C) cells. Equivalent graph view: O(V+E) with V=R·C and E≤4V.</p>
+          <h4>Correctness sketch</h4>
+          <p>BFS expands by nondecreasing distance. First visit = first time the wavefront reaches the cell = shortest path (induction on distance layers).</p>
+          <h4>Edge cases</h4>
+          <ul>
+            <li>Start == goal → return 1 (or 0 depending on problem definition — clarify)</li>
+            <li>Blocked start/goal → -1</li>
+            <li>Walls that disconnect the grid → unreachable</li>
+          </ul>
+          <h4>Interview traps</h4>
+          <ul>
+            <li>Using DFS for "shortest" — wrong on unweighted grids with detours</li>
+            <li>Global <code>head</code>/<code>tail</code> not reset between calls</li>
+            <li>Marking visited too late → exponential re-enqueues</li>
+          </ul>
+          <h4>Related classic algorithms</h4>
+          <p><strong>Level-order tree traversal</strong>, <strong>0-1 BFS</strong> (deque) when edges are 0/1, <strong>Dijkstra</strong> when edge weights vary.</p>
+        </div>
         <p class="guide-link-q"><a class="btn" href="question.html?id=q119-shortest-path-grid-bfs">Practice q119 →</a></p>
       </section>
 
@@ -307,6 +389,28 @@
 }</code></pre>
 
         <p class="guide-plain">BST insert/search/traverse live in the <strong>Binary Search Tree</strong> category (q63–q70). Tree path sum is the bridge from grid DFS to pointer recursion.</p>
+
+        <div class="guide-track-deep">
+          <h4>Invariant</h4>
+          <p>At node <code>u</code> with remaining target <code>T</code>, there exists a root→leaf path through <code>u</code> summing to the original target iff a leaf path in the subtree sums to <code>T</code>.</p>
+          <h4>Complexity</h4>
+          <p>Time <strong>O(n)</strong> nodes visited once (early exit if short-circuiting on success). Space <strong>O(h)</strong> recursion height.</p>
+          <h4>Correctness sketch</h4>
+          <p>Leaf check is exact. Internal nodes OR left/right after subtracting <code>val</code> — covers every root→leaf path exactly once.</p>
+          <h4>Edge cases</h4>
+          <ul>
+            <li><code>root == NULL</code> → false</li>
+            <li>Single-node tree → compare <code>val == target</code></li>
+            <li>Negative values allowed → don't prune on remaining &lt; 0 unless problem forbids negatives</li>
+          </ul>
+          <h4>Interview traps</h4>
+          <ul>
+            <li>Checking sum only at non-leaves</li>
+            <li>Confusing "any path" with "root-to-leaf only"</li>
+          </ul>
+          <h4>Related classic algorithms</h4>
+          <p><strong>Tree DFS</strong>, path sum variants, binary tree maximum path sum (harder — any node-to-node).</p>
+        </div>
         <p class="guide-link-q"><a class="btn" href="question.html?id=q120-tree-path-sum-dfs">Practice q120 →</a></p>
       </section>
 
@@ -401,6 +505,28 @@
           <em>Bottom-up</em> — fill <code>dp[0..n]</code> in a loop (what q111–q113 use). Same math, often easier in C interviews.<br>
           Start with tabulation; switch to memo if the recurrence is naturally recursive (e.g. tree DP).
         </div>
+
+        <div class="guide-track-deep">
+          <h4>Invariant (stairs)</h4>
+          <p>After processing index <code>i</code>, <code>dp[i]</code> equals the number of distinct ways to reach stair <code>i</code> with steps in {1,2}.</p>
+          <h4>Complexity</h4>
+          <p>Tabulation: time <strong>O(n)</strong>, space <strong>O(n)</strong> or <strong>O(1)</strong> with two variables. Memoized recursion: same asymptotic, different constant factors and stack use.</p>
+          <h4>Correctness sketch</h4>
+          <p>Last step onto <code>i</code> is either from <code>i-1</code> or <code>i-2</code>; those sets of paths are disjoint and cover all ways → recurrence is exact (Fibonacci).</p>
+          <h4>Edge cases</h4>
+          <ul>
+            <li><code>n = 0</code> / <code>n = 1</code> — define with interviewer (often return 1)</li>
+            <li>Large <code>n</code> — overflow <code>int</code>; may need <code>long long</code> or mod</li>
+          </ul>
+          <h4>Interview traps</h4>
+          <ul>
+            <li>Exponential recursion without memo</li>
+            <li>Off-by-one base cases (<code>dp[0]</code> vs <code>dp[1]</code>)</li>
+            <li>Confusing "ways" with "min steps"</li>
+          </ul>
+          <h4>Related classic algorithms</h4>
+          <p><strong>Fibonacci</strong>, 1-D DP, knapsack / coin change (unbounded), house robber (choice DP).</p>
+        </div>
       </section>
       <section class="guide-section" id="greedy">
         <div class="guide-section-head">
@@ -452,6 +578,28 @@
         </ol>
 
         <p class="guide-plain">Interval problems (<a href="question.html?id=q117-non-overlapping-intervals-greedy">q117</a>, <a href="question.html?id=q122-merge-intervals-greedy">q122</a>) use the same spirit: sort by end time, keep the greedy choice, one pass.</p>
+
+        <div class="guide-track-deep">
+          <h4>Invariant</h4>
+          <p>After scanning indices <code>0..i</code> (with <code>i ≤ maxReachable</code>), every index ≤ <code>maxReachable</code> is reachable from 0 by some jump sequence.</p>
+          <h4>Complexity</h4>
+          <p>Time <strong>O(n)</strong>, space <strong>O(1)</strong>.</p>
+          <h4>Correctness sketch</h4>
+          <p>If the end is reachable, there is a first index that reaches it; expanding the farthest frontier never skips a necessary landing pad inside the reachable prefix. If the scan hits <code>i &gt; maxReachable</code>, a gap exists → impossible.</p>
+          <h4>Edge cases</h4>
+          <ul>
+            <li><code>n = 1</code> → always true</li>
+            <li><code>nums[0] = 0</code> and <code>n &gt; 1</code> → false</li>
+            <li>Zeros in the middle that block the frontier</li>
+          </ul>
+          <h4>Interview traps</h4>
+          <ul>
+            <li>Simulating every jump path (exponential)</li>
+            <li>DP <code>can[i]</code> works but is slower to write under time pressure</li>
+          </ul>
+          <h4>Related classic algorithms</h4>
+          <p><strong>Interval covering</strong>, activity selection (sort by end), Huffman-style local choices when greedy choice property holds.</p>
+        </div>
         <p class="guide-link-q"><a class="btn" href="question.html?id=q116-jump-game-greedy">Practice q116 →</a></p>
       </section>
 
@@ -520,6 +668,26 @@
     stack[++top] = i;
 }</code></pre>
 
+        <div class="guide-track-deep">
+          <h4>Invariant</h4>
+          <p>Stack values are strictly decreasing (or increasing, depending on variant) from bottom to top; every popped element has found its next greater (or warmer) candidate.</p>
+          <h4>Complexity</h4>
+          <p>Time <strong>O(n)</strong> — each index pushed and popped at most once. Space <strong>O(n)</strong>.</p>
+          <h4>Correctness sketch</h4>
+          <p>When scanning right→left, the stack holds candidates to the right in increasing order of position. Smaller values can never be "next greater" for anything further left, so popping them is safe.</p>
+          <h4>Edge cases</h4>
+          <ul>
+            <li>Strictly decreasing array → all answers -1 / 0 wait</li>
+            <li>Duplicates — decide <code>&lt;</code> vs <code>≤</code> carefully</li>
+          </ul>
+          <h4>Interview traps</h4>
+          <ul>
+            <li>Storing values when you need indices (for distance = <code>i - prev</code>)</li>
+            <li>Wrong scan direction for the variant</li>
+          </ul>
+          <h4>Related classic algorithms</h4>
+          <p><strong>Next greater element</strong>, histogram largest rectangle, stock span — all monotonic stack family.</p>
+        </div>
         <p class="guide-link-q">
           <a class="btn" href="question.html?id=q114-daily-temperatures-monotonic-stack">q114 Daily Temperatures</a>
           <a class="btn" href="question.html?id=q115-next-greater-element-monotonic-stack">q115 Next Greater</a>
@@ -562,6 +730,26 @@
           <li><strong>Branch:</strong> append <code>nums[i]</code>, recurse with <code>i+1</code>; when that returns, loop tries the next <code>i</code>.</li>
         </ol>
 
+        <div class="guide-track-deep">
+          <h4>Invariant</h4>
+          <p>At call with <code>start</code>, <code>currentSet[0..setSize)</code> is a valid subset using only indices &lt; <code>start</code> from earlier choices; the loop extends it without duplicates.</p>
+          <h4>Complexity</h4>
+          <p>Time <strong>O(n·2ⁿ)</strong> if you copy each subset, or <strong>Θ(2ⁿ)</strong> if you only count. Space <strong>O(n)</strong> recursion + path buffer.</p>
+          <h4>Correctness sketch</h4>
+          <p>Every subset S has a unique sorted index sequence; the <code>start</code> pointer generates each sequence exactly once (combinatorial tree of include-next decisions).</p>
+          <h4>Edge cases</h4>
+          <ul>
+            <li>Empty input → one empty subset</li>
+            <li>Duplicates in <code>nums</code> → need sort + skip (not in q123)</li>
+          </ul>
+          <h4>Interview traps</h4>
+          <ul>
+            <li>Forgetting to record the empty subset</li>
+            <li>Using <code>i</code> instead of <code>i+1</code> → infinite / duplicates</li>
+          </ul>
+          <h4>Related classic algorithms</h4>
+          <p><strong>Permutations</strong>, combination sum, N-queens, Sudoku — same choose/explore/unchoose template.</p>
+        </div>
         <p class="guide-link-q"><a class="btn" href="question.html?id=q123-subsets-backtracking">Practice q123 Subsets →</a></p>
       </section>
 
@@ -787,6 +975,16 @@ bool ring_buffer_pop(lockless_ring_buffer_t *buf, uint8_t *out_data) {
           </ol>
         </div>
 
+        <div class="guide-track-deep">
+          <h4>ISR / lock-free caveats</h4>
+          <ul>
+            <li>Single-producer / single-consumer rings can be lock-free with careful <code>volatile</code> + memory barriers; multi-producer needs atomics or locks.</li>
+            <li><code>volatile</code> alone is not a concurrency primitive — it prevents compiler elision of MMIO/status reads, not reordering across cores.</li>
+            <li>Power-of-2 masks hide bugs if size is not actually 2ⁿ — assert it.</li>
+            <li>Zero-copy pointers into DMA buffers are invalid after the buffer is recycled — document lifetime.</li>
+          </ul>
+        </div>
+
         <p class="guide-footer-actions">
           <a class="btn btn-primary" href="index.html?section=buffers%20%26%20driver%20patterns">Buffers &amp; drivers →</a>
           <a class="btn" href="index.html?section=bit%20manipulation">Bit manipulation →</a>
@@ -811,10 +1009,14 @@ bool ring_buffer_pop(lockless_ring_buffer_t *buf, uint8_t *out_data) {
           <a class="btn btn-primary" href="index.html?section=dsa%20patterns">Open all DSA questions →</a>
           <a class="btn" href="index.html">← Home</a>
         </p>
+        <div class="guide-cross-links">
+          <a class="btn" href="c-guide.html">C Handbook →</a>
+        </div>
       </section>
     </main>
   </div>
 
-  <script src="js/dsa-guide.js?v=37"></script>
+  <script src="js/guide-common.js?v=38"></script>
+  <script src="js/dsa-guide.js?v=38"></script>
 </body>
 </html>

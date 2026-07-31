@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C Handbook · Lset Prep</title>
+  <link rel="stylesheet" href="css/style.css?v=38">
+</head>
+<body data-page="guide" data-guide-track="quick">
+  <header class="site-header">
+    <div class="brand">
+      <a href="index.html" class="brand-title">← Lset Prep</a>
+      <span class="brand-sub">C handbook · systems &amp; interview depth</span>
+    </div>
+  </header>
+
+  <div class="guide-layout">
+    <aside class="guide-sidebar" aria-label="Table of contents">
+<p class="guide-sidebar-title">On this page</p>
+<nav class="guide-sidebar-nav">
+<p class="guide-sidebar-group">Basics</p>
+<a href="#c-at-a-glance">C at a Glance</a>
+<a href="#the-compilation-pipeline">The Compilation Pipeline</a>
+<a href="#the-preprocessor-macros">The Preprocessor &amp; Macros</a>
+<a href="#inline-functions">Inline Functions</a>
+<a href="#keywords-identifiers-declaration-vs-definition">Keywords, Identifiers, Declaration vs De…</a>
+<a href="#data-types-memory-representation">Data Types &amp; Memory Representation</a>
+<a href="#type-qualifiers-const-and-volatile">Type Qualifiers — `const` and `volatile`</a>
+<a href="#storage-classes-the-process-memory-layout">Storage Classes &amp; The Process Memory Lay…</a>
+<a href="#typedef-vs-define">`typedef` vs `#define`</a>
+<a href="#enum">`enum`</a>
+<a href="#operators-pre-post-increment">Operators — Pre/Post Increment</a>
+<p class="guide-sidebar-group">Memory & pointers</p>
+<a href="#pointers">Pointers</a>
+<a href="#arrays-vs-pointers">Arrays vs Pointers</a>
+<a href="#function-pointers">Function Pointers</a>
+<a href="#dynamic-memory">Dynamic Memory</a>
+<a href="#allocating-2-d-arrays-dynamically">Allocating 2-D Arrays Dynamically</a>
+<a href="#memory-manipulation-memcpy-memmove-memset">Memory Manipulation — `memcpy`, `memmove…</a>
+<a href="#structures-unions-padding-alignment">Structures, Unions, Padding &amp; Alignment</a>
+<p class="guide-sidebar-group">Systems</p>
+<a href="#bit-manipulation">Bit Manipulation</a>
+<a href="#endianness">Endianness</a>
+<a href="#memory-mapped-i-o">Memory-Mapped I/O</a>
+<a href="#strings-reverse-pattern-search-word-reverse">Strings — Reverse, Pattern Search, Word …</a>
+<a href="#undefined-behavior">Undefined Behavior</a>
+<a href="#sharp-insights-for-systems-interviews">Sharp Insights for Systems Interviews</a>
+<p class="guide-sidebar-group">Revision</p>
+<a href="#quick-revision-tables">Quick-Revision Tables</a>
+<a href="#curated-interview-questions">Curated Interview Questions</a>
+<a href="#final-word">Final Word</a>
+</nav>
+<a class="guide-sidebar-cta btn btn-primary" href="index.html">← Home</a>
+<a class="guide-sidebar-cta btn" href="dsa-guide.html" style="margin-top:0.5rem">DSA Handbook →</a>
+    </aside>
+
+    <main class="guide-content">
+      <header class="guide-hero">
+        <p class="guide-kicker">IIT / MIT style handbook · pure C</p>
+        <h1>C programming for systems interviews</h1>
+        <p class="guide-lead">
+          From the compilation pipeline to undefined behavior: memory layout, pointers,
+          structs/padding, bit tricks, and the sharp facts interviewers probe.
+          Diagrams and classic algorithms stay learning-friendly; tables and Q&amp;A add rigor.
+          Pair with the <a href="dsa-guide.html">DSA Handbook</a> and live practice questions.
+        </p>
+        <div class="guide-track-bar">
+          <span class="guide-track-bar-label">Reading track</span>
+          <button type="button" class="guide-track-btn guide-track-active" data-track-set="quick">Quick</button>
+          <button type="button" class="guide-track-btn" data-track-set="deep">Deep</button>
+        </div>
+        <p class="guide-plain" style="margin-top:0.5rem">
+          <strong>Quick</strong> — skim definitions, diagrams, and takeaways.
+          <strong>Deep</strong> — expand interview Q&amp;A density (same page; use Deep on DSA for pattern proofs).
+        </p>
+      </header>
+
+<section class="guide-section" id="c-at-a-glance">
+<h2>1. C at a Glance</h2>
+<p class="guide-plain"><strong>What it is.</strong> C is a <em>mid-level, statically-typed, compiled</em> language that sits between assembly and high-level languages. You write portable source code that a <strong>compiler</strong> translates to machine instructions specific to a target ISA.</p>
+<p class="guide-plain"><strong>Why &quot;mid-level&quot;?</strong></p>
+<ul class="guide-list"><li>Direct memory access via pointers → suitable for <strong>system programming</strong> (kernels, drivers, embedded firmware).</li><li>Structured control flow, functions, types → suitable for <strong>application programming</strong>.</li><li>It bridges the abstraction gap between hardware (assembly) and high-level languages.</li></ul>
+<p class="guide-plain"><strong>Why it&#x27;s fast.</strong></p>
+<ul class="guide-list"><li>Compiles directly to machine code; no VM or interpreter.</li><li>Macros and <code>inline</code> allow zero-overhead abstractions.</li><li>Manual memory management means no GC pauses.</li><li>Predictable, transparent cost model: what you write is roughly what you get.</li></ul>
+<p class="guide-plain"><strong>The canonical compile command:</strong></p>
+<pre class="guide-code"><code class="language-bash">gcc -Wall filename.c -o filename</code></pre>
+<ul class="guide-list"><li><code>-Wall</code> enables most warnings (always use it).</li><li><code>-o filename</code> sets the output binary name (default is <code>a.out</code>).</li></ul>
+<div class="guide-takeaway"><strong>Insight.</strong> C&#x27;s &quot;hidden cost&quot; is zero only because <em>you</em> pay it explicitly with memory management, bounds-checking, and concurrency. A C interview is largely about whether you understand what the compiler is <em>not</em> doing for you.</div>
+<p class="guide-plain">---</p>
+</section>
+<section class="guide-section" id="the-compilation-pipeline">
+<h2>2. The Compilation Pipeline</h2>
+
+<div class="guide-pipeline" aria-label="Compilation pipeline">
+  <span class="guide-pipeline-step">.c</span><span class="guide-pipeline-arrow">→</span>
+  <span class="guide-pipeline-step">preprocess .i</span><span class="guide-pipeline-arrow">→</span>
+  <span class="guide-pipeline-step">compile .s</span><span class="guide-pipeline-arrow">→</span>
+  <span class="guide-pipeline-step">assemble .o</span><span class="guide-pipeline-arrow">→</span>
+  <span class="guide-pipeline-step">link exe</span><span class="guide-pipeline-arrow">→</span>
+  <span class="guide-pipeline-step">load</span>
+</div><p class="guide-plain">A <code>.c</code> file goes through <strong>five</strong> stages before it runs:</p>
+<pre class="guide-code"><code class="language-c">.c  ──Preprocessor──▶ .i  ──Compiler──▶ .s  ──Assembler──▶ .o  ──Linker──▶ executable  ──Loader──▶ running process</code></pre>
+<h3>2.1 Preprocessing (<code>.c</code> → <code>.i</code>)</h3>
+<p class="guide-plain">A textual transformation pass. The preprocessor:</p>
+<ul class="guide-list"><li>Strips comments.</li><li>Expands <code>#include</code> directives by inlining file contents.</li><li>Expands <code>#define</code> macros.</li><li>Evaluates conditional compilation (<code>#if</code>, <code>#ifdef</code>, <code>#ifndef</code>, <code>#endif</code>).</li></ul>
+<p class="guide-plain"><strong><code>#include &lt;foo.h&gt;</code> vs <code>#include &quot;foo.h&quot;</code></strong></p>
+<table class="guide-table"><thead><tr><th>Form</th><th>Search order</th></tr></thead><tbody><tr><td><code>#include &lt;foo.h&gt;</code></td><td>Only in <strong>system include paths</strong> (e.g. <code>/usr/include</code> on Linux, plus paths added with <code>-I</code>).</td></tr><tr><td><code>#include &quot;foo.h&quot;</code></td><td>First in the <strong>directory of the including file</strong> (project-local); then falls back to system paths.</td></tr></tbody></table>
+<p class="guide-plain">Inspect this stage with <code>gcc -E file.c</code>.</p>
+<h3>2.2 Compilation (<code>.i</code> → <code>.s</code>)</h3>
+<p class="guide-plain">The frontend parses, type-checks, applies optimizations, and emits <strong>assembly</strong> (<code>.s</code>, human-readable mnemonics for the target ISA). Inspect with <code>gcc -S file.i</code> (or <code>gcc -S file.c</code>).</p>
+<h3>2.3 Assembly (<code>.s</code> → <code>.o</code>)</h3>
+<p class="guide-plain">The assembler converts mnemonics into raw machine code, packaged in an <strong>object file</strong> (ELF on Linux, Mach-O on macOS, PE/COFF on Windows). At this point, references to <em>external</em> symbols like <code>printf</code> are <strong>unresolved</strong> placeholders.</p>
+<p class="guide-plain">Inspect with <code>objdump -d file.o</code>.</p>
+<h3>2.4 Linking (<code>.o</code> + libraries → executable)</h3>
+<p class="guide-plain">The <strong>linker</strong> does three jobs:</p>
+<ol class="guide-trace"><li><strong>Symbol resolution</strong> — matches every &quot;use&quot; of a symbol to its single &quot;definition&quot; (function calls to function bodies, extern variables to actual storage).</li><li><strong>Relocation</strong> — patches addresses now that final memory layout is known.</li><li><strong>Startup code injection</strong> — adds the C runtime stub (<code>_start</code>/<code>crt0</code>) that sets up <code>argc</code>/<code>argv</code>, calls <code>main()</code>, and on return passes the exit code to <code>_exit()</code>.</li></ol>
+<p class="guide-plain">Two flavors:</p>
+<ul class="guide-list"><li><strong>Static linking</strong> — library code is copied into the executable. Bigger binary, no runtime dependency.</li><li><strong>Dynamic linking</strong> — only references; the actual code lives in <code>.so</code>/<code>.dll</code> resolved at load time. Smaller binary, shared in RAM across processes, but breakable across distro upgrades.</li></ul>
+<h3>2.5 Loading</h3>
+<p class="guide-plain">The OS <strong>loader</strong> reads the executable from disk, maps the segments (text, data, bss) into the process&#x27;s virtual address space, sets up the heap and an initial stack, then jumps to the entry point. From here the C runtime runs and calls <code>main()</code>.</p>
+<h3>Common Mistakes</h3>
+<ul class="guide-list"><li>&quot;<code>printf</code> doesn&#x27;t exist&quot; at link time → forgot <code>-lm</code> for math, or library order is wrong (libraries go <em>after</em> objects on the gcc command line).</li><li>&quot;Multiple definition of <code>foo</code>&quot; → a non-<code>static</code> function/global with the same name in two <code>.c</code> files; the linker sees both. Mark file-private symbols <code>static</code>.</li><li>&quot;Undefined reference&quot; → forgot to compile/link a <code>.c</code> file, or a header was included but no implementation exists.</li></ul>
+<div class="guide-track-deep"><h3>Interview Q&amp;A</h3>
+<div class="guide-qa"><strong>Q1.</strong> Why are <code>printf</code> calls unresolved after the assembler stage?</div>
+<div class="guide-qa"><strong>A.</strong> The assembler only translates the source it sees; <code>printf</code> lives in <code>libc</code>. Resolving it is the <strong>linker&#x27;s</strong> job, which matches the call site against the symbol exported by <code>libc.a</code>/<code>libc.so</code>.</div>
+<div class="guide-qa"><strong>Q2.</strong> What&#x27;s the difference between a header file and a library?</div>
+<div class="guide-qa"><strong>A.</strong> A <em>header</em> declares an interface (function prototypes, types, macros) — used by the <strong>compiler</strong> for type-checking. A <em>library</em> contains the compiled implementation — used by the <strong>linker</strong> to resolve calls.</div>
+<div class="guide-qa"><strong>Q3.</strong> Why does <code>#include</code> work even though headers aren&#x27;t required for compilation?</div>
+<div class="guide-qa"><strong>A.</strong> They aren&#x27;t strictly required, but without prototypes the compiler can&#x27;t type-check call sites — it would assume implicit <code>int</code> return and fail to flag mismatched arguments. Headers are a <em>convention</em> for sharing declarations.</div>
+<div class="guide-qa"><strong>Q4.</strong> What does <code>crt0</code> (or <code>_start</code>) do?</div>
+<div class="guide-qa"><strong>A.</strong> It is the actual entry point the OS jumps to. It initializes <code>.bss</code> to zero, copies <code>.data</code> initializers, sets up <code>argc</code>/<code>argv</code>/<code>envp</code>, calls global constructors (in C++), invokes <code>main</code>, and on return passes the result to <code>_exit</code>.</div></div>
+<h3>Key Takeaway</h3>
+<div class="guide-takeaway">Five stages: <strong>preprocess → compile → assemble → link → load</strong>. The compiler produces <em>symbols</em>; the linker <em>binds</em> them. Most &quot;weird&quot; build errors are really errors at one specific stage — knowing which one tells you where to look.</div>
+<p class="guide-plain">---</p><p class="guide-link-q">Practice: <a class="btn" href="index.html?section=parsing%20%26%20formatting">Parsing section</a></p>
+</section>
+<section class="guide-section" id="the-preprocessor-macros">
+<h2>3. The Preprocessor &amp; Macros</h2>
+<p class="guide-plain">A <strong>macro</strong> is a textual substitution rule applied <em>before</em> compilation. The compiler never sees the macro name — only the expanded text.</p>
+<p class="guide-plain">A <strong>macro</strong> is a name defined using a preprocessor directive (#define) that is replaced by its corresponding text during preprocessing, before compilation</p>
+<pre class="guide-code"><code class="language-c">#define CUBE(b) b*b*b
+
+printf(&quot;%d&quot;, CUBE(1+2));   // expands to: 1+2 * 1+2 * 1+2  →  1 + 2 + 2 + 2 + 2 = 9, NOT 27</code></pre>
+<p class="guide-plain">The fix: parenthesize <strong>every parameter</strong> <em>and</em> the whole expression:</p>
+<pre class="guide-code"><code class="language-c">#define CUBE(b) ((b)*(b)*(b))
+
+printf(&quot;%d&quot;, CUBE(1+2));   // expands to ((1+2)*(1+2)*(1+2)) = 27 ✓</code></pre>
+<h3>Macro vs Function — The Real Comparison</h3>
+<table class="guide-table"><thead><tr><th>Aspect</th><th>Macro</th><th>Function</th></tr></thead><tbody><tr><td>Type checking</td><td>None</td><td>Strict</td></tr><tr><td>Stage</td><td>Preprocessor (text)</td><td>Compiled</td></tr><tr><td>Side effects</td><td>Arguments may be evaluated <strong>multiple times</strong></td><td>Evaluated once</td></tr><tr><td>Code size</td><td>Grows at every call site</td><td>Single definition</td></tr><tr><td>Speed</td><td>No call overhead</td><td>Call/return + stack frame</td></tr><tr><td>Debuggability</td><td>Hard (debugger sees expanded form)</td><td>Easy</td></tr><tr><td>Best for</td><td>Tiny snippets, conditional compilation, header guards</td><td>Anything non-trivial</td></tr></tbody></table>
+<h3>The Multiple-Evaluation Trap</h3>
+<pre class="guide-code"><code class="language-c">#define MAX(a,b) ((a) &gt; (b) ? (a) : (b))
+
+int x = 3;
+int m = MAX(x++, 5);   // x is incremented TWICE in the false branch in some expansions</code></pre>
+<p class="guide-plain">Functions don&#x27;t have this problem because arguments are evaluated exactly once before the call.</p>
+<h3>Useful Preprocessor Idioms</h3>
+<p class="guide-plain"><strong>Header guard (most common):</strong></p>
+<pre class="guide-code"><code class="language-c">#ifndef MY_HEADER_H
+#define MY_HEADER_H
+/* declarations */
+#endif</code></pre>
+<p class="guide-plain"><strong>Stringification (<code>#</code>) and token-pasting (<code>##</code>):</strong></p>
+<pre class="guide-code"><code class="language-c">#define LOG(var)  printf(#var &quot; = %d\n&quot;, var)   // LOG(x) → printf(&quot;x&quot; &quot; = %d\n&quot;, x)
+#define CAT(a,b)  a##b                          // CAT(foo, 42) → foo42</code></pre>
+<p class="guide-plain"><strong>Conditional compilation:</strong></p>
+<pre class="guide-code"><code class="language-c">#ifdef DEBUG
+    #define DBG(x) printf x
+#else
+    #define DBG(x)
+#endif</code></pre>
+<h3>Common Mistakes</h3>
+<ul class="guide-list"><li>Forgetting parentheses around parameters (<code>CUBE</code> example above).</li><li>Side-effecting arguments to a macro that uses them more than once.</li><li>A macro that ends in <code>;</code> inside an <code>if/else</code> chain — wrap multi-statement macros with <code>do { ... } while (0)</code>:</li></ul>
+<pre class="guide-code"><code class="language-c">#define SWAP(a,b) do { int _t = (a); (a) = (b); (b) = _t; } while (0)</code></pre>
+<div class="guide-track-deep"><h3>Interview Q&amp;A</h3>
+<div class="guide-qa"><strong>Q1.</strong> Why prefer <code>inline</code> functions over function-like macros?</div>
+<div class="guide-qa"><strong>A.</strong> <code>inline</code> functions get <strong>type checking</strong>, evaluate arguments <strong>once</strong>, work with debuggers, and the compiler can still inline them. Macros are textual and unsafe.</div>
+<div class="guide-qa"><strong>Q2.</strong> What does <code>#pragma once</code> do, and how does it differ from include guards?</div>
+<div class="guide-qa"><strong>A.</strong> Both prevent multiple inclusion. <code>#pragma once</code> is non-standard but supported by all major compilers; it&#x27;s faster (the compiler tracks the file inode, not text) but slightly less portable. Include guards are standard C and always work.</div>
+<div class="guide-qa"><strong>Q3.</strong> Can a macro recursively expand?</div>
+<div class="guide-qa"><strong>A.</strong> No. The preprocessor stops re-expanding a macro that appears in its own expansion (this prevents infinite loops).</div></div>
+<h3>Key Takeaway</h3>
+<div class="guide-takeaway">Macros are <em>blind text substitution</em>. They&#x27;re powerful but fragile. <strong>Always parenthesize</strong>. Prefer <code>static inline</code> or <code>enum</code>/<code>const</code> for value constants whenever possible.</div>
+<p class="guide-plain">---</p>
+</section>
+<section class="guide-section" id="inline-functions">
+<h2>4. Inline Functions</h2>
+<p class="guide-plain"><code>inline</code> is a <em>hint</em> to the compiler to substitute the function body at the call site, avoiding call overhead.</p>
+<p class="guide-plain">An inline function is a function whose call may be expanded in-place by the compiler, eliminating function call overhead, though the compiler may choose not to inline it.</p>
+<pre class="guide-code"><code class="language-c">#include &lt;stdio.h&gt;
+
+static inline int square(int x) {
+    return x * x;
+}
+
+int main(void) {
+    printf(&quot;%d\n&quot;, square(5));   // compiler may emit: printf(&quot;%d\n&quot;, 5*5);
+    return 0;
+}</code></pre>
+<h3>Why <code>static inline</code>?</h3>
+<p class="guide-plain">C99 has an unusual rule: an <code>inline</code> function definition does <strong>not</strong> by itself emit a callable symbol. If the compiler chooses not to inline a particular call (e.g., function pointer, debug build), the linker needs <em>some</em> definition to call — and a non-static <code>inline</code> function in a header doesn&#x27;t provide one, leading to:</p>
+<pre class="guide-code"><code class="language-c">undefined reference to `foo&#x27;</code></pre>
+<p class="guide-plain"><strong>Two common fixes:</strong></p>
+<ol class="guide-trace"><li><code>static inline</code> — gives every translation unit its own private copy. Simple, safe for header-only definitions.</li><li><code>inline</code> in the header + a separate non-inline definition (<code>extern inline</code>) in exactly one <code>.c</code> file.</li></ol>
+<h3>Inline vs Macro</h3>
+<table class="guide-table"><thead><tr><th></th><th><code>inline</code> function</th><th>macro</th></tr></thead><tbody><tr><td>Type-checked</td><td>✓</td><td>✗</td></tr><tr><td>Args evaluated once</td><td>✓</td><td>✗ (textual)</td></tr><tr><td>Debuggable</td><td>✓</td><td>✗</td></tr><tr><td>Conditional compilation</td><td>Limited</td><td>Full</td></tr></tbody></table>
+<h3>Common Mistakes</h3>
+<ul class="guide-list"><li>Putting a non-<code>static</code>, non-<code>extern inline</code> function definition in a header → multiple-definition link errors (or undefined-reference if no call gets inlined).</li><li>Assuming <code>inline</code> <em>forces</em> inlining. It doesn&#x27;t. Use compiler-specific <code>__attribute__((always_inline))</code> (GCC/Clang) if you really mean it — but be aware that even that can be ignored (e.g., recursive functions, varargs).</li></ul>
+<div class="guide-track-deep"><h3>Interview Q&amp;A</h3>
+<div class="guide-qa"><strong>Q1.</strong> Is <code>inline</code> guaranteed to inline?</div>
+<div class="guide-qa"><strong>A.</strong> No — it&#x27;s a hint. The compiler decides based on size, recursion, optimization level, etc.</div>
+<div class="guide-qa"><strong>Q2.</strong> When does inlining hurt performance?</div>
+<div class="guide-qa"><strong>A.</strong> When the function is large (causes I-cache pressure and code bloat) or called from many sites (binary size explosion). Modern compilers usually choose better than humans.</div>
+<div class="guide-qa"><strong>Q3.</strong> Where should <code>inline</code> definitions live?</div>
+<div class="guide-qa"><strong>A.</strong> In headers, marked <code>static inline</code>, so each translation unit has the body available for inlining.</div></div>
+<h3>Key Takeaway</h3>
+<div class="guide-takeaway"><code>static inline</code> in a header is the safest default for small, frequently-called helpers. <code>inline</code> is a request, not a command.</div>
+<p class="guide-plain">---</p>
+</section>
+<section class="guide-section" id="keywords-identifiers-declaration-vs-definition">
+<h2>5. Keywords, Identifiers, Declaration vs Definition</h2>
+<p class="guide-plain"><strong>Keywords</strong> are reserved words known to the compiler — <code>int</code>, <code>if</code>, <code>return</code>, <code>static</code>, etc. You cannot use them as variable names.</p>
+<p class="guide-plain"><strong>Identifiers</strong> are names <em>you</em> give: variables, functions, structs, macros, labels.</p>
+<h3>Declaration vs Definition — A Distinction Most Beginners Miss</h3>
+<table class="guide-table"><thead><tr><th></th><th>Declaration</th><th>Definition</th></tr></thead><tbody><tr><td>What it does</td><td>Tells the compiler a name&#x27;s <em>type</em> exists</td><td>Allocates storage / provides a body</td></tr><tr><td>Allocates memory?</td><td>No</td><td>Yes (for variables) / yes (for functions)</td></tr><tr><td>How many times allowed?</td><td>Many (in different translation units)</td><td>Exactly <strong>one</strong> per program (One Definition Rule)</td></tr></tbody></table>
+<pre class="guide-code"><code class="language-c">extern int counter;        // declaration  (promises &#x27;counter&#x27; exists somewhere)
+int counter = 0;           // definition   (allocates storage, optionally initializes)
+
+void log_msg(const char*); // declaration (function prototype)
+void log_msg(const char *m){ /* body */ } // definition</code></pre>
+<p class="guide-plain">In most contexts the two collapse — <code>int x = 5;</code> is both a declaration <em>and</em> a definition. The split matters when you have multiple <code>.c</code> files sharing a global.</p>
+<h3><code>int main()</code> vs <code>int main(void)</code></h3>
+<p class="guide-plain">In C, the difference is real:</p>
+<pre class="guide-code"><code class="language-c">void fun()      { }   // empty parameter list = &quot;I&#x27;m not telling you what I take&quot;
+void fun(void)  { }   // explicit: &quot;I take ZERO arguments&quot;</code></pre>
+<pre class="guide-code"><code class="language-c">fun(10, &quot;GfG&quot;, &quot;GQ&quot;);  // legal in C if fun() declared, ill-formed if fun(void)</code></pre>
+<p class="guide-plain">Best practice: <strong>always write <code>int main(void)</code></strong> (or <code>int main(int argc, char *argv[])</code>). Empty parens are a pre-ANSI relic.</p>
+<p class="guide-plain">In C++ both forms mean the same thing — empty parens already imply zero arguments.</p>
+<h3>Key Takeaway</h3>
+<div class="guide-takeaway">Use <code>void</code> to mean &quot;no arguments&quot;. Use <code>static</code> to scope a global to its file. Declaration tells the compiler about a name; definition produces the actual symbol.</div>
+<p class="guide-plain">---</p>
+</section>
+<section class="guide-section" id="data-types-memory-representation">
+<h2>6. Data Types &amp; Memory Representation</h2>
+<h3>Primitive Sizes (typical, but <strong>not</strong> guaranteed by the standard)</h3>
+<table class="guide-table"><thead><tr><th>Type</th><th>Typical size (LP64)</th><th>Min guaranteed by standard</th></tr></thead><tbody><tr><td><code>char</code></td><td>1 byte</td><td>1 byte (1 byte ≥ 8 bits)</td></tr><tr><td><code>short</code></td><td>2 bytes</td><td>≥ 2 bytes</td></tr><tr><td><code>int</code></td><td>4 bytes</td><td>≥ 2 bytes</td></tr><tr><td><code>long</code></td><td>8 bytes (Linux) / 4 bytes (Windows)</td><td>≥ 4 bytes</td></tr><tr><td><code>long long</code></td><td>8 bytes</td><td>≥ 8 bytes</td></tr><tr><td><code>float</code></td><td>4 bytes (IEEE 754 single)</td><td>implementation-defined</td></tr><tr><td><code>double</code></td><td>8 bytes (IEEE 754 double)</td><td>implementation-defined</td></tr><tr><td>pointer</td><td>4 bytes (32-bit) / 8 bytes (64-bit)</td><td>implementation-defined</td></tr></tbody></table>
+<div class="guide-takeaway"><strong>Insight.</strong> <code>int</code> is <strong>not</strong> portable in size. If you need a known width, use <code>&lt;stdint.h&gt;</code> types: <code>int32_t</code>, <code>uint64_t</code>, <code>intptr_t</code>, etc.</div>
+<h3>Signed vs Unsigned Integers</h3>
+<p class="guide-plain">A signed <code>int</code> (typical 32-bit) reserves the <strong>MSB as the sign bit</strong> (two&#x27;s complement on every modern machine), giving range <code>−2³¹</code> to <code>2³¹−1</code>. An unsigned <code>int</code> uses all 32 bits for magnitude → <code>0</code> to <code>2³²−1</code>.</p>
+<pre class="guide-code"><code class="language-c">int      a = -1;
+unsigned u =  1;
+if (a &lt; u) puts(&quot;less&quot;);      // surprisingly: prints nothing</code></pre>
+<p class="guide-plain">Why? In a mixed signed/unsigned comparison, the signed value is promoted to <strong>unsigned</strong>, so <code>-1</code> becomes <code>0xFFFFFFFF</code>, which is much larger than <code>1</code>. <strong>Classic UB-adjacent gotcha.</strong></p>
+<h3>Format Specifiers (printf/scanf)</h3>
+<table class="guide-table"><thead><tr><th>Specifier</th><th>Type</th></tr></thead><tbody><tr><td><code>%c</code></td><td><code>char</code></td></tr><tr><td><code>%d</code> / <code>%i</code></td><td><code>int</code></td></tr><tr><td><code>%u</code></td><td><code>unsigned int</code></td></tr><tr><td><code>%ld</code> / <code>%lu</code></td><td><code>long</code> / <code>unsigned long</code></td></tr><tr><td><code>%lld</code> / <code>%llu</code></td><td><code>long long</code> / <code>unsigned long long</code></td></tr><tr><td><code>%f</code></td><td><code>float</code> (printf promotes to <code>double</code>) — for <code>scanf</code> use <code>%f</code> for float, <code>%lf</code> for double</td></tr><tr><td><code>%lf</code></td><td><code>double</code></td></tr><tr><td><code>%x</code> / <code>%X</code></td><td>hex (lowercase / uppercase)</td></tr><tr><td><code>%o</code></td><td>octal</td></tr><tr><td><code>%p</code></td><td>pointer (cast to <code>void*</code>)</td></tr><tr><td><code>%s</code></td><td>null-terminated string</td></tr><tr><td><code>%zu</code></td><td><code>size_t</code></td></tr></tbody></table>
+<h3>Common Mistakes</h3>
+<ul class="guide-list"><li>Using <code>%d</code> for a <code>size_t</code> or <code>unsigned long</code> → undefined behavior (<code>%zu</code> and <code>%lu</code>).</li><li>Mixing signed and unsigned in arithmetic / comparisons.</li><li>Assuming <code>sizeof(int) == 4</code> always — true on most desktops, but check.</li></ul>
+<div class="guide-track-deep"><h3>Interview Q&amp;A</h3>
+<div class="guide-qa"><strong>Q1.</strong> What is integer promotion?</div>
+<div class="guide-qa"><strong>A.</strong> In any arithmetic expression, types narrower than <code>int</code> (e.g., <code>char</code>, <code>short</code>) are promoted to <code>int</code> (or <code>unsigned int</code> if needed) before the operation. So <code>char a=200; char b=200; int c = a+b;</code> works correctly because the addition happens in <code>int</code>.</div>
+<div class="guide-qa"><strong>Q2.</strong> Why does <code>unsigned int x = 0; x--;</code> not crash?</div>
+<div class="guide-qa"><strong>A.</strong> Unsigned arithmetic is defined to wrap modulo 2ⁿ. So <code>x</code> becomes <code>UINT_MAX</code>. <em>Signed</em> overflow, by contrast, is undefined behavior.</div>
+<div class="guide-qa"><strong>Q3.</strong> Sizes of <code>int</code> and <code>long</code> on a 64-bit Linux vs 64-bit Windows?</div>
+<div class="guide-qa"><strong>A.</strong> Linux uses <strong>LP64</strong>: <code>int=4</code>, <code>long=8</code>, <code>pointer=8</code>. Windows uses <strong>LLP64</strong>: <code>int=4</code>, <code>long=4</code>, <code>long long=8</code>, <code>pointer=8</code>.</div></div>
+<h3>Key Takeaway</h3>
+<div class="guide-takeaway">When portability matters, reach for <code>&lt;stdint.h&gt;</code>. Watch the signed/unsigned boundary like a hawk in comparisons.</div>
+<p class="guide-plain">---</p>
+</section>
+<section class="guide-section" id="type-qualifiers-const-and-volatile">
+<h2>7. Type Qualifiers — <code>const</code> and <code>volatile</code></h2>
+<h3><code>const</code> — Compiler-Enforced Read-Only</h3>
+<p class="guide-plain"><code>const</code> says &quot;the program will not modify this object&quot;. The compiler enforces this and may also use it for optimization.</p>
+<p class="guide-plain">The trick is reading multi-<code>const</code> declarations <strong>right-to-left</strong>:</p>
+<table class="guide-table"><thead><tr><th>Declaration</th><th>Meaning</th></tr></thead><tbody><tr><td><code>const int a</code></td><td><code>a</code> is a constant int</td></tr><tr><td><code>int const a</code></td><td>identical — <code>a</code> is a constant int</td></tr><tr><td><code>const int *p</code></td><td><code>p</code> points to a const int → <strong>value is const, pointer can move</strong></td></tr><tr><td><code>int * const p</code></td><td><code>p</code> is a const pointer to int → <strong>pointer is const, value can change</strong></td></tr><tr><td><code>const int * const p</code></td><td>both pointer and pointee are const</td></tr></tbody></table>
+<pre class="guide-code"><code class="language-c">const int *p;        int *const q;     const int *const r;
+p = &amp;x;   ✓           q = &amp;x;  ✗ (init only)   r = &amp;x;  ✗
+*p = 5;   ✗           *q = 5;  ✓                 *r = 5;  ✗</code></pre>
+<div class="guide-takeaway"><strong>Const-correctness mantra:</strong> read pointer declarations from the <em>variable name leftward</em>: &quot;<code>p</code> is a … pointer to … const int&quot;.</div>
+<h3><code>volatile</code> — Disables Optimization</h3>
+<p class="guide-plain"><code>volatile</code> tells the compiler: <em>&quot;this object can change in ways you cannot predict — never cache it in a register, always re-read it from memory, never optimize away accesses.&quot;</em></p>
+<p class="guide-plain">Without <code>volatile</code>, the compiler may hoist a load out of a loop:</p>
+<pre class="guide-code"><code class="language-c">int Flag = 1;            // not volatile
+while (!Flag) { /* ... */ }   // compiler may load Flag once and loop forever</code></pre>
+<p class="guide-plain">With <code>volatile</code>, every access <em>must</em> go to memory:</p>
+<pre class="guide-code"><code class="language-c">volatile int Flag = 1;
+ISR(void) { Flag = 0; }     // updated by interrupt
+
+int main(void) {
+    while (!Flag) {          // compiler re-reads Flag every iteration
+        /* do work */
+    }
+    return 0;
+}</code></pre>
+<h3>When to use <code>volatile</code></h3>
+<ul class="guide-list"><li><strong>Memory-mapped I/O registers</strong> (the hardware updates them).</li><li><strong>Variables modified by signal handlers / ISRs.</strong></li><li><strong>Variables shared across threads</strong> <em>for crude visibility</em> — though for proper threading you need <code>_Atomic</code> (C11) or pthread mutexes; <code>volatile</code> alone does <strong>not</strong> provide atomicity or memory barriers.</li></ul>
+<h3><code>const</code> and <code>volatile</code> Together — Yes, Both!</h3>
+<p class="guide-plain">A read-only hardware status register: it <strong>never changes from the program&#x27;s side</strong> (<code>const</code>) but <strong>the hardware can update it any time</strong> (<code>volatile</code>).</p>
+<pre class="guide-code"><code class="language-c">// Address 0x00020000 is a hardware status register
+#define STATUS_REG 0x00020000
+
+const volatile uint32_t *status = (const volatile uint32_t *)STATUS_REG;
+
+uint32_t s = *status;   // re-read every time, but program can&#x27;t write to it</code></pre>
+<p class="guide-plain">For a writable port that the program controls but lives at a fixed address:</p>
+<pre class="guide-code"><code class="language-c">volatile uint32_t * const port_reg = (volatile uint32_t *)0x40000000;
+//   ^^^^^^^^         ^^^^^         hw can change it,         we never reassign the pointer
+
+*port_reg = 0xDEADBEEF;   // legal — write-through</code></pre>
+<h3>Common Mistakes</h3>
+<ul class="guide-list"><li>Using <code>volatile</code> for thread synchronization — it provides <strong>neither atomicity nor memory ordering</strong>. Use <code>&lt;stdatomic.h&gt;</code> or mutexes.</li><li>Misreading <code>const int <em>p</code> as &quot;<code>p</code> is constant&quot; (it isn&#x27;t — </em>what it points to* is).</li><li>Casting away <code>const</code> and writing to a string literal → undefined behavior, often a segfault, because string literals live in read-only <code>.rodata</code>.</li></ul>
+<div class="guide-track-deep"><h3>Interview Q&amp;A</h3>
+<div class="guide-qa"><strong>Q1.</strong> Difference between <code>const</code> and <code>volatile</code>?</div>
+<div class="guide-qa"><strong>A.</strong> <code>const</code> → compiler-enforced &quot;read-only&quot; promise. <code>volatile</code> → &quot;do not optimize accesses; the value can change underneath you&quot;.</div>
+<div class="guide-qa"><strong>Q2.</strong> Can a variable be both <code>const</code> and <code>volatile</code>?</div>
+<div class="guide-qa"><strong>A.</strong> Yes — e.g. a hardware status register the program reads but never writes; <code>volatile</code> because the hardware updates it, <code>const</code> because the code shouldn&#x27;t.</div>
+<div class="guide-qa"><strong>Q3.</strong> Will <code>volatile</code> make a variable thread-safe?</div>
+<div class="guide-qa"><strong>A.</strong> No. It prevents the compiler from caching, but it does not guarantee atomicity, ordering, or cross-CPU visibility. Use atomics or locks.</div>
+<div class="guide-qa"><strong>Q4.</strong> What happens if I cast away <code>const</code> and modify the object?</div>
+<div class="guide-qa"><strong>A.</strong> If the object was originally declared <code>const</code>, behavior is <strong>undefined</strong>. If it was a non-const object only viewed through a <code>const</code> pointer, the modification is legal (though dirty practice).</div></div>
+<h3>Key Takeaway</h3>
+<div class="guide-takeaway"><code>const</code> is <em>promise to the compiler</em>. <code>volatile</code> is <em>promise from the compiler</em>. They solve different problems and frequently combine.</div>
+<p class="guide-plain">---</p>
+</section>
+<section class="guide-section" id="storage-classes-the-process-memory-layout">
+<h2>8. Storage Classes &amp; The Process Memory Layout</h2>
+
+<div class="guide-mem-layout">high addresses
+┌─────────────┐
+│    stack    │  ↓ grows down
+├─────────────┤
+│     …       │
+├─────────────┤
+│    heap     │  ↑ grows up
+├─────────────┤
+│    .bss     │  zero-init globals
+├─────────────┤
+│    .data    │  initialized globals
+├─────────────┤
+│   .rodata   │  string literals, const
+├─────────────┤
+│    .text    │  machine code
+└─────────────┘
+low addresses</div><p class="guide-plain">A <strong>storage class</strong> specifier qualifies a declaration with four pieces of information:</p>
+<ol class="guide-trace"><li><strong>Lifetime</strong> (extent) — when storage exists.</li><li><strong>Scope</strong> (visibility) — where the name is visible.</li><li><strong>Linkage</strong> — whether the name refers to the same object across translation units.</li><li><strong>Default initial value</strong>.</li></ol>
+<h3>The Four Storage Classes</h3>
+<table class="guide-table"><thead><tr><th>Class</th><th>Lifetime</th><th>Scope</th><th>Linkage</th><th>Default value</th><th>Memory region</th></tr></thead><tbody><tr><td><code>auto</code></td><td>Function call</td><td>Block</td><td>None</td><td><strong>Garbage</strong></td><td>Stack</td></tr><tr><td><code>register</code></td><td>Function call</td><td>Block</td><td>None</td><td>Garbage</td><td>CPU register (hint)</td></tr><tr><td><code>static</code> (local)</td><td>Whole program</td><td>Block</td><td>None</td><td><strong>Zero-initialized</strong></td><td><code>.data</code> (init&#x27;d) / <code>.bss</code> (uninit)</td></tr><tr><td><code>static</code> (file scope)</td><td>Whole program</td><td>File</td><td><strong>Internal</strong></td><td>Zero</td><td><code>.data</code> / <code>.bss</code></td></tr><tr><td><code>extern</code></td><td>Whole program</td><td>File</td><td><strong>External</strong></td><td>Zero</td><td><code>.data</code> / <code>.bss</code></td></tr></tbody></table>
+<h4><code>auto</code> — The Implicit Default</h4>
+<p class="guide-plain">Local variables are <code>auto</code> by default. Stored on the <strong>stack</strong>, exists only during the function call, <strong>uninitialized</strong> (contains garbage). The keyword is essentially never written.</p>
+<h4><code>register</code> — A Hint Only</h4>
+<p class="guide-plain">Suggests the compiler keep this variable in a CPU register. You <strong>cannot take its address</strong> (<code>&amp;x</code> is illegal). Modern compilers ignore the hint and do their own register allocation; <code>register</code> is largely vestigial.</p>
+<h4><code>static</code> — Two Different Meanings</h4>
+<ol class="guide-trace"><li><strong>Inside a function:</strong> the variable persists across calls (lifetime = whole program), but the <strong>name</strong> is still local to the function.</li></ol>
+<pre class="guide-code"><code class="language-c">   void counter(void) {
+       static int n = 0;    // initialized ONCE before main(), not on every call
+       n++;
+       printf(&quot;%d\n&quot;, n);
+   }</code></pre>
+<p class="guide-plain">The &quot;initialization&quot; you write is performed by the C runtime <em>before</em> <code>main()</code> runs — it&#x27;s not an instruction inside the function. By the time <code>counter()</code> is first called, <code>n</code> already equals <code>0</code>.</p>
+<ol class="guide-trace"><li><strong>At file scope (global):</strong> restricts linkage to <strong>internal</strong> — the symbol is invisible to other <code>.c</code> files. This is C&#x27;s namespace-like mechanism.</li></ol>
+<pre class="guide-code"><code class="language-c">   static int helper_flag;        // not visible outside this .c file
+   static void internal_fn(void); // same — file-private function</code></pre>
+<h4><code>extern</code> — &quot;Defined Elsewhere&quot;</h4>
+<p class="guide-plain">A <em>declaration</em> without a definition. Tells the compiler the symbol exists somewhere; the linker will find it.</p>
+<pre class="guide-code"><code class="language-c">// file1.c
+int shared = 42;          // definition, allocates storage
+
+// file2.c
+extern int shared;        // declaration, no storage allocated
+void use(void) { shared++; }</code></pre>
+<p class="guide-plain">For functions, the <code>extern</code> keyword is the implicit default — bare prototypes are already extern.</p>
+<h3>The Process Memory Layout</h3>
+<p class="guide-plain">A typical Linux/Unix process map (high → low addresses):</p>
+<pre class="guide-code"><code class="language-c">┌──────────────────────────┐  high address
+│         Stack            │  grows downward — local vars, function call frames
+│           ↓              │
+├──────────────────────────┤
+│            ↕             │  unmapped gap (~ many GB on 64-bit)
+├──────────────────────────┤
+│           ↑              │
+│         Heap             │  grows upward — malloc/calloc/realloc allocations
+├──────────────────────────┤
+│  .bss (uninit. globals)  │  zero-filled by loader; e.g. `static int x;`
+├──────────────────────────┤
+│ .data (init. globals)    │  e.g. `static int x = 42;`
+├──────────────────────────┤
+│ .rodata (read-only data) │  string literals, `const` globals
+├──────────────────────────┤
+│ .text  (code)            │  the compiled program instructions
+└──────────────────────────┘  low address</code></pre>
+<h4>Where Does Each Variable Live?</h4>
+<table class="guide-table"><thead><tr><th>Declaration</th><th>Region</th></tr></thead><tbody><tr><td><code>int x;</code> inside <code>main()</code></td><td>Stack</td></tr><tr><td><code>static int x;</code> inside <code>main()</code></td><td><code>.bss</code> (uninit)</td></tr><tr><td><code>static int x = 5;</code> inside <code>main()</code></td><td><code>.data</code></td></tr><tr><td><code>int x;</code> at file scope</td><td><code>.bss</code></td></tr><tr><td><code>int x = 5;</code> at file scope</td><td><code>.data</code></td></tr><tr><td><code>const int x = 5;</code> at file scope</td><td><code>.rodata</code></td></tr><tr><td><code>char *s = &quot;hello&quot;;</code></td><td><code>s</code> on stack, <code>&quot;hello&quot;</code> in <code>.rodata</code></td></tr><tr><td><code>char s[] = &quot;hello&quot;;</code></td><td><code>s</code> is an array on the stack, modifiable</td></tr><tr><td><code>malloc(...)</code></td><td>Heap</td></tr><tr><td>function bodies</td><td><code>.text</code></td></tr></tbody></table>
+<h3>Worked Example — What Does This Print?</h3>
+<pre class="guide-code"><code class="language-c">#include &lt;stdio.h&gt;
+static int animals = 8;
+const  int i = 5;
+
+static int call_me(void) {
+    printf(&quot;%d %d&quot;, i, animals);
+}
+
+int main(void) {
+    int animals = 2;     // shadows the file-scope &#x27;animals&#x27;
+    call_me();
+    printf(&quot;%d&quot;, animals);
+    return 0;
+}</code></pre>
+<p class="guide-plain"><strong>Output:</strong> <code>5 82</code></p>
+<p class="guide-plain">Why?</p>
+<ul class="guide-list"><li>Inside <code>call_me()</code>, <code>animals</code> resolves to the file-scope <code>static</code> (which is <code>8</code>) — there is no local shadow there.</li><li><code>printf(&quot;%d %d&quot;, i, animals);</code> prints <code>5 8</code>, with no trailing newline.</li><li>Back in <code>main()</code>, the local <code>animals</code> (= <code>2</code>) is printed → final output: <code>5 82</code>.</li></ul>
+<h3>Common Mistakes</h3>
+<ul class="guide-list"><li>Returning a pointer to a stack variable from a function → <strong>dangling pointer</strong>, undefined behavior.</li></ul>
+<pre class="guide-code"><code class="language-c">  int *bad(void) { int x = 5; return &amp;x; }   // x dies on return — NEVER do this</code></pre>
+<ul class="guide-list"><li>Modifying a string literal: <code>char *s = &quot;hi&quot;; s[0] = &#x27;H&#x27;;</code> → UB, segfault on most systems.</li><li>Forgetting that <code>static</code> initializers run <em>once before main</em>, not on each function entry.</li></ul>
+<div class="guide-track-deep"><h3>Interview Q&amp;A</h3>
+<div class="guide-qa"><strong>Q1.</strong> Where does a <code>static</code> local variable live?</div>
+<div class="guide-qa"><strong>A.</strong> In <code>.data</code> (if initialized non-zero) or <code>.bss</code> (if uninitialized or zero-initialized). Its <strong>scope</strong> is still the enclosing block, but its <strong>lifetime</strong> is the whole program.</div>
+<div class="guide-qa"><strong>Q2.</strong> What&#x27;s the purpose of <code>static</code> at file scope?</div>
+<div class="guide-qa"><strong>A.</strong> To give the symbol <strong>internal linkage</strong> — invisible to other translation units. Used to hide implementation helpers and avoid name collisions.</div>
+<div class="guide-qa"><strong>Q3.</strong> Difference between heap and stack?</div>
+<div class="guide-qa"><strong>A.</strong> Stack: managed by the compiler via push/pop, fast (one instruction to allocate), LIFO, fixed small size, automatic deallocation. Heap: managed by the program via <code>malloc</code>/<code>free</code>, slower (bookkeeping for free lists), larger, manual deallocation, and the source of leaks/fragmentation.</div>
+<div class="guide-qa"><strong>Q4.</strong> Why is the stack faster than the heap?</div>
+<div class="guide-qa"><strong>A.</strong> Stack allocation is just <code>sub rsp, N</code> — one instruction. There&#x27;s no bookkeeping (no free lists), and freshly-pushed memory is almost always already in L1 cache (great cache locality). Heap allocation requires walking free lists, possibly system calls (<code>brk</code>/<code>mmap</code>), and the returned memory may be cold.</div>
+<div class="guide-qa"><strong>Q5.</strong> What does <code>extern</code> actually do?</div>
+<div class="guide-qa"><strong>A.</strong> It declares a name as having <strong>external linkage</strong> without providing a definition — the linker is told &quot;this symbol lives in another translation unit, please resolve it&quot;.</div></div>
+<h3>Key Takeaway</h3>
+<div class="guide-takeaway">Memorize the table: <code>auto</code>, <code>register</code>, <code>static</code>, <code>extern</code> × {lifetime, scope, linkage, default value}. Memorize the segment layout. Almost every &quot;where does this variable go?&quot; interview question reduces to these two tables.</div>
+<p class="guide-plain">---</p>
+</section>
+<section class="guide-section" id="typedef-vs-define">
+<h2>9. <code>typedef</code> vs <code>#define</code></h2>
+<p class="guide-plain"><code>typedef</code> introduces a <strong>type alias</strong> at the language level. <code>#define</code> is <strong>textual substitution</strong> at the preprocessor level. They look similar but behave very differently with pointers.</p>
+<pre class="guide-code"><code class="language-c">typedef char* ptr;
+#define PTR  char*
+
+ptr  a, b, c;     // a, b, c are ALL char*  (size 8 each on x86-64)
+PTR  x, y, z;     // expands to: char* x, y, z;
+                  // x is char*, but y and z are plain char (size 1)!</code></pre>
+<p class="guide-plain"><code>typedef</code>&#x27;s alias is <em>atomic</em>; the compiler treats <code>ptr</code> as a single type token. <code>#define</code> is dumb text replacement, so the <code>*</code> only binds to the first identifier.</p>
+<h3>Why <code>typedef</code>?</h3>
+<ul class="guide-list"><li><strong>Readability:</strong> <code>typedef int (*signal_handler_t)(int);</code> beats raw function-pointer syntax.</li><li><strong>Portability:</strong> <code>typedef unsigned long u64;</code> lets you switch the underlying type in one place.</li><li><strong>Type-safety:</strong> Used with structs to drop the <code>struct</code> keyword:</li></ul>
+<pre class="guide-code"><code class="language-c">  typedef struct Point { int x, y; } Point;
+  Point p;     // instead of: struct Point p;</code></pre>
+<h3>Common Mistakes</h3>
+<ul class="guide-list"><li>Using <code>#define</code> for types — works for simple aliases but breaks for pointers / function pointers.</li><li>Forgetting that <code>typedef</code>&#x27;d aliases hide the underlying type, sometimes too well — <code>size_t</code> vs <code>int</code> confusion in printf format specifiers.</li></ul>
+<h3>Key Takeaway</h3>
+<div class="guide-takeaway">Use <code>typedef</code> for types. Use <code>#define</code> for constants (or better, <code>enum</code> / <code>static const</code>). Mixing them up creates subtle bugs that compile cleanly.</div>
+<p class="guide-plain">---</p>
+</section>
+<section class="guide-section" id="enum">
+<h2>10. <code>enum</code></h2>
+<p class="guide-plain"><code>enum</code> defines a <strong>named set of integer constants</strong>.</p>
+<pre class="guide-code"><code class="language-c">enum Color { RED, GREEN, BLUE };           // RED=0, GREEN=1, BLUE=2 (auto)
+enum Status { OK = 0, FAIL = -1, BUSY = 1 };</code></pre>
+<h3>Why use enums?</h3>
+<ul class="guide-list"><li><strong>Readability</strong> — <code>state == OK</code> reads better than <code>state == 0</code>.</li><li><strong>Debuggability</strong> — debuggers print symbolic names rather than magic numbers.</li><li><strong>Compiler-checkable values</strong> — many compilers warn on missing cases in <code>switch</code> over an enum.</li><li>Better than <code>#define</code> because enum constants are visible to the debugger and respect scope.</li></ul>
+<h3>Quirks</h3>
+<ul class="guide-list"><li>Underlying type is <code>int</code> in standard C (C++23 allows fixed underlying types).</li><li>Enum <em>values</em> live at file scope — they pollute the namespace if not careful.</li></ul>
+<pre class="guide-code"><code class="language-c">switch (state) {
+    case OK:   /* ... */  break;
+    case FAIL: /* ... */  break;
+    case BUSY: /* ... */  break;
+    // GCC -Wswitch warns if any enum constant is missing
+}</code></pre>
+<h3>Key Takeaway</h3>
+<div class="guide-takeaway">Prefer <code>enum</code> over <code>#define</code> for sets of related integer constants — you get type-checking and debugger-friendly names.</div>
+<p class="guide-plain">---</p>
+</section>
+<section class="guide-section" id="operators-pre-post-increment">
+<h2>11. Operators — Pre/Post Increment</h2>
+<pre class="guide-code"><code class="language-c">int b = 10;
+int a = b++;     // POST: a gets old b (10), then b becomes 11
+                 // result: a == 10, b == 11</code></pre>
+<pre class="guide-code"><code class="language-c">int b = 10;
+int a = ++b;     // PRE: b first becomes 11, then a gets new b
+                 // result: a == 11, b == 11</code></pre>
+<h3>The Operand Rules</h3>
+<p class="guide-plain">The operand of <code>++</code>/<code>--</code> must be a <strong>modifiable lvalue</strong> (something with an address you can write to).</p>
+<pre class="guide-code"><code class="language-c">5++;          // ✗ illegal — 5 is not an lvalue
+a++;          // ✓
+(a + b)++;    // ✗ illegal — (a+b) is an rvalue
+a + b++;      // ✓ — only b is incremented</code></pre>
+<h3>Sequence Points &amp; Undefined Behavior</h3>
+<p class="guide-plain">The classic UB landmine:</p>
+<pre class="guide-code"><code class="language-c">int i = 0;
+i = i++ + ++i;     // UNDEFINED — i is modified more than once between sequence points
+printf(&quot;%d %d&quot;, i++, i++);   // UNDEFINED — order of arg evaluation is unspecified
+arr[i] = i++;      // UNDEFINED</code></pre>
+<p class="guide-plain">C17 introduced more precise wording (&quot;sequenced before&quot;), but the practical rule is unchanged: <strong>never modify the same object twice in one expression</strong> unless the standard explicitly defines an ordering (e.g., <code>&amp;&amp;</code>, <code>||</code>, <code>?:</code>, <code>,</code>).</p>
+<div class="guide-track-deep"><h3>Interview Q&amp;A</h3>
+<div class="guide-qa"><strong>Q1.</strong> What does <code>a = b++</code> do exactly?</div>
+<div class="guide-qa"><strong>A.</strong> Evaluates <code>b</code>, <strong>assigns its current value</strong> to <code>a</code>, then increments <code>b</code>. The result of <code>b++</code> <em>as a sub-expression</em> is the <strong>old</strong> value.</div>
+<div class="guide-qa"><strong>Q2.</strong> Is <code>i = i++;</code> defined?</div>
+<div class="guide-qa"><strong>A.</strong> <strong>No.</strong> The same object <code>i</code> is being modified twice without a sequence point between the modifications. UB.</div>
+<div class="guide-qa"><strong>Q3.</strong> Difference between <code>i++</code> and <code>++i</code> in a <code>for</code> loop?</div>
+<div class="guide-qa"><strong>A.</strong> <em>Semantically</em> none — the result is discarded either way. <em>Historically</em> <code>++i</code> was sometimes faster for non-trivial types (C++ iterators), but for <code>int</code>s any modern compiler emits identical code.</div></div>
+<h3>Key Takeaway</h3>
+<div class="guide-takeaway">Pre = &quot;increment first&quot;. Post = &quot;use old, then increment&quot;. Never modify the same variable more than once in a single expression.</div>
+<p class="guide-plain">---</p>
+</section>
+<section class="guide-section" id="pointers">
+<h2>12. Pointers</h2>
+<p class="guide-plain">A <strong>pointer</strong> is a variable whose value is an address. Its <em>type</em> tells the compiler how many bytes to read/write when dereferencing and how pointer arithmetic should scale.</p>
+<pre class="guide-code"><code class="language-c">int  x = 42;
+int *p = &amp;x;        // p holds the address of x
+int  y = *p;        // y = 42 — dereference
+
+p++;                // moves p forward by sizeof(int) bytes — NOT 1 byte</code></pre>
+<h3>Pointer Sizes</h3>
+<ul class="guide-list"><li>On a 64-bit system, every pointer is <strong>8 bytes</strong>, regardless of what it points to.</li><li>On a 32-bit system, every pointer is <strong>4 bytes</strong>.</li><li>A <code>char <em></code>, <code>int </em></code>, <code>void <em></code>, and function pointer all have the same size on a given platform — what differs is the </em>type* (and hence dereference / arithmetic semantics).</li></ul>
+<h3>The Five Pointer Pathologies</h3>
+<table class="guide-table"><thead><tr><th>Pathology</th><th>Definition</th><th>Example</th></tr></thead><tbody><tr><td><strong>NULL pointer</strong></td><td>A pointer with the well-defined value 0 / <code>NULL</code>. Dereferencing it is UB (almost always a segfault).</td><td><code>int <em>p = NULL; </em>p = 5;</code></td></tr><tr><td><strong>Wild pointer</strong></td><td>A pointer that has never been initialized; contains garbage.</td><td><code>int <em>p; </em>p = 5;</code></td></tr><tr><td><strong>Dangling pointer</strong></td><td>Points to memory that has been freed or gone out of scope.</td><td><code>free(p); *p = 5;</code></td></tr><tr><td><strong>Void pointer</strong></td><td>Generic pointer with no associated type. Cannot be dereferenced without a cast.</td><td><code>void <em>p; </em>(int*)p</code></td></tr><tr><td><strong>Function pointer</strong></td><td>Holds the address of executable code, not data.</td><td><code>int (*fp)(int);</code></td></tr></tbody></table>
+<h4>Void Pointer — The Generic</h4>
+<p class="guide-plain">A <code>void <em></code> can hold the address of an object of any type. You cannot dereference it directly; you must cast to a real pointer type first. This is why <code>malloc</code> returns <code>void </em></code> — you cast it (in C this is implicit and not even necessary; in C++ it&#x27;s required).</p>
+<pre class="guide-code"><code class="language-c">void *raw = malloc(sizeof(int));
+int  *p   = (int *)raw;          // cast before use
+*p = 100;</code></pre>
+<h4>Dangling Pointer — Common Causes</h4>
+<pre class="guide-code"><code class="language-c">// 1. Returning the address of a local variable
+int *bad(void) { int x = 5; return &amp;x; }   // x dies on return
+
+// 2. Use-after-free
+char *p = malloc(10);
+free(p);
+strcpy(p, &quot;oops&quot;);                          // p still holds the old address — UB
+
+// 3. Local goes out of scope
+int *p;
+{ int t = 10; p = &amp;t; }                     // t&#x27;s lifetime ends at }
+*p;                                         // UB</code></pre>
+<p class="guide-plain"><strong>Defense:</strong> set pointers to <code>NULL</code> after <code>free()</code>, and never return addresses of locals.</p>
+<h3>Pointer Arithmetic Scales by Type Size</h3>
+<pre class="guide-code"><code class="language-c">int arr[5] = {10, 20, 30, 40, 50};
+int *p = arr;            // p == &amp;arr[0]
+*(p + 2);                // 30 — moved 2 * sizeof(int) = 8 bytes forward</code></pre>
+<p class="guide-plain"><code>p + n</code> is equivalent to <code>&amp;p[n]</code>. <code><em>(p + n)</code> is equivalent to <code>p[n]</code>. In fact <code>arr[i]</code> is </em>literally<em> defined as <code></em>(arr + i)</code> — and because <code>+</code> is commutative, <code>i[arr]</code> is also legal C (don&#x27;t write this).</p>
+<h3>Pointer to Pointer (<code>**</code>)</h3>
+<p class="guide-plain">A pointer that holds the address of another pointer. Used for:</p>
+<ul class="guide-list"><li>Modifying a pointer through a function (out-parameters):</li></ul>
+<pre class="guide-code"><code class="language-c">  void allocate(int **out) { *out = malloc(sizeof(int)); }
+  int *p = NULL;
+  allocate(&amp;p);   // now p points to fresh heap memory</code></pre>
+<ul class="guide-list"><li>2-D arrays via array of pointers (<code>int **grid</code>).</li><li><code>argv</code> itself is a <code>char **</code>.</li></ul>
+<h3>Pointer to Array — A Frequently-Confused Beast</h3>
+<pre class="guide-code"><code class="language-c">int (*p)[10];      //  p is a POINTER TO an array of 10 ints  → sizeof(*p) == 40
+int *p[10];        //  p is an ARRAY of 10 pointers to int    → sizeof(p)  == 80</code></pre>
+<p class="guide-plain">Reading the cdecl algorithm: start at the variable name, follow C&#x27;s operator precedence. Parentheses force &quot;pointer to&quot; to bind first.</p>
+<pre class="guide-code"><code class="language-c">int data[4][3] = { {23,55,50}, {45,38,55}, {70,43,45}, {34,46,60} };
+
+int (*ptr)[3] = data;              // ptr points to the first row
+ptr[i][j];      // ≡ *(*(ptr + i) + j)
+ptr++;          // moves forward by sizeof(int[3]) = 12 bytes — to next row</code></pre>
+<p class="guide-plain">Why does <code>int <em>ptr = data;</code> fail? Because <code>data</code> decays to <code>int (</em>)[3]</code> (pointer-to-array-of-3-ints), not <code>int *</code>.</p>
+<h3>Key Takeaway</h3>
+<div class="guide-takeaway">A pointer is <em>(address, type)</em>. The address tells where; the type tells how to interpret and how arithmetic scales. Master decay rules and you&#x27;ve mastered 80% of C pointer interview questions.</div>
+<p class="guide-plain">---</p><p class="guide-link-q">Practice: <a class="btn" href="question.html?id=q103-swap-two-integers-using-pointers">q103 Swap</a> <a class="btn" href="question.html?id=q104-reverse-array-with-pointer-walking">q104 Reverse</a> <a class="btn" href="question.html?id=q109-delete-node-double-pointer">q109 Double pointer</a></p>
+</section>
+<section class="guide-section" id="arrays-vs-pointers">
+<h2>13. Arrays vs Pointers</h2>
+<p class="guide-plain">Arrays and pointers are <strong>related</strong> but <strong>not the same</strong>.</p>
+<h3>Array Decay Rule</h3>
+<p class="guide-plain">In <em>most</em> contexts, an array name decays into a pointer to its first element. <strong>Exceptions:</strong> as the operand of <code>sizeof</code>, <code>&amp;</code>, or as a string literal initializer for a <code>char[]</code>.</p>
+<pre class="guide-code"><code class="language-c">int a[10];
+int *p = a;            // a decays to &amp;a[0]
+sizeof(a);             // 40 — array does NOT decay here
+sizeof(p);             // 8  — sizeof a pointer
+&amp;a;                    // type: int (*)[10] — pointer to whole array</code></pre>
+<h3><code>char *p = &quot;hello&quot;</code> vs <code>char q[] = &quot;hello&quot;</code></h3>
+<p class="guide-plain">This is <em>the</em> most-asked C interview question.</p>
+<pre class="guide-code"><code class="language-c">char *p = &quot;hello&quot;;        // p is a pointer to a string LITERAL in .rodata
+char  q[] = &quot;hello&quot;;      // q is an ARRAY on the STACK, initialized from the literal
+
+p[0] = &#x27;H&#x27;;               // UB — writing to read-only memory (often segfaults)
+q[0] = &#x27;H&#x27;;               // ✓ legal — q is your own modifiable copy
+
+sizeof(p);                // 8 — pointer size on x86-64
+sizeof(q);                // 6 — 5 chars + &#x27;\0&#x27;, the actual array size
+
+strlen(p);                // 5
+strlen(q);                // 5</code></pre>
+<p class="guide-plain">Why? Inspect the compiled assembly:</p>
+<pre class="guide-code"><code class="language-text">char *s = &quot;abc&quot;;          # → store address of .rodata literal
+char  s[] = &quot;abc&quot;;        # → copy the bytes &#x27;a&#x27;,&#x27;b&#x27;,&#x27;c&#x27;,&#x27;\0&#x27; onto the stack</code></pre>
+<table class="guide-table"><thead><tr><th>Aspect</th><th><code>char *p = &quot;...&quot;</code></th><th><code>char q[] = &quot;...&quot;</code></th></tr></thead><tbody><tr><td>What is stored</td><td>Address of literal</td><td>Bytes of literal (copied)</td></tr><tr><td>Where lives</td><td>Literal in <code>.rodata</code>; <code>p</code> itself on stack</td><td>The bytes are on the stack</td></tr><tr><td>Modifiable?</td><td><strong>No</strong> — UB</td><td><strong>Yes</strong></td></tr><tr><td><code>sizeof</code></td><td>sizeof a pointer (4 or 8)</td><td>length of array including <code>\0</code></td></tr><tr><td>Lifetime</td><td>Literal: program lifetime</td><td>Array: function call</td></tr></tbody></table>
+<h3>Array Cannot Be Reassigned</h3>
+<pre class="guide-code"><code class="language-c">int a[5];
+int b[5];
+// a = b;        ✗ — array names are not lvalues
+memcpy(a, b, sizeof(a));   // ✓ — copy element-by-element</code></pre>
+<p class="guide-plain">But pointers can:</p>
+<pre class="guide-code"><code class="language-c">int *p, *q;
+p = q;           // ✓ — pointer assignment</code></pre>
+<h3>Common Mistakes</h3>
+<ul class="guide-list"><li><code>sizeof(arr)</code> inside a function where <code>arr</code> is a parameter — gives pointer size, not array size, because parameters decay. Always pass length explicitly.</li><li>Modifying string literals.</li><li>Confusing <code>char <em>names[]</code> (array of pointers) with <code>char (</em>names)[N]</code> (pointer to array).</li></ul>
+<div class="guide-track-deep"><h3>Interview Q&amp;A</h3>
+<div class="guide-qa"><strong>Q1.</strong> Are arrays and pointers the same in C?</div>
+<div class="guide-qa"><strong>A.</strong> No. An array name <em>decays</em> to a pointer to its first element in most expressions, but <code>sizeof</code> and <code>&amp;</code> see the array type. The array itself is a contiguous block; the pointer is just an address.</div>
+<div class="guide-qa"><strong>Q2.</strong> What does <code>sizeof</code> return for an array parameter?</div>
+<div class="guide-qa"><strong>A.</strong> Size of a pointer, not the array. C function parameters of array type are silently rewritten as pointers (<code>void f(int a[10])</code> ≡ <code>void f(int *a)</code>).</div>
+<div class="guide-qa"><strong>Q3.</strong> Why does <code>char *s = &quot;hello&quot;; s[0]=&#x27;H&#x27;;</code> segfault?</div>
+<div class="guide-qa"><strong>A.</strong> String literals live in read-only memory (<code>.rodata</code>). Writing through <code>s</code> violates page protection. Use <code>char s[] = &quot;hello&quot;</code> for a modifiable copy.</div></div>
+<h3>Key Takeaway</h3>
+<div class="guide-takeaway">Arrays decay; pointers don&#x27;t. Literals are read-only. <code>sizeof</code> lies inside functions when applied to &quot;array&quot; parameters.</div>
+<p class="guide-plain">---</p><p class="guide-link-q">Practice: <a class="btn" href="question.html?id=q106-pointer-to-array-vs-array-of-pointers">q106 Array of pointers</a> <a class="btn" href="question.html?id=q108-sort-array-of-string-pointers">q108 String pointers</a></p>
+</section>
+<section class="guide-section" id="function-pointers">
+<h2>14. Function Pointers</h2>
+<p class="guide-plain">A <strong>function pointer</strong> holds the address of executable code. You can call functions through it, store callbacks in it, and build dispatch tables (&quot;vtables&quot;) with it.</p>
+<h3>Declaration Syntax — The Cdecl Trick</h3>
+<pre class="guide-code"><code class="language-c">int  (*fp)(int, int);    // fp is a pointer to a function taking (int,int) returning int
+int   *fp(int, int);     // fp is a function taking (int,int) returning int*  (totally different!)
+int *(*fp)(int, int, int);  // pointer to function (int,int,int) returning int*</code></pre>
+<p class="guide-plain">The parentheses around <code>*fp</code> are mandatory; without them it parses as a function returning a pointer.</p>
+<h3>Assigning and Calling</h3>
+<pre class="guide-code"><code class="language-c">int Add(int a, int b)      { return a + b; }
+int Multiply(int a, int b) { return a * b; }
+
+int (*op)(int, int);
+
+op = Add;                  // function name decays to its address; &amp; is optional
+op = &amp;Add;                 // equivalent
+int r1 = op(2, 3);         // 5  — call via pointer
+int r2 = (*op)(2, 3);      // 5  — explicit dereference, same effect</code></pre>
+<h3>Callbacks — Passing Behavior as a Parameter</h3>
+<pre class="guide-code"><code class="language-c">#include &lt;stdio.h&gt;
+
+int Add(int a, int b)      { return a + b; }
+int Multiply(int a, int b) { return a * b; }
+
+void Do_operation(int (*op)(int, int), int x, int y) {
+    int result = op(x, y);
+    printf(&quot;result = %d\n&quot;, result);
+}
+
+int main(void) {
+    Do_operation(Add, 2, 3);        // 5
+    Do_operation(Multiply, 2, 3);   // 6
+    return 0;
+}</code></pre>
+<p class="guide-plain">This is C&#x27;s mechanism for higher-order functions — callbacks (<code>qsort</code>&#x27;s comparator), event handlers, plugin systems, state machines.</p>
+<h3><code>typedef</code> Makes It Readable</h3>
+<pre class="guide-code"><code class="language-c">typedef int (*BinOp)(int, int);
+
+BinOp op = Add;
+op(3, 4);</code></pre>
+<h3>Function Pointers in Structs — &quot;Polymorphism&quot; in C</h3>
+<p class="guide-plain">This is how C achieves OO-style dispatch — used pervasively in the Linux kernel (<code>struct file_operations</code>).</p>
+<pre class="guide-code"><code class="language-c">#include &lt;stdio.h&gt;
+
+typedef struct sCommClass {
+    int (*open)(struct sCommClass *self, char *fspec);
+} tCommClass;
+
+// &quot;Subclass&quot; 1
+static int tcpOpen(tCommClass *tcp, char *fspec) {
+    printf(&quot;Opening TCP: %s\n&quot;, fspec);
+    return 0;
+}
+static void tcpInit(tCommClass *tcp) { tcp-&gt;open = &amp;tcpOpen; }
+
+// &quot;Subclass&quot; 2
+static int httpOpen(tCommClass *http, char *fspec) {
+    printf(&quot;Opening HTTP: %s\n&quot;, fspec);
+    return 0;
+}
+static void httpInit(tCommClass *http) { http-&gt;open = &amp;httpOpen; }
+
+int main(void) {
+    tCommClass commTcp, commHttp;
+
+    tcpInit(&amp;commTcp);
+    httpInit(&amp;commHttp);
+
+    // Same call site, different behavior — runtime polymorphism in pure C
+    commTcp.open(&amp;commTcp,  &quot;bigiron.box.com:5000&quot;);
+    commHttp.open(&amp;commHttp,&quot;http://www.microsoft.com&quot;);
+    return 0;
+}</code></pre>
+<p class="guide-plain"><strong>Output:</strong></p>
+<pre class="guide-code"><code class="language-c">Opening TCP: bigiron.box.com:5000
+Opening HTTP: http://www.microsoft.com</code></pre>
+<h3>Common Mistakes</h3>
+<ul class="guide-list"><li>Forgetting the parentheses: <code>int <em>fp(int)</code> is a </em>function<em> returning <code>int </em></code>, not a pointer.</li><li>Calling through a NULL function pointer → segfault.</li><li>Mismatched calling conventions when the pointer comes from another language / library — corrupted stack.</li></ul>
+<div class="guide-track-deep"><h3>Interview Q&amp;A</h3>
+<div class="guide-qa"><strong>Q1.</strong> What&#x27;s the difference between <code>void (<em>f)()</code> and <code>void </em>f()</code>?</div>
+<div class="guide-qa"><strong>A.</strong> First is a pointer to a function returning <code>void</code>. Second is a function returning <code>void *</code>.</div>
+<div class="guide-qa"><strong>Q2.</strong> Why is <code>&amp;</code> optional when assigning a function to a pointer?</div>
+<div class="guide-qa"><strong>A.</strong> Function names, like array names, decay into pointers in most contexts. <code>op = Add;</code> and <code>op = &amp;Add;</code> are both legal and equivalent.</div>
+<div class="guide-qa"><strong>Q3.</strong> Real-world uses of function pointers?</div>
+<div class="guide-qa"><strong>A.</strong> <code>qsort</code>/<code>bsearch</code> comparators, callbacks, state machines, dispatch tables, dynamic loading (<code>dlsym</code>), kernel device-driver <code>file_operations</code> structs.</div></div>
+<h3>Key Takeaway</h3>
+<div class="guide-takeaway">Function pointers + structs = vtables. This is how the kernel and most large C codebases do polymorphism. The syntax is ugly; <code>typedef</code> makes it tolerable.</div>
+<p class="guide-plain">---</p>
+</section>
+<section class="guide-section" id="dynamic-memory">
+<h2>15. Dynamic Memory</h2>
+<p class="guide-plain">C has no garbage collector. The four heap functions live in <code>&lt;stdlib.h&gt;</code>.</p>
+<h3><code>malloc</code> — Allocate Raw Bytes</h3>
+<pre class="guide-code"><code class="language-c">void *malloc(size_t size);</code></pre>
+<ul class="guide-list"><li>Allocates <code>size</code> bytes on the heap.</li><li>Returns a <code>void *</code> to the block, or <code>NULL</code> on failure.</li><li><strong>Does not initialize</strong> the memory — it contains garbage.</li></ul>
+<pre class="guide-code"><code class="language-c">int *p = malloc(100 * sizeof(int));   // 400 bytes (on 32-bit int)
+if (!p) { perror(&quot;malloc&quot;); exit(1); }   // ALWAYS check for NULL
+p[0] = 42;
+free(p);
+p = NULL;                                 // defensive</code></pre>
+<div class="guide-takeaway"><strong>Idiom:</strong> <code>malloc(N <em> sizeof(</em>p))</code> — using <code>sizeof(*p)</code> instead of <code>sizeof(int)</code> means changing <code>p</code>&#x27;s type later doesn&#x27;t break the allocation.</div>
+<h3><code>calloc</code> — Allocate and Zero</h3>
+<pre class="guide-code"><code class="language-c">void *calloc(size_t nmemb, size_t size);</code></pre>
+<ul class="guide-list"><li>Allocates <code>nmemb * size</code> bytes.</li><li><strong>Zero-initializes</strong> every byte.</li><li>Useful for arrays where 0 is a sensible default; counters, flags, sparse data.</li></ul>
+<pre class="guide-code"><code class="language-c">int *p = calloc(25, sizeof(int));   // 25 ints, all set to 0</code></pre>
+<p class="guide-plain"><code>calloc</code> can be faster than <code>malloc + memset</code> because the OS often hands back zero-filled pages already.</p>
+<h3><code>realloc</code> — Resize an Existing Allocation</h3>
+<pre class="guide-code"><code class="language-c">void *realloc(void *ptr, size_t newSize);</code></pre>
+<ul class="guide-list"><li>Resizes the block at <code>ptr</code> to <code>newSize</code> bytes.</li><li>May move the block — <strong>always reassign</strong> the returned pointer.</li><li>Existing data up to <code>min(old, new)</code> is preserved.</li><li>On failure, returns <code>NULL</code> and the <strong>original block remains valid</strong> (don&#x27;t lose the old pointer!).</li></ul>
+<pre class="guide-code"><code class="language-c">int *p   = malloc(10 * sizeof *p);
+int *tmp = realloc(p, 20 * sizeof *p);
+if (!tmp) { /* p is still valid */ free(p); return; }
+p = tmp;</code></pre>
+<p class="guide-plain">Special cases:</p>
+<ul class="guide-list"><li><code>realloc(NULL, n)</code> ≡ <code>malloc(n)</code>.</li><li><code>realloc(p, 0)</code> is implementation-defined (don&#x27;t rely on it; use <code>free</code>).</li></ul>
+<h3><code>free</code> — Release Memory</h3>
+<pre class="guide-code"><code class="language-c">void free(void *ptr);</code></pre>
+<ul class="guide-list"><li>Returns the block to the heap allocator.</li><li><code>free(NULL)</code> is a no-op (safe).</li><li>Calling <code>free</code> twice on the same pointer (<strong>double-free</strong>) → UB, often heap corruption.</li><li>Using a pointer <strong>after</strong> <code>free</code> (<strong>use-after-free</strong>) → UB, classic security bug.</li></ul>
+<h3>Memory Bug Catalog</h3>
+<table class="guide-table"><thead><tr><th>Bug</th><th>What happens</th><th>How to avoid</th></tr></thead><tbody><tr><td><strong>Memory leak</strong></td><td>Allocated, lost the pointer, never freed</td><td>Pair every <code>malloc</code> with <code>free</code>; use Valgrind / ASan</td></tr><tr><td><strong>Double free</strong></td><td>Same pointer freed twice — corrupts free list</td><td>Set pointer to <code>NULL</code> after free</td></tr><tr><td><strong>Use-after-free</strong></td><td>Read/write through pointer to freed memory</td><td>Set pointer to <code>NULL</code> after free</td></tr><tr><td><strong>Buffer overflow</strong></td><td>Wrote past the end of allocation</td><td>Track sizes; use <code>snprintf</code>, <code>strncpy</code> carefully</td></tr><tr><td><strong>NULL deref</strong></td><td>Forgot to check <code>malloc</code> return</td><td>Always check <code>if (!p)</code></td></tr><tr><td><strong>Mismatched alloc/free</strong></td><td><code>malloc</code>+<code>delete</code>, <code>new</code>+<code>free</code>, <code>malloc</code>+<code>delete[]</code></td><td>Match every allocation with the right release</td></tr><tr><td><strong>Heap fragmentation</strong></td><td>Long-running program, many small allocs of varying sizes</td><td>Use pools / arenas for hot paths</td></tr></tbody></table>
+<h3>Cost Model</h3>
+<ul class="guide-list"><li>Stack alloc: <strong>~1 instruction</strong> (<code>sub rsp, N</code>).</li><li><code>malloc</code>: <strong>hundreds of cycles</strong> (free-list walk; sometimes a <code>brk</code>/<code>mmap</code> syscall, which is thousands of cycles).</li><li><code>free</code>: similar cost; may consolidate adjacent free blocks.</li></ul>
+<div class="guide-track-deep"><h3>Interview Q&amp;A</h3>
+<div class="guide-qa"><strong>Q1.</strong> Difference between <code>malloc</code> and <code>calloc</code>?</div>
+<div class="guide-qa"><strong>A.</strong> <code>calloc(n,sz)</code> zero-initializes the result; <code>malloc(n*sz)</code> doesn&#x27;t. <code>calloc</code> takes element count + element size; <code>malloc</code> takes total bytes.</div>
+<div class="guide-qa"><strong>Q2.</strong> What does <code>realloc</code> do if it can&#x27;t grow in place?</div>
+<div class="guide-qa"><strong>A.</strong> Allocates a new block of the requested size, copies over the existing contents, frees the old block, and returns the new pointer (which differs from the old one). On failure, returns <code>NULL</code> and <strong>leaves the original block intact</strong>.</div>
+<div class="guide-qa"><strong>Q3.</strong> Why can <code>free</code> be called with <code>NULL</code>?</div>
+<div class="guide-qa"><strong>A.</strong> The standard requires <code>free(NULL)</code> to be a no-op. This eliminates a common cleanup-path branch.</div>
+<div class="guide-qa"><strong>Q4.</strong> What&#x27;s the difference between heap and stack memory in C?</div>
+<div class="guide-qa"><strong>A.</strong> Stack: managed automatically, fast, small (typically 1–8 MB), LIFO. Heap: managed manually via <code>malloc</code>/<code>free</code>, larger but slower, prone to leaks and fragmentation.</div>
+<div class="guide-qa"><strong>Q5.</strong> Is <code>int arr[n]</code> (variable-length array) on the stack or heap?</div>
+<div class="guide-qa"><strong>A.</strong> Stack (in C99 VLAs). VLAs were made optional in C11. They&#x27;re convenient but risky — large <code>n</code> blows the stack.</div></div>
+<h3>Key Takeaway</h3>
+<div class="guide-takeaway">Every <code>malloc</code> deserves a <code>free</code>. Every <code>realloc</code> needs a temporary pointer to handle failure. NULL out pointers after freeing.</div>
+<p class="guide-plain">---</p><p class="guide-link-q">Practice: <a class="btn" href="question.html?id=q53-createnode-allocate-initialize-a-new-node">q53 Create node</a> <a class="btn" href="question.html?id=q70-freetree-must-use-postorder-children-before-parent">q70 Free tree</a></p>
+</section>
+<section class="guide-section" id="allocating-2-d-arrays-dynamically">
+<h2>16. Allocating 2-D Arrays Dynamically</h2>
+<p class="guide-plain">A genuine 2-D array (<code>int arr[R][C]</code>) is contiguous in memory and indexed via <code>arr[i][j] = <em>(arr + i</em>C + j)</code>. When <code>R</code> or <code>C</code> aren&#x27;t known at compile time, you have <strong>five idioms</strong> to choose from — each with different memory layout, performance, and ease of use.</p>
+<h3>Idiom 1 — Single Pointer (<code>int *</code>), Manual Index Math</h3>
+<p class="guide-plain"><strong>Most cache-friendly.</strong> One contiguous block; no extra indirection. You compute the offset yourself.</p>
+<pre class="guide-code"><code class="language-c">int r = 3, c = 4;
+int *ptr = malloc(r * c * sizeof(int));
+for (int i = 0; i &lt; r * c; i++) ptr[i] = i + 1;
+
+// access (i,j):
+ptr[i * c + j];
+
+free(ptr);</code></pre>
+<p class="guide-plain">✓ One alloc, one free. ✓ Contiguous. ✗ Manual index arithmetic.</p>
+<h3>Idiom 2 — Array of Pointers (<code>int *arr[R]</code>)</h3>
+<p class="guide-plain">Each row independently allocated. Rows can have <strong>different sizes</strong> (&quot;jagged array&quot;).</p>
+<pre class="guide-code"><code class="language-c">int r = 3, c = 4;
+int *arr[r];                              // VLA on the stack
+for (int i = 0; i &lt; r; i++)
+    arr[i] = malloc(c * sizeof(int));
+
+arr[i][j] = ++count;
+
+for (int i = 0; i &lt; r; i++) free(arr[i]); // r frees</code></pre>
+<p class="guide-plain">✓ Natural <code>arr[i][j]</code> syntax. ✗ Rows scattered → cache-unfriendly. ✗ <code>r+1</code> allocations.</p>
+<h3>Idiom 3 — Pointer to Pointer (<code>int **</code>)</h3>
+<p class="guide-plain">The fully heap-allocated version of Idiom 2. Both the row-pointer table and the rows live on the heap.</p>
+<pre class="guide-code"><code class="language-c">int **arr = malloc(r * sizeof(int *));     // table of r pointers
+for (int i = 0; i &lt; r; i++)
+    arr[i] = malloc(c * sizeof(int));      // each row
+
+arr[i][j] = ++count;
+
+for (int i = 0; i &lt; r; i++) free(arr[i]);  // free rows
+free(arr);                                  // free table</code></pre>
+<p class="guide-plain">✓ <code>arr[i][j]</code> works. ✗ <code>r+1</code> allocations, two indirections per access, scattered rows.</p>
+<h3>Idiom 4 — Single <code>malloc</code>, Pointer-Table + Data Concatenated</h3>
+<p class="guide-plain"><strong>Best of both worlds:</strong> one allocation, one free, contiguous data, but <code>arr[i][j]</code> syntax still works.</p>
+<pre class="guide-code"><code class="language-c">size_t len = sizeof(int *) * r + sizeof(int) * c * r;
+int **arr  = malloc(len);
+int  *ptr  = (int *)(arr + r);             // data starts right after the pointer table
+for (int i = 0; i &lt; r; i++) arr[i] = ptr + c * i;
+
+arr[i][j] = ++count;
+
+free(arr);                                  // ONE free</code></pre>
+<p class="guide-plain">✓ One alloc/free. ✓ Mostly contiguous data. ✗ Slightly tricky pointer arithmetic.</p>
+<h3>Idiom 5 — Pointer to Array (<code>int (*ptr)[N]</code>) — Compile-Time C, Runtime R</h3>
+<p class="guide-plain">When the column count is known at compile time, this is the cleanest:</p>
+<pre class="guide-code"><code class="language-c">int r = 3;
+int (*ptr)[3] = malloc(r * sizeof *ptr);   // r rows of int[3]
+
+for (int i = 0; i &lt; r; i++)
+    for (int j = 0; j &lt; 3; j++)
+        ptr[i][j] = i*3 + j;
+
+free(ptr);                                  // ONE free</code></pre>
+<p class="guide-plain">For runtime-sized columns, C99 lets you use a VLA pointer:</p>
+<pre class="guide-code"><code class="language-c">void process(int m, int n) {
+    int (*ptr)[n] = malloc(m * n * sizeof(int));   // VLA-pointer
+    /* ... */
+    free(ptr);
+}</code></pre>
+<p class="guide-plain">✓ One alloc, contiguous, full <code>[i][j]</code> syntax. ✗ Requires column count at allocation time.</p>
+<h3>Comparison Table</h3>
+<table class="guide-table"><thead><tr><th>Method</th><th>Allocations</th><th>Contiguous?</th><th><code>arr[i][j]</code> works?</th><th>Cache-friendly</th><th>Best for</th></tr></thead><tbody><tr><td>1. Flat <code>int *</code></td><td>1</td><td>✓</td><td>✗ (use <code>arr[i*c+j]</code>)</td><td>✓✓✓</td><td>Numeric kernels, GPU-style code</td></tr><tr><td>2. Array of <code>int *</code></td><td>R+1</td><td>✗</td><td>✓</td><td>✗</td><td>Jagged arrays</td></tr><tr><td>3. <code>int **</code></td><td>R+1</td><td>✗</td><td>✓</td><td>✗</td><td>Quick prototyping</td></tr><tr><td>4. Combined block</td><td>1</td><td>✓</td><td>✓</td><td>✓✓</td><td>General-purpose tables</td></tr><tr><td>5. Pointer to array</td><td>1</td><td>✓</td><td>✓</td><td>✓✓✓</td><td>When column count is known</td></tr></tbody></table>
+<h3>Key Takeaway</h3>
+<div class="guide-takeaway">Prefer <strong>Idiom 1</strong> or <strong>Idiom 5</strong> for performance. Use <strong>Idiom 4</strong> when you want contiguous + <code>arr[i][j]</code> ergonomics. Avoid <strong>Idiom 3</strong> in hot paths.</div>
+<p class="guide-plain">---</p>
+</section>
+<section class="guide-section" id="memory-manipulation-memcpy-memmove-memset">
+<h2>17. Memory Manipulation — <code>memcpy</code>, <code>memmove</code>, <code>memset</code></h2>
+<table class="guide-table"><thead><tr><th>Function</th><th>Signature</th><th>Behavior</th></tr></thead><tbody><tr><td><code>memcpy</code></td><td><code>void <em>memcpy(void </em>dst, const void *src, size_t n)</code></td><td>Copies <code>n</code> bytes. <strong>UB if regions overlap.</strong></td></tr><tr><td><code>memmove</code></td><td><code>void <em>memmove(void </em>dst, const void *src, size_t n)</code></td><td>Copies <code>n</code> bytes. <strong>Safe for overlapping regions.</strong></td></tr><tr><td><code>memset</code></td><td><code>void <em>memset(void </em>s, int c, size_t n)</code></td><td>Sets <code>n</code> bytes to <code>c</code> (interpreted as <code>unsigned char</code>).</td></tr></tbody></table>
+<h3>Why Two Copy Functions?</h3>
+<p class="guide-plain"><code>memcpy</code> is allowed to copy in any order — forward, backward, in chunks of 8 or 16 bytes, with SIMD. This makes it fast but <strong>unsafe</strong> when source and destination overlap. <code>memmove</code> checks for overlap and copies in the safe direction (front-to-back if <code>dst &lt; src</code>, back-to-front otherwise).</p>
+<pre class="guide-code"><code class="language-c">char str[7] = &quot;abcdef&quot;;
+memcpy(str + 6, str, 10);    // ⚠️ UB — regions overlap; result is garbage / corruption
+memmove(str + 6, str, 10);   // ✓  safe — defined output</code></pre>
+<h3><code>memset</code> Caveats</h3>
+<ul class="guide-list"><li>The &quot;fill value&quot; is converted to <code>unsigned char</code>, so only the low 8 bits matter.</li><li><code>memset(arr, -1, n)</code> works to fill an <code>int</code> array with <code>0xFFFFFFFF</code> (all-ones) — but <strong>only</strong> because all ones in two&#x27;s complement is <code>-1</code>.</li><li><code>memset(arr, 1, n)</code> does <strong>not</strong> fill an int array with <code>1</code>s; each byte becomes <code>0x01</code>, so each int becomes <code>0x01010101</code> = 16843009.</li></ul>
+<pre class="guide-code"><code class="language-c">int a[4];
+memset(a, 0, sizeof a);    // ✓ all ints become 0
+memset(a, -1, sizeof a);   // ✓ all ints become -1 (0xFFFFFFFF)
+memset(a, 1, sizeof a);    // ✗ each int is 0x01010101, not 1</code></pre>
+<h3>Common Mistakes</h3>
+<ul class="guide-list"><li>Using <code>memcpy</code> on overlapping regions.</li><li>Wrong size argument: <code>memcpy(dst, src, sizeof(src))</code> where <code>src</code> is a pointer (gets pointer size, not the data size).</li><li>Using <code>memset</code> to &quot;zero out&quot; floating-point arrays — works <em>because</em> IEEE 754 zero is all-bits-zero, but for any non-zero pattern it&#x27;s wrong.</li></ul>
+<div class="guide-track-deep"><h3>Interview Q&amp;A</h3>
+<div class="guide-qa"><strong>Q1.</strong> When does <code>memcpy</code> produce wrong results?</div>
+<div class="guide-qa"><strong>A.</strong> When source and destination overlap. Use <code>memmove</code> instead.</div>
+<div class="guide-qa"><strong>Q2.</strong> Why is <code>memcpy</code> typically faster than <code>memmove</code>?</div>
+<div class="guide-qa"><strong>A.</strong> It can copy without checking overlap and use the most aggressive copy strategy (SIMD, large chunks, prefetching).</div>
+<div class="guide-qa"><strong>Q3.</strong> Will <code>memset(p, 0, sizeof(double[10]))</code> zero-initialize the array?</div>
+<div class="guide-qa"><strong>A.</strong> Yes — IEEE 754 <code>0.0</code> is encoded as all-bits-zero. But this is a portability footgun; better to use a loop or <code>{0}</code> initializer.</div></div>
+<h3>Key Takeaway</h3>
+<div class="guide-takeaway"><code>memcpy</code> is fast but assumes no overlap. <code>memmove</code> handles overlap. <code>memset</code> works one byte at a time — fine for 0 and -1, dangerous for anything else.</div>
+<p class="guide-plain">---</p><p class="guide-link-q">Practice: <a class="btn" href="question.html?id=q78-memset-memcpy-memmove-standard-functions">q78 mem*</a> <a class="btn" href="question.html?id=q79-custom-memcpy">q79 memcpy</a> <a class="btn" href="question.html?id=q80-custom-memmove-overlap-safe">q80 memmove</a> <a class="btn" href="question.html?id=q81-custom-memset">q81 memset</a></p>
+</section>
+<section class="guide-section" id="structures-unions-padding-alignment">
+<h2>18. Structures, Unions, Padding &amp; Alignment</h2>
+<h3>Structures — Heterogeneous Aggregate</h3>
+<p class="guide-plain">A <code>struct</code> is a user-defined type that groups variables of (possibly different) types under one name. Each member gets its own storage.</p>
+<pre class="guide-code"><code class="language-c">struct Point { int x, y, z; };
+
+struct Point p1 = {1, 2, 3};                  // positional init
+struct Point p2 = {.y = 0, .z = 1, .x = 2};   // C99 designated initializers — order doesn&#x27;t matter</code></pre>
+<p class="guide-plain"><strong>Designated initializers</strong> make struct creation order-independent and self-documenting. The output of:</p>
+<pre class="guide-code"><code class="language-c">struct Point p1 = {.y = 0, .z = 1, .x = 2};
+printf(&quot;%d %d %d&quot;, p1.x, p1.y, p1.z);   // → &quot;2 0 1&quot;</code></pre>
+<h4>Struct Assignment &amp; Comparison</h4>
+<pre class="guide-code"><code class="language-c">struct Point a = {1,2,3}, b;
+b = a;                  // ✓ legal — element-wise copy (memcpy semantics)
+if (a == b) /* ... */   // ✗ illegal — no built-in equality
+if (memcmp(&amp;a, &amp;b, sizeof a) == 0) /* careful: padding bytes may differ */</code></pre>
+<p class="guide-plain"><code>memcmp</code> may give false negatives because padding bytes are uninitialized.</p>
+<h4>Strings Inside Structs Are Copied</h4>
+<pre class="guide-code"><code class="language-c">struct Test { char str[20]; };
+struct Test st1, st2;
+strcpy(st1.str, &quot;GeeksQuiz&quot;);
+st2 = st1;              // copies all 20 bytes including the string
+st1.str[0] = &#x27;S&#x27;;       // modifies st1 only
+puts(st2.str);          // &quot;GeeksQuiz&quot; — st2 is independent</code></pre>
+<h3>Unions — Shared Memory for Mutually Exclusive Members</h3>
+<p class="guide-plain">A <code>union</code> allocates <strong>one</strong> chunk of memory the size of its largest member; all members share that same address. You set one at a time; reading a different member than was last written is implementation-defined (&quot;type punning&quot;).</p>
+<pre class="guide-code"><code class="language-c">union test {
+    int  x;
+    char arr[4];
+    int  y;
+};
+
+union test t;
+t.x = 0;            // writes 4 zero bytes
+t.arr[1] = &#x27;G&#x27;;     // arr is now &quot;\0G\0\0&quot;
+printf(&quot;%s&quot;, t.arr); // prints nothing — first byte is &#x27;\0&#x27;, so strlen==0</code></pre>
+<h4>Sizing Rule</h4>
+<pre class="guide-code"><code class="language-c">struct {
+    short s[5];          // 5 * 2 = 10 bytes
+    union {
+        float y;         // 4 bytes
+        long  z;         // 8 bytes  ← largest
+    } u;                 // union takes 8 bytes
+} t;
+// total: 10 + 8 = 18 bytes (ignoring padding for this illustrative count)</code></pre>
+<p class="guide-plain"><em>With</em> padding/alignment on a 64-bit system, this would round up to 24 bytes (long requires 8-byte alignment).</p>
+<h4>The Tagged Union (Discriminated Union) Pattern</h4>
+<p class="guide-plain">The classic C trick for sum types / variant records:</p>
+<pre class="guide-code"><code class="language-c">enum ConnType { NETWORK, USB, VIRTUAL };
+
+struct Connection {
+    enum ConnType type;          // the &quot;tag&quot; tells which variant is active
+    union {
+        struct Network network;
+        struct USB     usb;
+        struct Virtual virtual;
+    } u;
+};
+
+void use(struct Connection *c) {
+    switch (c-&gt;type) {
+        case NETWORK: handle_net(&amp;c-&gt;u.network); break;
+        case USB:     handle_usb(&amp;c-&gt;u.usb);     break;
+        case VIRTUAL: handle_vir(&amp;c-&gt;u.virtual); break;
+    }
+}</code></pre>
+<p class="guide-plain">Used in compilers (AST nodes), parsers, message-passing systems.</p>
+<h3>Struct Padding &amp; Alignment</h3>
+<p class="guide-plain">The compiler inserts <strong>padding</strong> between members so each member sits at an address that&#x27;s a multiple of its <strong>alignment requirement</strong>. This trades a few wasted bytes for fast unaligned-load-free access.</p>
+<h4>Alignment Rules (typical)</h4>
+<ul class="guide-list"><li><code>char</code> → 1</li><li><code>short</code> → 2</li><li><code>int</code>, <code>float</code> → 4</li><li><code>double</code>, <code>long</code>, pointer (LP64) → 8</li></ul>
+<p class="guide-plain">The struct&#x27;s overall alignment = the <strong>largest</strong> alignment of any member. The struct&#x27;s size is rounded up to a multiple of its alignment so that arrays of the struct still align each element correctly.</p>
+<h4>Worked Example</h4>
+<pre class="guide-code"><code class="language-c">struct A {
+    char  c;    // offset 0, size 1
+    // 3 bytes padding
+    int   i;    // offset 4, size 4
+    char  d;    // offset 8, size 1
+    // 3 bytes padding (so next struct in array starts at multiple of 4)
+};               // total size = 12, alignment = 4</code></pre>
+<p class="guide-plain">Reorder for tightness:</p>
+<pre class="guide-code"><code class="language-c">struct B {
+    int  i;     // offset 0
+    char c;     // offset 4
+    char d;     // offset 5
+    // 2 bytes padding
+};               // total size = 8 (saved 4 bytes!)</code></pre>
+<p class="guide-plain"><strong>Rule of thumb:</strong> order members from largest-aligned to smallest.</p>
+<h4>Forcing Packed Layout</h4>
+<pre class="guide-code"><code class="language-c">struct __attribute__((packed)) Wire {   // GCC/Clang
+    char  c;
+    int   i;
+    char  d;
+};                                       // size = 6, no padding — but unaligned access!</code></pre>
+<p class="guide-plain">Useful for network packets and on-disk formats where byte-exact layout matters. <strong>Cost:</strong> unaligned loads on some architectures are slow or fault.</p>
+<h3>Limitations</h3>
+<ul class="guide-list"><li>Cannot initialize members at declaration (<code>struct site { char name[] = &quot;x&quot;; };</code> — illegal in C).</li><li>Cannot have static members (C++ allows them in <code>struct</code>, never in <code>union</code>).</li><li>Cannot compare structs with <code>==</code>.</li></ul>
+<div class="guide-track-deep"><h3>Interview Q&amp;A</h3>
+<div class="guide-qa"><strong>Q1.</strong> What is structure padding and why does it exist?</div>
+<div class="guide-qa"><strong>A.</strong> Compilers insert unused bytes between members so each member starts at an address aligned to its size. This avoids slow/unsupported unaligned memory accesses on most CPUs.</div>
+<div class="guide-qa"><strong>Q2.</strong> How would you minimize the size of a struct?</div>
+<div class="guide-qa"><strong>A.</strong> Order members from largest alignment to smallest. Optionally use <code>__attribute__((packed))</code> if you accept unaligned-access penalties.</div>
+<div class="guide-qa"><strong>Q3.</strong> When would you use a union?</div>
+<div class="guide-qa"><strong>A.</strong> (1) To save memory when only one of several values is active at a time. (2) For type punning — reading the same bytes through different types (legal in C, UB in C++ except for some special cases). (3) Tagged unions for variant records.</div>
+<div class="guide-qa"><strong>Q4.</strong> Sizes of <code>struct { int a; char b; }</code> and <code>union { int a; char b; }</code> on x86-64?</div>
+<div class="guide-qa"><strong>A.</strong> Struct: 8 bytes (4 for int, 1 for char + 3 padding). Union: 4 bytes (size of largest member, alignment of largest member).</div>
+<div class="guide-qa"><strong>Q5.</strong> Can you compare two structs with <code>==</code>?</div>
+<div class="guide-qa"><strong>A.</strong> No. Use a member-by-member comparison or <code>memcmp</code> (which may falsely flag padding differences).</div></div>
+<h3>Key Takeaway</h3>
+<div class="guide-takeaway">Struct = &quot;all members&quot;. Union = &quot;one member at a time, sharing storage&quot;. Padding is your friend (speed) and enemy (size). Reorder members and use packed sparingly.</div>
+<p class="guide-plain">---</p><p class="guide-link-q">Practice: <a class="btn" href="question.html?id=q76-dma-descriptor-ring-nic-hardware-driver-style">q76 DMA ring</a></p>
+</section>
+<section class="guide-section" id="bit-manipulation">
+<h2>19. Bit Manipulation</h2>
+<p class="guide-plain">The five bitwise operators: <code>&amp;</code> (AND), <code>|</code> (OR), <code>^</code> (XOR), <code>~</code> (NOT), <code>&lt;&lt;</code> (shift left), <code>&gt;&gt;</code> (shift right).</p>
+<h3>The Four Canonical Bit Operations</h3>
+<pre class="guide-code"><code class="language-c">// num is the integer; n is the bit position (0 = LSB)
+
+num |=  (1 &lt;&lt; n);         // SET bit n
+num &amp;= ~(1 &lt;&lt; n);         // CLEAR bit n
+num ^=  (1 &lt;&lt; n);         // TOGGLE bit n
+int isSet = (num &gt;&gt; n) &amp; 1;   // CHECK bit n  →  0 or 1</code></pre>
+<h4>Worked Example</h4>
+<pre class="guide-code"><code class="language-c">#include &lt;stdio.h&gt;
+
+int main(void) {
+    int num = 0b00001010;   // = 10
+    int n   = 1;
+
+    num |=  (1 &lt;&lt; n);  printf(&quot;Set    bit %d: %d (%#x)\n&quot;, n, num, num); // 10
+    num &amp;= ~(1 &lt;&lt; n);  printf(&quot;Clear  bit %d: %d (%#x)\n&quot;, n, num, num); // 8
+    num ^=  (1 &lt;&lt; n);  printf(&quot;Toggle bit %d: %d (%#x)\n&quot;, n, num, num); // 10
+    printf(&quot;Bit %d is %s\n&quot;, n, ((num &gt;&gt; n) &amp; 1) ? &quot;set&quot; : &quot;clear&quot;);
+    return 0;
+}</code></pre>
+<h3>Useful Bit Tricks</h3>
+<pre class="guide-code"><code class="language-c">// Number of bits in an int
+int bits = sizeof(int) * CHAR_BIT;     // CHAR_BIT == 8 normally
+
+// Mask the MSB
+int msb_mask = 1 &lt;&lt; (bits - 1);        // 0x80000000 on 32-bit int
+if (num &amp; msb_mask) /* MSB is set */ ;
+
+// Power of 2: 1 &lt;&lt; i  ==  2^i
+// Divide by 2^i:  num &gt;&gt; i  (for non-negative integers)
+// Multiply by 2^i:  num &lt;&lt; i  (watch for overflow)
+
+// Check if x is a power of two
+int isPow2 = (x != 0) &amp;&amp; ((x &amp; (x - 1)) == 0);
+
+// Count set bits (Brian Kernighan&#x27;s)
+int popcount(unsigned x) {
+    int c = 0;
+    while (x) { x &amp;= x - 1; c++; }     // clears lowest set bit each iteration
+    return c;
+}
+
+// Lowest set bit
+unsigned lsb = x &amp; -x;                  // assumes two&#x27;s complement</code></pre>
+<h3>Bit Rotation</h3>
+<p class="guide-plain">Unlike a shift (which loses bits), a <strong>rotate</strong> wraps the dropped bits back to the other end.</p>
+<pre class="guide-code"><code class="language-c">#define INT_BITS 32
+
+unsigned int leftRotate(unsigned int n, unsigned int d) {
+    return (n &lt;&lt; d) | (n &gt;&gt; (INT_BITS - d));
+}
+
+unsigned int rightRotate(unsigned int n, unsigned int d) {
+    return (n &gt;&gt; d) | (n &lt;&lt; (INT_BITS - d));
+}</code></pre>
+<p class="guide-plain"><strong>Caveat:</strong> if <code>d == 0</code> or <code>d == 32</code>, <code>n &gt;&gt; 32</code> is <strong>undefined behavior</strong> in C (shifts by ≥ width are UB). Production code masks: <code>d &amp;= INT_BITS - 1;</code> before the rotate, but even then a <code>d == 0</code> case may need a special branch.</p>
+<h3>Nibble &amp; Byte Swap</h3>
+<p class="guide-plain">Swap nibbles within each byte (e.g. <code>0x32</code> → <code>0x23</code>):</p>
+<pre class="guide-code"><code class="language-c">num = ((num &amp; 0xF0F0F0F0) &gt;&gt; 4) | ((num &amp; 0x0F0F0F0F) &lt;&lt; 4);</code></pre>
+<p class="guide-plain">Swap adjacent bytes (<code>0x12345678</code> → <code>0x34127856</code>):</p>
+<pre class="guide-code"><code class="language-c">num = ((num &amp; 0xFF00FF00) &gt;&gt; 8) | ((num &amp; 0x00FF00FF) &lt;&lt; 8);</code></pre>
+<p class="guide-plain">Swap halves (<code>0xAAAABBBB</code> → <code>0xBBBBAAAA</code>):</p>
+<pre class="guide-code"><code class="language-c">num = (num &gt;&gt; 16) | (num &lt;&lt; 16);</code></pre>
+<p class="guide-plain">Combine all three → full 32-bit byte reverse (== <code>bswap32</code>).</p>
+<h3>Shift Caveats — Undefined Behavior Zone</h3>
+<ul class="guide-list"><li>Shift by negative amount → UB.</li><li>Shift by ≥ width of type → UB.</li><li>Left-shift of a <strong>signed</strong> value where the result overflows the type → UB.</li><li>Right-shift of a <strong>negative</strong> signed value → implementation-defined (usually arithmetic shift, sign-extending).</li></ul>
+<p class="guide-plain"><strong>Defensive pattern:</strong> do bit work on <code>unsigned</code> types whenever possible.</p>
+<div class="guide-track-deep"><h3>Interview Q&amp;A</h3>
+<div class="guide-qa"><strong>Q1.</strong> How do you check if a number is a power of two?</div>
+<div class="guide-qa"><strong>A.</strong> <code>x != 0 &amp;&amp; (x &amp; (x - 1)) == 0</code>. Subtracting 1 from a power-of-two flips the single set bit and turns all lower bits on; ANDing gives zero.</div>
+<div class="guide-qa"><strong>Q2.</strong> Difference between <code>&gt;&gt;</code> for signed vs unsigned types?</div>
+<div class="guide-qa"><strong>A.</strong> Unsigned: logical shift, fill with 0. Signed: implementation-defined; typically arithmetic shift that sign-extends. To force logical, cast to unsigned first.</div>
+<div class="guide-qa"><strong>Q3.</strong> Why is <code>1 &lt;&lt; 31</code> problematic for <code>int</code>?</div>
+<div class="guide-qa"><strong>A.</strong> On 32-bit <code>int</code>, <code>1</code> is signed. Shifting into the sign bit is <strong>undefined behavior</strong>. Use <code>1u &lt;&lt; 31</code> or <code>(unsigned)1 &lt;&lt; 31</code>.</div>
+<div class="guide-qa"><strong>Q4.</strong> How would you swap two integers without a temporary?</div>
+<div class="guide-qa"><strong>A.</strong></div>
+<pre class="guide-code"><code class="language-c">a ^= b; b ^= a; a ^= b;     // works, but UB if a and b are the same variable!</code></pre>
+<div class="guide-qa">The &quot;trick&quot; is rarely worth it — modern compilers optimize the temp version equally well, and the XOR version is unreadable.</div></div>
+<h3>Key Takeaway</h3>
+<div class="guide-takeaway">Five operators, four canonical operations (set/clear/toggle/test). Always use <code>unsigned</code> for bit manipulation. Beware shifts ≥ width — that&#x27;s UB.</div>
+<p class="guide-plain">---</p><p class="guide-link-q">Practice: <a class="btn" href="question.html?id=q27-set-clear-toggle-check-bit">q27 Bits</a> <a class="btn" href="question.html?id=q32-count-set-bits-brian-kernighan-s-trick">q32 Kernighan</a> <a class="btn" href="question.html?id=q39-bit-range-operations-set-clear-write-bits-in-start-end">q39 Ranges</a></p>
+</section>
+<section class="guide-section" id="endianness">
+<h2>20. Endianness</h2>
+<p class="guide-plain"><strong>Endianness</strong> is the byte order in which a multi-byte scalar is stored in memory.</p>
+<table class="guide-table"><thead><tr><th>Endianness</th><th>MSB stored at</th><th>Common platforms</th></tr></thead><tbody><tr><td><strong>Big-endian</strong></td><td>Lowest address (natural reading order)</td><td>Network protocols (TCP/IP), older PowerPC, SPARC</td></tr><tr><td><strong>Little-endian</strong></td><td>Highest address (reversed)</td><td>x86, x86-64, most ARM (configurable), RISC-V default</td></tr></tbody></table>
+<p class="guide-plain">For the 4-byte value <code>0x11223344</code>:</p>
+<pre class="guide-code"><code class="language-c">Address →   00    01    02    03
+Big   :     11    22    33    44       MSB at low address
+Little:     44    33    22    11       LSB at low address</code></pre>
+<h3>Detect at Runtime</h3>
+<pre class="guide-code"><code class="language-c">#include &lt;stdio.h&gt;
+
+int main(void) {
+    uint32_t x = 0x11223344;
+    uint8_t *p = (uint8_t *)&amp;x;
+    printf(&quot;%s endian\n&quot;, (p[0] == 0x44) ? &quot;little&quot; : &quot;big&quot;);
+}</code></pre>
+<p class="guide-plain">The <code>union</code> trick:</p>
+<pre class="guide-code"><code class="language-c">union { uint32_t i; uint8_t  b[4]; } u = { .i = 1 };
+int little_endian = (u.b[0] == 1);</code></pre>
+<h3>Why It Matters</h3>
+<ul class="guide-list"><li><strong>Network protocols</strong> are defined as big-endian (&quot;network byte order&quot;). Always convert with <code>htons</code>/<code>htonl</code>/<code>ntohs</code>/<code>ntohl</code> when reading from or writing to the wire.</li><li><strong>Binary file formats</strong> must specify endianness, or readers on different platforms will see wrong values.</li><li><strong>Type-punning via union/cast</strong> depends on endianness; portable code must use explicit byte-pack/unpack.</li></ul>
+<div class="guide-track-deep"><h3>Interview Q&amp;A</h3>
+<div class="guide-qa"><strong>Q1.</strong> Why does network byte order exist?</div>
+<div class="guide-qa"><strong>A.</strong> A protocol must commit to a single byte order, otherwise two endpoints would interpret the same bytes differently. The internet picked big-endian decades ago and stuck with it.</div>
+<div class="guide-qa"><strong>Q2.</strong> Is endianness the same as bit ordering?</div>
+<div class="guide-qa"><strong>A.</strong> No. Endianness is <em>byte</em> order in memory. Within a byte, bit numbering is just a labeling convention; it doesn&#x27;t change the underlying storage.</div>
+<div class="guide-qa"><strong>Q3.</strong> How do you write portable code that works on both endians?</div>
+<div class="guide-qa"><strong>A.</strong> Use byte-by-byte serialization (<code>buf[0] = (x &gt;&gt; 24) &amp; 0xFF; buf[1] = (x &gt;&gt; 16) &amp; 0xFF; …</code>) or use <code>htonl</code>/<code>ntohl</code>-family functions for network code.</div></div>
+<h3>Key Takeaway</h3>
+<div class="guide-takeaway">x86 is little-endian. Networks are big-endian. Anything that crosses the line — sockets, files, hardware — needs explicit conversion.</div>
+<p class="guide-plain">---</p>
+</section>
+<section class="guide-section" id="memory-mapped-i-o">
+<h2>21. Memory-Mapped I/O</h2>
+<p class="guide-plain">Hardware peripherals (UARTs, GPIOs, timers) are exposed to the CPU as <strong>memory addresses</strong>. Reading/writing the address triggers the device. This is <strong>memory-mapped I/O (MMIO)</strong>.</p>
+<p class="guide-plain">The C idiom for accessing an MMIO register:</p>
+<pre class="guide-code"><code class="language-c">#define PORT_REG_ADDR  0x40020000
+
+// Pointer that:
+//  - points to a 32-bit volatile location
+//  - is itself const (we never re-aim it)
+volatile uint32_t * const port_reg = (volatile uint32_t *)PORT_REG_ADDR;
+
+void set_port(uint32_t value) {
+    *port_reg = value;            // write triggers hardware
+}
+
+uint32_t read_port(void) {
+    return *port_reg;             // read fetches from device
+}</code></pre>
+<p class="guide-plain"><strong>Why every qualifier matters:</strong></p>
+<pre class="guide-code"><code class="language-text">volatile uint32_t * const port_reg
+   |          |        |    |
+   |          |        |    +---- name
+   |          |        +--------- the POINTER is const (never reassigned)
+   |          +------------------ pointed type is uint32_t
+   +----------------------------- pointed type is volatile (never cache or optimize away)</code></pre>
+<ul class="guide-list"><li>Without <code>volatile</code>, the compiler may cache the value in a register and skip subsequent reads.</li><li>Without <code>const</code> on the pointer, code might accidentally re-aim it at a different address.</li><li>The <code>uint32_t</code> width must match the hardware register size; mismatched-width access can fault on some MCUs.</li></ul>
+<h3>Read-Only and Write-Only Registers</h3>
+<pre class="guide-code"><code class="language-c">const volatile uint32_t * const status_reg  = (const volatile uint32_t *)0x4002000C;
+//      ^^^^^^^                                                                        prevents accidental writes
+//      |                                                                              hardware updates it any time
+//      |                                                                              compiler must always re-read</code></pre>
+<p class="guide-plain">For write-only registers (some hardware FIFOs), you can simply omit the read paths in code; there&#x27;s no syntactic distinction.</p>
+<h3>Common Mistakes</h3>
+<ul class="guide-list"><li>Forgetting <code>volatile</code> → compiler optimizes the loop &quot;wait for ready bit&quot; into infinite waiting (or instant exit).</li><li>Wrong access width: writing 8 bits to a 32-bit register.</li><li>Reading a write-only register (some hardware faults).</li><li>Not using a memory barrier on out-of-order CPUs (ARM/PowerPC) — <code>volatile</code> doesn&#x27;t imply a barrier across cores.</li></ul>
+<h3>Worked Example — Polling a Device</h3>
+<pre class="guide-code"><code class="language-c">#define UART_STATUS  ((volatile uint32_t *)0x40011000)
+#define UART_DATA    ((volatile uint32_t *)0x40011004)
+#define TX_READY     (1u &lt;&lt; 0)
+
+void uart_putc(char c) {
+    while ((*UART_STATUS &amp; TX_READY) == 0) { /* spin */ }    // volatile is essential
+    *UART_DATA = (uint32_t)c;
+}</code></pre>
+<p class="guide-plain">Without <code>volatile</code>, the optimizer would load <code>*UART_STATUS</code> once before the loop and spin forever.</p>
+<h3>Key Takeaway</h3>
+<div class="guide-takeaway">Every MMIO access needs <code>volatile</code>. The pointer is usually <code>* const</code> (never re-aimed). Width and alignment must match the device. On multi-core systems, add memory barriers — <code>volatile</code> alone is not enough.</div>
+<p class="guide-plain">---</p><p class="guide-link-q">Practice: <a class="btn" href="question.html?id=q87-mmap-anonymous-memory-file-mapping">q87 mmap</a></p>
+</section>
+<section class="guide-section" id="strings-reverse-pattern-search-word-reverse">
+<h2>22. Strings — Reverse, Pattern Search, Word Reverse</h2>
+<p class="guide-plain">C &quot;strings&quot; are just <code>char</code> arrays terminated by <code>&#x27;\0&#x27;</code>. There is no length prefix; every operation walks until it finds the null terminator. This is the source of countless bugs and the entire <code>strn*</code> family of safer functions.</p>
+<h3>Safer Input — Use <code>fgets</code>, Not <code>gets</code></h3>
+<pre class="guide-code"><code class="language-c">char str[25];
+fgets(str, sizeof(str), stdin);          // safe — caps at sizeof-1
+str[strcspn(str, &quot;\n&quot;)] = &#x27;\0&#x27;;          // strip trailing newline if present</code></pre>
+<p class="guide-plain"><code>gets</code> was removed from C11 because it has no length parameter — a textbook buffer overflow.</p>
+<h3>Reverse a String In-Place</h3>
+<pre class="guide-code"><code class="language-c">#include &lt;string.h&gt;
+
+void reverse_string(char *s) {
+    int first = 0, last = (int)strlen(s) - 1;
+    while (first &lt; last) {
+        char tmp = s[first];
+        s[first] = s[last];
+        s[last]  = tmp;
+        first++; last--;
+    }
+}</code></pre>
+<div class="guide-takeaway">The &quot;swap without temp&quot; trick (<code>a = a + b - (b = a)</code>) appears in the source notes; it&#x27;s clever but <strong>technically UB</strong> in C (modifies and reads <code>b</code> between sequence points). Use a temp.</div>
+<h3>Reverse Words in a Sentence</h3>
+<p class="guide-plain">Two-pass algorithm:</p>
+<ol class="guide-trace"><li>Reverse the entire string. <code>&quot;hello world&quot;</code> → <code>&quot;dlrow olleh&quot;</code>.</li><li>Reverse each word in place. → <code>&quot;world hello&quot;</code>.</li></ol>
+<pre class="guide-code"><code class="language-c">#include &lt;string.h&gt;
+#include &lt;ctype.h&gt;
+
+static void rev(char *s, int i, int j) {
+    while (i &lt; j) { char t = s[i]; s[i] = s[j]; s[j] = t; i++; j--; }
+}
+
+void reverse_words(char *s) {
+    int n = (int)strlen(s);
+    rev(s, 0, n - 1);
+
+    int word_start = 0;
+    for (int i = 0; i &lt;= n; i++) {
+        if (s[i] == &#x27; &#x27; || s[i] == &#x27;\0&#x27;) {
+            rev(s, word_start, i - 1);
+            word_start = i + 1;
+        }
+    }
+}</code></pre>
+<h3>Naïve Substring Search — Pattern Matching</h3>
+<p class="guide-plain">Returns 1 if <code>pat</code> is found in <code>text</code>, else 0:</p>
+<pre class="guide-code"><code class="language-c">int contains(const char *text, const char *pat) {
+    for (int i = 0; text[i]; i++) {
+        int j = 0;
+        while (pat[j] &amp;&amp; text[i + j] == pat[j]) j++;
+        if (pat[j] == &#x27;\0&#x27;) return 1;       // matched all of pat
+    }
+    return 0;
+}</code></pre>
+<p class="guide-plain">Time complexity: O(n·m). For better worst-case, use <strong>KMP</strong> or <strong>Boyer-Moore</strong> (out of scope here, but worth knowing).</p>
+<div class="guide-takeaway"><strong>Tip.</strong> <code>strstr(text, pat)</code> is the standard library version — returns a pointer to the first match, or <code>NULL</code>.</div>
+<h3>Common Mistakes</h3>
+<ul class="guide-list"><li>Forgetting the null terminator when building strings byte-by-byte.</li><li>Using <code>strcpy</code>/<code>strcat</code> without checking destination size — buffer overflow.</li><li>Iterating with <code>strlen(s)</code> inside a loop condition — O(n²) instead of O(n).</li><li>Confusing <code>sizeof</code> (compile-time, includes <code>\0</code>) with <code>strlen</code> (runtime, excludes <code>\0</code>).</li></ul>
+<h3>Key Takeaway</h3>
+<div class="guide-takeaway">Always know the buffer size; pair every write with a length check. Prefer <code>snprintf</code>, <code>fgets</code>, <code>strncat</code> (with care). Use <code>&lt;string.h&gt;</code> whenever possible — its implementations are tested and SIMD-optimized.</div>
+<p class="guide-plain">---</p><p class="guide-link-q">Practice: <a class="btn" href="question.html?id=q01-reverse-a-string-in-place">q01 Reverse string</a> <a class="btn" href="question.html?id=q11-reverse-words-in-a-string-in-place-three-reversal-trick">q11 Words</a> <a class="btn" href="question.html?id=q97-implement-atoi-string-to-integer">q97 atoi</a></p>
+</section>
+<section class="guide-section" id="undefined-behavior">
+<h2>23. Undefined Behavior</h2>
+<p class="guide-plain"><strong>Undefined behavior (UB)</strong> is the C standard&#x27;s term for code constructs whose effect the language <strong>does not define at all</strong>. The compiler is allowed to do <em>anything</em>: produce expected output, garbage output, crash, format your hard drive, or &quot;time-travel&quot; — optimize as if any path leading to UB cannot be reached.</p>
+<p class="guide-plain">This is not academic — modern optimizers exploit UB aggressively. A single UB in your program can silently change unrelated code far away.</p>
+<h3>The Top UB Hit List</h3>
+<h4>1. Out-of-bounds array access</h4>
+<pre class="guide-code"><code class="language-c">int a[5];
+a[10] = 0;      // UB
+a[-1] = 0;      // UB</code></pre>
+<h4>2. Dereferencing NULL or uninitialized pointers</h4>
+<pre class="guide-code"><code class="language-c">int *p;     *p = 5;     // UB — wild pointer
+int *q = NULL;  *q = 5; // UB</code></pre>
+<h4>3. Use-after-free / double-free</h4>
+<pre class="guide-code"><code class="language-c">free(p); *p = 1;       // use-after-free
+free(p); free(p);      // double-free</code></pre>
+<h4>4. Modifying string literals</h4>
+<pre class="guide-code"><code class="language-c">char *s = &quot;abc&quot;; s[0] = &#x27;A&#x27;;   // UB — literals are read-only</code></pre>
+<h4>5. Signed integer overflow</h4>
+<pre class="guide-code"><code class="language-c">int x = INT_MAX;
+x = x + 1;              // UB — compiler may assume this never happens</code></pre>
+<p class="guide-plain">Unsigned overflow, in contrast, is <strong>defined</strong> to wrap modulo 2ⁿ.</p>
+<h4>6. Shifting by ≥ width</h4>
+<pre class="guide-code"><code class="language-c">int n = 32;
+int x = 1 &lt;&lt; n;         // UB on 32-bit int</code></pre>
+<h4>7. Reading an uninitialized variable</h4>
+<pre class="guide-code"><code class="language-c">int x;
+printf(&quot;%d&quot;, x);        // UB</code></pre>
+<h4>8. Strict-aliasing violations</h4>
+<pre class="guide-code"><code class="language-c">float f = 3.14f;
+int i = *(int *)&amp;f;     // UB (strict aliasing)
+// Use memcpy or a union for type punning instead</code></pre>
+<h4>9. Modifying an object twice without a sequence point</h4>
+<pre class="guide-code"><code class="language-c">i = i++ + ++i;          // UB
+arr[i] = i++;           // UB</code></pre>
+<h4>10. Returning the address of a local</h4>
+<pre class="guide-code"><code class="language-c">int *bad(void) { int x = 0; return &amp;x; }   // UB on dereference</code></pre>
+<h4>11. Calling <code>main</code> recursively</h4>
+<pre class="guide-code"><code class="language-c">int main(void) { main(); return 0; }       // UB in C (legal in C++)</code></pre>
+<h4>12. Mismatched types in <code>printf</code>/<code>scanf</code></h4>
+<pre class="guide-code"><code class="language-c">double d = 1.5;
+printf(&quot;%d&quot;, d);        // UB — %d expects int, got double</code></pre>
+<h4>13. <code>memcpy</code> with overlapping regions</h4>
+<p class="guide-plain">Use <code>memmove</code> instead.</p>
+<h4>14. Division/modulo by zero</h4>
+<pre class="guide-code"><code class="language-c">int x = 5 / 0;          // UB</code></pre>
+<h3>Why You Should Care</h3>
+<p class="guide-plain">Compilers exploit UB. A &quot;harmless&quot; UB can:</p>
+<ul class="guide-list"><li>Make a security check disappear (<code>if (p &amp;&amp; p-&gt;field)</code> deleted because dereferencing <code>p</code> later &quot;proves&quot; <code>p != NULL</code>).</li><li>Turn a finite loop infinite (signed overflow assumption).</li><li>Reorder instructions in ways that break threading invariants.</li></ul>
+<p class="guide-plain"><strong>Defensive habits:</strong></p>
+<ul class="guide-list"><li>Compile with <code>-Wall -Wextra -Wpedantic</code>.</li><li>Use <strong>AddressSanitizer</strong> (<code>-fsanitize=address</code>) in CI — catches UAF, OOB, leaks.</li><li>Use <strong>UndefinedBehaviorSanitizer</strong> (<code>-fsanitize=undefined</code>) — catches signed overflow, shift UB, alignment bugs.</li><li>Use <strong>Valgrind</strong> for traditional unit tests.</li><li>Always check <code>malloc</code>/<code>realloc</code> return values.</li><li>Initialize variables; NULL out pointers after <code>free</code>.</li><li>Don&#x27;t be clever with sequence points.</li></ul>
+<h3>Implementation-Defined vs Undefined vs Unspecified</h3>
+<table class="guide-table"><thead><tr><th>Category</th><th>What it means</th><th>Example</th></tr></thead><tbody><tr><td><strong>Undefined</strong></td><td>Anything can happen; non-portable; no diagnostic required</td><td>Signed overflow</td></tr><tr><td><strong>Unspecified</strong></td><td>Standard lists ≥1 valid behaviors; compiler picks one without telling you</td><td>Order of argument evaluation</td></tr><tr><td><strong>Implementation-defined</strong></td><td>Compiler picks one and <strong>must document</strong> it</td><td>Size of <code>int</code>, behavior of <code>&gt;&gt;</code> on negative</td></tr></tbody></table>
+<h3>Key Takeaway</h3>
+<div class="guide-takeaway">UB is not a corner case; it&#x27;s a <strong>contract</strong>. The standard says &quot;if you do X, we owe you nothing.&quot; Treat it as a critical bug class. Sanitizers catch most of it for free; use them.</div>
+<p class="guide-plain">---</p>
+</section>
+<section class="guide-section" id="sharp-insights-for-systems-interviews">
+<h2>24. Sharp Insights for Systems Interviews</h2>
+<p class="guide-plain">These short, sharp facts are the kind of thing senior interviewers love to probe.</p>
+<h3>Why is the stack faster than the heap?</h3>
+<ul class="guide-list"><li><strong>Allocation = one instruction</strong> (<code>sub rsp, N</code>). No bookkeeping data structures.</li><li><strong>Deallocation = one instruction</strong> (<code>add rsp, N</code> on function return).</li><li><strong>Cache locality</strong> — the top of the stack is almost always already in L1.</li><li>The heap requires walking free lists, possibly system calls (<code>brk</code>/<code>mmap</code>), thread synchronization, and may return cold memory.</li></ul>
+<h3>What is cache locality and why does it matter?</h3>
+<ul class="guide-list"><li><strong>Spatial locality</strong> — if you access <code>a[0]</code>, the cache loads a whole <em>line</em> (typically 64 bytes), so <code>a[1]…a[15]</code> for <code>int</code> are essentially free.</li><li><strong>Temporal locality</strong> — recently accessed memory stays in cache; reuse is cheap.</li><li><strong>Stride-1 access</strong> (linear walk through arrays) maximizes spatial locality. Random access (linked lists, hash tables) destroys it.</li><li>A cache miss costs <strong>hundreds of cycles</strong>; a hit is <strong>~4 cycles</strong> (L1). This is why &quot;data-oriented&quot; code beats &quot;pointer-chasing&quot; code, often by 10×.</li></ul>
+<h3>Cost of <code>malloc</code>/<code>free</code></h3>
+<ul class="guide-list"><li>Typical fast-path: ~50–200 cycles (free list lookup, bookkeeping).</li><li>Slow path on growth: thousands of cycles (<code>brk</code>/<code>mmap</code> syscall, page faults).</li><li>In allocation-heavy hot loops, use <strong>arena allocators</strong> or <strong>object pools</strong> — bulk-allocate, hand out slots, free everything at once.</li></ul>
+<h3>Why is signed overflow UB but unsigned isn&#x27;t?</h3>
+<ul class="guide-list"><li>The standard left signed representation implementation-defined for decades (there were one&#x27;s-complement and sign-magnitude machines historically). UB lets the compiler optimize aggressively (e.g., <code>i + 1 &gt; i</code> is always true for signed <code>i</code>, so the loop must terminate).</li><li>Unsigned is defined by the standard to wrap modulo 2ⁿ.</li></ul>
+<h3>Why do compilers reorder instructions?</h3>
+<ul class="guide-list"><li>To hide memory latency (start a load early), keep pipelines full, exploit superscalar issue. Provided <strong>observable behavior</strong> (per the as-if rule) doesn&#x27;t change.</li><li>This is why <code>volatile</code>, atomics, and barriers exist — they are the way you tell the optimizer (and the CPU) &quot;<em>don&#x27;t reorder past this point</em>&quot;.</li></ul>
+<h3>What does <code>restrict</code> (C99) do?</h3>
+<ul class="guide-list"><li>Tells the compiler: &quot;for the lifetime of this pointer, the object it points to is accessed <em>only</em> through this pointer (or pointers derived from it).&quot;</li><li>Enables vectorization and load/store reordering that would otherwise be unsafe.</li><li>Example: <code>void mul(double <em>restrict a, const double </em>restrict b, int n)</code> lets the compiler vectorize without worrying about <code>a</code> and <code>b</code> overlapping.</li></ul>
+<h3>Function-call cost</h3>
+<ul class="guide-list"><li>Modern x86: ~1–3 cycles for prediction + jump if not inlined; pushing args, saving callee-save registers, return all add up to ~10–20 cycles for a typical call.</li><li>Inlining eliminates the call but bloats the I-cache footprint. Modern compilers usually pick well.</li></ul>
+<h3>Why are linked lists often slower than arrays?</h3>
+<ul class="guide-list"><li>Each node is a separate allocation, scattered across the heap.</li><li>Traversing means <strong>random access patterns</strong> → cache misses → 100×+ slowdown over a contiguous array, even if both are O(n).</li><li>For small data, arrays even beat hash tables on lookups due to cache-friendliness.</li></ul>
+<h3>What is &quot;as-if&quot; optimization?</h3>
+<ul class="guide-list"><li>The compiler may transform code in any way as long as the <strong>observable behavior</strong> (volatile accesses, file I/O, library calls) is preserved.</li><li>This is why <code>for (int i = 0; i &lt; 1000000; i++) sum += i;</code> may compile to a single closed-form <code>sum += 499999500000;</code>.</li></ul>
+<h3>Why does <code>printf(&quot;%d&quot;, x)</code> not need a <code>\n</code> to print on some systems?</h3>
+<ul class="guide-list"><li><code>stdout</code> is <strong>line-buffered</strong> when connected to a TTY, <strong>block-buffered</strong> when redirected to a file or pipe. Output sits in the buffer until newline / fill / <code>fflush</code> / program exit.</li><li>In an interactive shell, missing <code>\n</code> may print immediately. In a script with a redirect, it may not appear until the program ends.</li></ul>
+<p class="guide-plain">---</p>
+</section>
+<section class="guide-section" id="quick-revision-tables">
+<h2>25. Quick-Revision Tables</h2>
+<h3>Storage Classes</h3>
+<table class="guide-table"><thead><tr><th>Class</th><th>Lifetime</th><th>Scope</th><th>Linkage</th><th>Default Value</th><th>Region</th></tr></thead><tbody><tr><td><code>auto</code></td><td>Block</td><td>Block</td><td>None</td><td>Garbage</td><td>Stack</td></tr><tr><td><code>register</code></td><td>Block</td><td>Block</td><td>None</td><td>Garbage</td><td>Register hint</td></tr><tr><td><code>static</code> (local)</td><td>Program</td><td>Block</td><td>None</td><td>Zero</td><td><code>.data</code> / <code>.bss</code></td></tr><tr><td><code>static</code> (file)</td><td>Program</td><td>File</td><td>Internal</td><td>Zero</td><td><code>.data</code> / <code>.bss</code></td></tr><tr><td><code>extern</code></td><td>Program</td><td>File</td><td>External</td><td>Zero (if defined)</td><td><code>.data</code> / <code>.bss</code></td></tr></tbody></table>
+<h3>Memory Segments</h3>
+<table class="guide-table"><thead><tr><th>Segment</th><th>Holds</th><th>Permissions</th></tr></thead><tbody><tr><td><code>.text</code></td><td>Compiled code</td><td>Read + Execute</td></tr><tr><td><code>.rodata</code></td><td>String literals, <code>const</code> globals</td><td>Read-only</td></tr><tr><td><code>.data</code></td><td>Initialized non-const globals/statics</td><td>Read + Write</td></tr><tr><td><code>.bss</code></td><td>Uninitialized / zero-init globals</td><td>Read + Write</td></tr><tr><td>Heap</td><td><code>malloc</code> allocations</td><td>Read + Write</td></tr><tr><td>Stack</td><td>Locals, return addresses</td><td>Read + Write</td></tr></tbody></table>
+<h3>Pointer Pathologies at a Glance</h3>
+<table class="guide-table"><thead><tr><th>Type</th><th>Cause</th><th>Symptom</th></tr></thead><tbody><tr><td>NULL</td><td><code>int <em>p = NULL; </em>p</code></td><td>Segfault</td></tr><tr><td>Wild</td><td>uninitialized</td><td>Crash / random behavior</td></tr><tr><td>Dangling</td><td>UAF / scope-end</td><td>Heisenbug</td></tr><tr><td>Memory leak</td><td>malloc, no free</td><td>Slow growth, OOM</td></tr></tbody></table>
+<h3><code>const</code> / <code>volatile</code> Reading Rules</h3>
+<table class="guide-table"><thead><tr><th>Declaration</th><th>&quot;p is …&quot;</th></tr></thead><tbody><tr><td><code>int *p</code></td><td>pointer to int</td></tr><tr><td><code>const int *p</code></td><td>pointer to constant int (value can&#x27;t change via p)</td></tr><tr><td><code>int * const p</code></td><td>constant pointer to int (p can&#x27;t be reassigned)</td></tr><tr><td><code>const int * const p</code></td><td>constant pointer to constant int</td></tr><tr><td><code>volatile int *p</code></td><td>pointer to volatile int (re-read every access)</td></tr><tr><td><code>volatile int * const p</code></td><td>constant pointer to volatile int (typical for MMIO)</td></tr></tbody></table>
+<h3><code>malloc</code> Family Cheat Sheet</h3>
+<table class="guide-table"><thead><tr><th>Function</th><th>Initializes?</th><th>Args</th><th>Resizes?</th></tr></thead><tbody><tr><td><code>malloc(n)</code></td><td>No (garbage)</td><td>bytes</td><td>No</td></tr><tr><td><code>calloc(n, sz)</code></td><td>Yes (zero)</td><td>count, element size</td><td>No</td></tr><tr><td><code>realloc(p, n)</code></td><td>Preserves old, garbage in new</td><td>pointer, new bytes</td><td>Yes (may move)</td></tr><tr><td><code>free(p)</code></td><td>—</td><td>pointer</td><td>Releases</td></tr></tbody></table>
+<h3>Bit-Op Cheat Sheet</h3>
+<table class="guide-table"><thead><tr><th>Operation</th><th>Code</th></tr></thead><tbody><tr><td>Set bit n</td><td>`x</td><td>= (1 &lt;&lt; n)`</td></tr><tr><td>Clear bit n</td><td><code>x &amp;= ~(1 &lt;&lt; n)</code></td></tr><tr><td>Toggle bit n</td><td><code>x ^= (1 &lt;&lt; n)</code></td></tr><tr><td>Test bit n</td><td><code>(x &gt;&gt; n) &amp; 1</code></td></tr><tr><td>Lowest set bit</td><td><code>x &amp; -x</code></td></tr><tr><td>Clear lowest set bit</td><td><code>x &amp; (x - 1)</code></td></tr><tr><td>Power of 2?</td><td><code>x &amp;&amp; !(x &amp; (x - 1))</code></td></tr></tbody></table>
+<h3><code>memcpy</code> / <code>memmove</code> / <code>memset</code></h3>
+<table class="guide-table"><thead><tr><th>Function</th><th>Overlap-safe?</th><th>Use when</th></tr></thead><tbody><tr><td><code>memcpy</code></td><td>No</td><td>Source/dest known disjoint, max speed</td></tr><tr><td><code>memmove</code></td><td>Yes</td><td>Regions may overlap</td></tr><tr><td><code>memset</code></td><td>n/a</td><td>Filling with byte value (<code>0</code>, <code>-1</code>)</td></tr></tbody></table>
+<h3>Format Specifiers Quick-Reference</h3>
+<p class="guide-plain">| <code>%d</code> <code>int</code> | <code>%u</code> <code>unsigned</code> | <code>%ld</code>/<code>%lu</code> <code>long</code> | <code>%lld</code>/<code>%llu</code> <code>long long</code> |</p>
+<p class="guide-plain">| <code>%f</code> <code>float</code> (printf) / <code>%lf</code> <code>double</code> | <code>%c</code> <code>char</code> | <code>%s</code> <code>char<em></code> | <code>%p</code> <code>void</em></code> |</p>
+<p class="guide-plain">| <code>%x</code>/<code>%X</code> hex | <code>%o</code> octal | <code>%zu</code> <code>size_t</code> | <code>%e</code> scientific |</p>
+<p class="guide-plain">---</p>
+</section>
+<section class="guide-section" id="curated-interview-questions">
+<h2>26. Curated Interview Questions</h2>
+<h3>Compilation &amp; Linking</h3>
+<ol class="guide-trace"><li>Walk me through what happens between <code>gcc file.c -o app</code> and the binary running.</li><li>Why is <code>printf</code> unresolved at the assembler stage but resolved at link?</li><li>Difference between <code>#include &lt;foo.h&gt;</code> and <code>#include &quot;foo.h&quot;</code>?</li><li>What is <code>static</code> linkage and when would you use it on a function?</li><li>What&#x27;s the practical difference between a header file and a library?</li></ol>
+<h3>Memory Layout &amp; Storage</h3>
+<ol class="guide-trace"><li>Where in memory does each of these live: <code>int x;</code> (global), <code>static int y;</code> (local), <code>int *z = malloc(4);</code>, <code>&quot;hello&quot;</code> literal?</li><li>Why is the stack typically faster than the heap?</li><li>What&#x27;s the lifetime of a <code>static</code> local variable, and when is it initialized?</li><li>What happens if you return a pointer to a local variable from a function?</li><li>What&#x27;s the difference between <code>extern</code> and <code>static</code> at file scope?</li></ol>
+<h3>Pointers</h3>
+<ol class="guide-trace"><li>What is a dangling pointer? A wild pointer? A void pointer?</li><li>Decode: <code>int <em>(</em>foo)(int, int, int);</code> What is <code>foo</code>?</li><li>Write the difference between <code>const int <em>p</code>, <code>int </em> const p</code>, and <code>const int * const p</code>.</li><li>Difference between <code>char *s = &quot;hi&quot;;</code> and <code>char s[] = &quot;hi&quot;;</code>?</li><li>Why does <code>int <em>p = arr;</code> work but <code>int (</em>p)[10] = arr;</code> is sometimes preferred?</li><li>What does pointer arithmetic actually do in <code>p + 1</code>?</li></ol>
+<h3>Arrays &amp; Strings</h3>
+<ol class="guide-trace"><li>Why does <code>sizeof(arr)</code> give the wrong answer inside a function?</li><li>How are string literals stored, and why is modifying them UB?</li><li>Implement <code>strlen</code> and <code>strcpy</code> from scratch.</li><li>Implement a function to reverse the words of a sentence in place.</li></ol>
+<h3>Memory Management</h3>
+<ol class="guide-trace"><li>Difference between <code>malloc</code>, <code>calloc</code>, and <code>realloc</code>.</li><li>How would you safely use <code>realloc</code>?</li><li>What is a memory leak, double-free, and use-after-free? How do you detect each?</li><li>When would you use <code>memmove</code> over <code>memcpy</code>?</li><li>Show four different ways to allocate a 2-D array on the heap and their tradeoffs.</li></ol>
+<h3>Structs, Unions, Padding</h3>
+<ol class="guide-trace"><li>What is structure padding and why does the compiler do it?</li><li>How do you minimize the size of a struct? Demonstrate.</li><li>What is a tagged union? When would you use one?</li><li>Can you compare two structs with <code>==</code>? Why not?</li><li>Calculate the size of: <code>struct { char a; int b; char c; double d; };</code> on x86-64.</li></ol>
+<h3>Macros, Inline, typedef, enum</h3>
+<ol class="guide-trace"><li>Why might <code>#define SQUARE(x) x*x</code> give wrong results? Show a fix.</li><li>When would you use <code>inline</code> instead of a macro?</li><li>Why must inline functions in headers usually be <code>static inline</code>?</li><li>Difference between <code>typedef</code> and <code>#define</code> for <code>char *</code>?</li><li>Why prefer <code>enum</code> over <code>#define</code> for related constants?</li></ol>
+<h3>Qualifiers</h3>
+<ol class="guide-trace"><li>What does <code>volatile</code> actually do? Why isn&#x27;t it enough for thread safety?</li><li>Give a real-world example where a variable should be both <code>const</code> and <code>volatile</code>.</li><li>What does <code>restrict</code> (C99) tell the compiler?</li></ol>
+<h3>Bit Manipulation</h3>
+<ol class="guide-trace"><li>Set, clear, toggle, and test the n-th bit of an int.</li><li>How do you check if a number is a power of two?</li><li>Implement left and right rotation by <code>d</code> bits.</li><li>Given an int, swap its high 16 bits with its low 16 bits.</li><li>How would you reverse the byte order of a 32-bit integer (<code>bswap</code>)?</li></ol>
+<h3>Endianness &amp; MMIO</h3>
+<ol class="guide-trace"><li>How do you detect endianness at runtime?</li><li>Why is the network byte order big-endian?</li><li>Why must memory-mapped I/O accesses use <code>volatile</code>?</li><li>Decode this declaration: <code>volatile uint32_t * const port_reg;</code></li></ol>
+<h3>Undefined Behavior</h3>
+<ol class="guide-trace"><li>Is <code>i = i++ + ++i;</code> defined? Why not?</li><li>Name three common UB pitfalls in everyday C code.</li><li>Why is signed integer overflow UB but unsigned overflow defined?</li><li>What happens if you cast away <code>const</code> and modify the object?</li></ol>
+<h3>Function Pointers</h3>
+<ol class="guide-trace"><li>Declare a pointer to a function taking two <code>int</code>s and returning <code>int</code>. Then assign and call it.</li><li>How do you implement a polymorphic interface in C? Sketch a &quot;vtable&quot; pattern.</li><li>What&#x27;s the difference between <code>void (<em>f)()</code> and <code>void </em>f()</code>?</li></ol>
+<h3>Cost &amp; Performance</h3>
+<ol class="guide-trace"><li>Why is array iteration faster than linked-list traversal?</li><li>What is cache locality and how does it affect data structure choice?</li><li>What is the typical cost of a function call, a <code>malloc</code>, an L1 cache hit, and an L1 cache miss?</li><li>What is the &quot;as-if&quot; rule and how does it enable optimizations?</li></ol>
+<p class="guide-plain">---</p>
+</section>
+<section class="guide-section" id="final-word">
+<h2>Final Word</h2>
+<p class="guide-plain">C is small but unforgiving. The interview separator isn&#x27;t syntax — it&#x27;s whether you can:</p>
+<ul class="guide-list"><li><strong>Reason about memory</strong> (where does this live? who owns it? when does it die?)</li><li><strong>Spot UB</strong> (this code &quot;works&quot; but is the standard happy?)</li><li><strong>Predict the compiler</strong> (what will optimization do here?)</li><li><strong>Think about the machine</strong> (cache lines, branch prediction, instruction throughput)</li></ul>
+<p class="guide-plain">Master the storage-class table, the memory-layout diagram, the const/volatile distinction, the pointer-vs-array decay rules, and the UB hit list — and you&#x27;ll handle 90% of what systems interviewers ask. The remaining 10% is practice on bit-twiddling, data-structure implementation, and reading code under pressure.</p>
+<p class="guide-plain">Good luck.</p>
+<p class="guide-plain">---</p>
+<p class="guide-plain"><em>Document derived from source notes; deduplicated, fact-checked, code-corrected, and expanded for interview prep.</em></p>
+</section>
+
+      <section class="guide-section" id="next-steps">
+        <h2>Next steps</h2>
+        <p class="guide-plain">Practice the matching Lset Prep categories, then return here for revision tables.</p>
+        <div class="guide-cross-links">
+          <a class="btn btn-primary" href="index.html?section=pointers">Pointers practice →</a>
+          <a class="btn" href="index.html?section=bit%20manipulation">Bit manipulation →</a>
+          <a class="btn" href="dsa-guide.html">DSA Handbook →</a>
+          <a class="btn" href="index.html">← Home</a>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/guide-common.js?v=38"></script>
+  <script src="js/c-guide.js?v=38"></script>
+</body>
+</html>
