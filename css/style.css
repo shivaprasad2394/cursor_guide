@@ -2280,7 +2280,7 @@ body[data-guide-track="deep"] .guide-track-quick-only {
 
 .guide-viz-split {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
   gap: 1rem;
   align-items: start;
   margin-top: 0.5rem;
@@ -2309,23 +2309,28 @@ body[data-guide-track="deep"] .guide-track-quick-only {
 
 .guide-code-live {
   margin: 0;
-  max-height: 18rem;
+  min-height: 22rem;
+  max-height: 36rem;
   overflow: auto;
+  padding: 0.85rem 1rem;
+  font-size: 0.86rem;
+  line-height: 1.55;
 }
 
 .guide-code-live .guide-code-line {
   display: block;
-  padding: 0.1rem 0.35rem;
+  padding: 0.18rem 0.45rem;
   border-radius: 3px;
   border-left: 3px solid transparent;
   white-space: pre;
 }
 
 .guide-code-live .guide-code-line-hot {
-  background: rgba(240, 180, 41, 0.22);
+  background: rgba(240, 180, 41, 0.28);
   border-left-color: var(--amber);
   color: var(--text);
   font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(240, 180, 41, 0.35);
 }
 
 .guide-table-picker td:first-child {
