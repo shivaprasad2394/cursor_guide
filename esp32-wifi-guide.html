@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Technically corrected ESP32 OpenMAC and Wi-Fi driver handbook with interactive packet walkthroughs.">
   <title>ESP32 OpenMAC &amp; Wi-Fi Driver Handbook · Lset Prep</title>
-  <link rel="stylesheet" href="css/style.css?v=44">
+  <link rel="stylesheet" href="css/style.css?v=45">
 </head>
 <body data-page="guide" data-guide-track="quick">
   <header class="site-header">
@@ -115,26 +115,32 @@
 </figure>
 
 <div class="wifi-walkthrough" data-walkthrough="rx">
-  <div class="wifi-walk-toolbar">
-    <button class="btn wifi-walk-prev" type="button">← Previous</button>
-    <span class="wifi-walk-count" aria-live="polite"></span>
-    <button class="btn btn-primary wifi-walk-next" type="button">Next →</button>
+  <div class="wifi-walk-head">
+    <div>
+      <span class="wifi-walk-kicker">Automatic RX packet flow</span>
+      <span class="wifi-walk-count" aria-live="polite"></span>
+    </div>
+    <button class="btn wifi-walk-toggle" type="button" aria-pressed="false">Pause animation</button>
   </div>
   <div class="wifi-walk-stages" aria-label="RX packet stages"></div>
   <div class="wifi-walk-detail" aria-live="polite"></div>
+  <div class="wifi-walk-progress" aria-hidden="true"><span></span></div>
 </div>
 <p class="guide-plain">The critical invariant is ownership: <strong>hardware-owned descriptors are not writable by software; stack-owned payloads are not reusable until the release callback or copy contract completes</strong>. A descriptor and its payload are related resources, but not necessarily governed by the same allocator.</p></section>
 <section class="guide-section" id="end-to-end-tx-plcp-completion-and-timeout-hazards"><h2>5. End-to-end TX, PLCP, completion, and timeout hazards</h2><p class="guide-plain">The TX path converts an Ethernet frame to an 802.11 data frame, adds LLC/SNAP, obtains a smart frame, chooses one of five slots, prepares a DMA descriptor, programs observed PLCP/config registers, and starts transmission. This build appends CRC in software and configures its observed path accordingly.</p>
 <div class="wifi-diagram wifi-flow" role="img" aria-label="TX pipeline from Ethernet frame to completion"><div class="wifi-node"><strong>Ethernet</strong><span>14-byte header</span></div><span class="wifi-arrow" aria-hidden="true">→</span><div class="wifi-node"><strong>Encapsulate</strong><span>802.11 + LLC</span></div><span class="wifi-arrow" aria-hidden="true">→</span><div class="wifi-node"><strong>TX slot</strong><span>one of five</span></div><span class="wifi-arrow" aria-hidden="true">→</span><div class="wifi-node"><strong>Descriptor</strong><span>payload + FCS</span></div><span class="wifi-arrow" aria-hidden="true">→</span><div class="wifi-node"><strong>PLCP/MMIO</strong><span>observed sequence</span></div><span class="wifi-arrow" aria-hidden="true">→</span><div class="wifi-node"><strong>Complete</strong><span>recycle once</span></div></div>
 
 <div class="wifi-walkthrough" data-walkthrough="tx">
-  <div class="wifi-walk-toolbar">
-    <button class="btn wifi-walk-prev" type="button">← Previous</button>
-    <span class="wifi-walk-count" aria-live="polite"></span>
-    <button class="btn btn-primary wifi-walk-next" type="button">Next →</button>
+  <div class="wifi-walk-head">
+    <div>
+      <span class="wifi-walk-kicker">Automatic TX packet flow</span>
+      <span class="wifi-walk-count" aria-live="polite"></span>
+    </div>
+    <button class="btn wifi-walk-toggle" type="button" aria-pressed="false">Pause animation</button>
   </div>
   <div class="wifi-walk-stages" aria-label="TX packet stages"></div>
   <div class="wifi-walk-detail" aria-live="polite"></div>
+  <div class="wifi-walk-progress" aria-hidden="true"><span></span></div>
 </div>
 <p class="guide-plain">Completion reads a slot bitmap, clears a completion bit, recycles the smart frame, and marks the slot free. The fallback timeout is 50 ms. Timeout recovery is hazardous unless completion and timeout removal are serialized: a late completion can otherwise recycle a frame twice or refer to a reused slot.</p>
 <div class="guide-takeaway">Production rule: model each slot as <code>FREE → PREPARED → IN_FLIGHT → COMPLETING → FREE</code>, attach a generation/cookie, and make exactly one path win completion.</div></section>
@@ -153,13 +159,16 @@
 </figure>
 
 <div class="wifi-walkthrough" data-walkthrough="ap">
-  <div class="wifi-walk-toolbar">
-    <button class="btn wifi-walk-prev" type="button">← Previous</button>
-    <span class="wifi-walk-count" aria-live="polite"></span>
-    <button class="btn btn-primary wifi-walk-next" type="button">Next →</button>
+  <div class="wifi-walk-head">
+    <div>
+      <span class="wifi-walk-kicker">Automatic AP join flow</span>
+      <span class="wifi-walk-count" aria-live="polite"></span>
+    </div>
+    <button class="btn wifi-walk-toggle" type="button" aria-pressed="false">Pause animation</button>
   </div>
   <div class="wifi-walk-stages" aria-label="AP join stages"></div>
   <div class="wifi-walk-detail" aria-live="polite"></div>
+  <div class="wifi-walk-progress" aria-hidden="true"><span></span></div>
 </div>
 <p class="guide-plain">DHCP direction must stay separate from association:</p>
 <ol class="guide-trace"><li>Client broadcasts <strong>DHCPDISCOVER</strong>.</li><li>AP-side DHCP server sends <strong>DHCPOFFER</strong>.</li><li>Client sends <strong>DHCPREQUEST</strong>.</li><li>Server sends <strong>DHCPACK</strong>.</li><li>ESP-IDF may report <code>IP_EVENT_AP_STAIPASSIGNED</code> after assignment; that event is a local notification, not a DHCP packet traveling to the client.</li></ol>
@@ -241,7 +250,7 @@
       </section>
     </main>
   </div>
-  <script src="js/guide-common.js?v=44"></script>
-  <script src="js/esp32-wifi-guide.js?v=44"></script>
+  <script src="js/guide-common.js?v=45"></script>
+  <script src="js/esp32-wifi-guide.js?v=45"></script>
 </body>
 </html>

@@ -10,7 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "docs" / "esp32_openmac_wifi_guide.md"
 OUT = ROOT / "esp32-wifi-guide.html"
-ASSET_VERSION = "44"
+ASSET_VERSION = "45"
 
 
 def slugify(text: str) -> str:
@@ -162,13 +162,16 @@ def walkthrough(kind: str) -> str:
     labels = {"rx": "RX packet", "tx": "TX packet", "ap": "AP join"}
     return f"""
 <div class="wifi-walkthrough" data-walkthrough="{kind}">
-  <div class="wifi-walk-toolbar">
-    <button class="btn wifi-walk-prev" type="button">← Previous</button>
-    <span class="wifi-walk-count" aria-live="polite"></span>
-    <button class="btn btn-primary wifi-walk-next" type="button">Next →</button>
+  <div class="wifi-walk-head">
+    <div>
+      <span class="wifi-walk-kicker">Automatic {labels[kind]} flow</span>
+      <span class="wifi-walk-count" aria-live="polite"></span>
+    </div>
+    <button class="btn wifi-walk-toggle" type="button" aria-pressed="false">Pause animation</button>
   </div>
   <div class="wifi-walk-stages" aria-label="{labels[kind]} stages"></div>
   <div class="wifi-walk-detail" aria-live="polite"></div>
+  <div class="wifi-walk-progress" aria-hidden="true"><span></span></div>
 </div>"""
 
 
