@@ -34,6 +34,117 @@
     ],
   };
 
+  const SEQUENCES = {
+    rx: {
+      actors: ["PHY / DMA", "Wi-Fi ISR", "wifi_hardware", "MAC task (C)", "esp_netif / LwIP"],
+      events: [
+        { from: 0, to: 1, call: "DMA fills descriptor; interrupt", ref: "hardware.c:330–340" },
+        { from: 1, to: 2, call: "queue RX_ENTRY", ref: "hardware.c:335–339" },
+        { from: 2, to: 3, call: "c_hand_rx_to_mac_stack(dma_item)", ref: "80211_mac_interface.c:167–177" },
+        { from: 3, to: 3, call: "handle_ap_rx_data(): ToDS → Ethernet", ref: "80211_mac.c:542–586" },
+        { from: 3, to: 4, call: "mac_ap_netif_receive(eth_buf, len)", ref: "mac.c:31–43" },
+        { from: 3, to: 2, call: "rs_recycle_dma_item(dma_item)", ref: "hardware.c:367–386" },
+      ],
+    },
+    tx: {
+      actors: ["LwIP", "mac.c driver", "MAC event queue", "802.11 MAC (C)", "hardware.c", "MMIO / Radio"],
+      events: [
+        { from: 0, to: 1, call: "openmac_netif_transmit(buffer, len)", ref: "mac.c:48–57" },
+        { from: 1, to: 2, call: "c_transmit_data_frame(): malloc + copy", ref: "80211_mac_interface.c:219–238" },
+        { from: 2, to: 3, call: "handle_ap_tx_data(): Ethernet → FromDS", ref: "80211_mac.c:664–793" },
+        { from: 3, to: 4, call: "rs_tx_smart_frame(smart_frame)", ref: "80211_mac_interface.c:127–163" },
+        { from: 4, to: 5, call: "CRC + descriptor + PLCP/MMIO kick", ref: "hardware.c:191–253" },
+        { from: 5, to: 4, call: "ISR 0x80 → processTxComplete()", ref: "hardware.c:320–340" },
+      ],
+    },
+    ap: {
+      actors: ["Station", "RX DMA / ISR", "AP MAC (C)", "TX hardware", "LwIP DHCP"],
+      events: [
+        { from: 2, to: 0, call: "Beacon / Probe response", ref: "80211_mac.c:382–408, 620–659" },
+        { from: 0, to: 2, call: "Authentication request → response", ref: "80211_mac.c:411–467" },
+        { from: 0, to: 2, call: "Association request → AID response", ref: "80211_mac.c:470–537" },
+        { from: 0, to: 2, call: "EAPOL-Key exchange (not implemented)", ref: "Production security stage" },
+        { from: 0, to: 4, call: "DHCPDISCOVER → DHCPOFFER", ref: "LwIP AP netif after association" },
+        { from: 4, to: 0, call: "DHCPREQUEST → DHCPACK / lease", ref: "IP_EVENT_AP_STAIPASSIGNED is local" },
+      ],
+    },
+  };
+
+  function escapeSvg(text) {
+    return String(text)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function renderSequence(walkthrough, activeIndex) {
+    const kind = walkthrough.dataset.walkthrough;
+    const sequence = SEQUENCES[kind];
+    const target = walkthrough.querySelector(".wifi-callflow");
+    if (!sequence || !target) return;
+
+    const width = 1100;
+    const side = 70;
+    const headerY = 12;
+    const headerHeight = 50;
+    const eventStart = 105;
+    const rowHeight = 66;
+    const height = eventStart + sequence.events.length * rowHeight + 24;
+    const gap = (width - side * 2) / (sequence.actors.length - 1);
+    const xAt = (index) => side + index * gap;
+    const markerId = `wifi-seq-arrow-${kind}`;
+    const activeMarkerId = `wifi-seq-arrow-active-${kind}`;
+
+    const actors = sequence.actors
+      .map((actor, index) => {
+        const x = xAt(index);
+        return `
+          <g class="wifi-seq-actor">
+            <rect x="${x - 74}" y="${headerY}" width="148" height="${headerHeight}" rx="7"></rect>
+            <text x="${x}" y="${headerY + 30}">${escapeSvg(actor)}</text>
+            <line x1="${x}" y1="${headerY + headerHeight}" x2="${x}" y2="${height - 12}"></line>
+          </g>`;
+      })
+      .join("");
+
+    const events = sequence.events
+      .map((event, index) => {
+        const fromX = xAt(event.from);
+        const toX = xAt(event.to);
+        const y = eventStart + index * rowHeight;
+        const state = index === activeIndex ? " is-active" : index < activeIndex ? " is-complete" : "";
+        const marker = index === activeIndex ? activeMarkerId : markerId;
+        const labelX = event.from === event.to ? fromX + 48 : (fromX + toX) / 2;
+        const anchor = event.from === event.to ? "start" : "middle";
+        const arrow =
+          event.from === event.to
+            ? `<path d="M ${fromX} ${y} h 62 v 25 h -62" marker-end="url(#${marker})"></path>`
+            : `<line x1="${fromX}" y1="${y}" x2="${toX}" y2="${y}" marker-end="url(#${marker})"></line>`;
+        return `
+          <g class="wifi-seq-event${state}" data-seq-step="${index}">
+            ${arrow}
+            <text class="wifi-seq-call" x="${labelX}" y="${y - 9}" text-anchor="${anchor}">${escapeSvg(event.call)}</text>
+            <text class="wifi-seq-ref" x="${labelX}" y="${y + 18}" text-anchor="${anchor}">${escapeSvg(event.ref)}</text>
+          </g>`;
+      })
+      .join("");
+
+    target.innerHTML = `
+      <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeSvg(kind.toUpperCase())} source call sequence">
+        <defs>
+          <marker id="${markerId}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0L10 5L0 10z"></path>
+          </marker>
+          <marker id="${activeMarkerId}" class="wifi-seq-marker-active" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M0 0L10 5L0 10z"></path>
+          </marker>
+        </defs>
+        ${actors}
+        ${events}
+      </svg>`;
+  }
+
   function render(walkthrough, index, focusStage = false) {
     const flow = FLOWS[walkthrough.dataset.walkthrough];
     if (!flow) return;
@@ -44,10 +155,12 @@
     stageButtons.forEach((button, i) => {
       button.classList.toggle("is-active", i === safeIndex);
       button.classList.toggle("is-complete", i < safeIndex);
-      button.setAttribute("aria-current", i === safeIndex ? "step" : "false");
+      if (i === safeIndex) button.setAttribute("aria-current", "step");
+      else button.removeAttribute("aria-current");
     });
 
     const item = flow[safeIndex];
+    const sourceEvent = SEQUENCES[walkthrough.dataset.walkthrough].events[safeIndex];
     walkthrough.querySelector(".wifi-walk-count").textContent = `Stage ${safeIndex + 1} of ${flow.length}`;
     walkthrough.querySelector(".wifi-walk-detail").innerHTML = `
       <div class="wifi-walk-detail-title">
@@ -60,7 +173,9 @@
         <div><dt>Owner</dt><dd>${item.owner}</dd></div>
         <div><dt>Lifetime</dt><dd>${item.lifetime}</dd></div>
       </dl>
+      <div class="wifi-walk-source"><strong>Source call</strong><code>${sourceEvent.call}</code><span>${sourceEvent.ref}</span></div>
       <p class="wifi-walk-why"><strong>Why this stage matters</strong>${item.why}</p>`;
+    renderSequence(walkthrough, safeIndex);
 
     const progress = walkthrough.querySelector(".wifi-walk-progress span");
     progress.classList.remove("is-running");
@@ -104,7 +219,7 @@
     stages.innerHTML = flow
       .map(
         (item, i) =>
-          `<button type="button" class="wifi-walk-stage" data-step="${i}" aria-current="false"><span>${i + 1}</span>${item.stage}</button>`
+          `<button type="button" class="wifi-walk-stage" data-step="${i}"><span>${i + 1}</span>${item.stage}</button>`
       )
       .join("");
 

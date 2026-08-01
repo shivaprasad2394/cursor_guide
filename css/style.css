@@ -3309,6 +3309,111 @@ body[data-guide-track="deep"] .guide-track-quick-only {
   font-size: 0.7rem;
 }
 
+.wifi-callflow {
+  margin-bottom: 1rem;
+  padding: 0.65rem;
+  border: 1px solid rgba(91, 140, 255, 0.25);
+  border-radius: 9px;
+  background:
+    linear-gradient(rgba(91, 140, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(91, 140, 255, 0.025) 1px, transparent 1px),
+    rgba(0, 0, 0, 0.24);
+  background-size: 22px 22px;
+  overflow-x: auto;
+}
+
+.wifi-callflow svg {
+  display: block;
+  width: 100%;
+  min-width: 900px;
+  height: auto;
+}
+
+.wifi-seq-actor rect {
+  fill: var(--bg-panel);
+  stroke: rgba(91, 140, 255, 0.55);
+  stroke-width: 1.5;
+}
+
+.wifi-seq-actor text {
+  fill: var(--text);
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.wifi-seq-actor line {
+  stroke: rgba(156, 163, 175, 0.38);
+  stroke-width: 1.2;
+  stroke-dasharray: 5 5;
+}
+
+.wifi-seq-event line,
+.wifi-seq-event path {
+  fill: none;
+  stroke: rgba(156, 163, 175, 0.62);
+  stroke-width: 1.5;
+  transition:
+    stroke 240ms ease,
+    stroke-width 240ms ease,
+    opacity 240ms ease;
+}
+
+.wifi-callflow marker path {
+  fill: var(--text-muted);
+}
+
+.wifi-callflow .wifi-seq-marker-active path {
+  fill: var(--green);
+}
+
+.wifi-seq-call {
+  fill: var(--text-muted);
+  font-family: var(--mono);
+  font-size: 10px;
+  transition: fill 240ms ease;
+}
+
+.wifi-seq-ref {
+  fill: #778195;
+  font-family: var(--sans);
+  font-size: 9px;
+  transition: fill 240ms ease;
+}
+
+.wifi-seq-event.is-complete line,
+.wifi-seq-event.is-complete path {
+  stroke: rgba(91, 140, 255, 0.72);
+}
+
+.wifi-seq-event.is-complete .wifi-seq-call {
+  fill: #a9c0ff;
+}
+
+.wifi-seq-event.is-active line,
+.wifi-seq-event.is-active path {
+  stroke: var(--green);
+  stroke-width: 3;
+  filter: drop-shadow(0 0 5px rgba(57, 217, 138, 0.55));
+  stroke-dasharray: 8 4;
+  animation: wifi-seq-flow 850ms linear infinite;
+}
+
+.wifi-seq-event.is-active .wifi-seq-call {
+  fill: var(--green);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.wifi-seq-event.is-active .wifi-seq-ref {
+  fill: var(--amber);
+}
+
+@keyframes wifi-seq-flow {
+  to { stroke-dashoffset: -12; }
+}
+
 .wifi-walk-stages {
   display: grid;
   grid-template-columns: repeat(6, minmax(105px, 1fr));
@@ -3438,6 +3543,37 @@ body[data-guide-track="deep"] .guide-track-quick-only {
   font-size: 0.8rem;
 }
 
+.wifi-walk-source {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid rgba(91, 140, 255, 0.24);
+  border-radius: 6px;
+  background: rgba(91, 140, 255, 0.06);
+  font-size: 0.72rem;
+}
+
+.wifi-walk-source strong {
+  color: var(--blue);
+  font-family: var(--sans);
+  text-transform: uppercase;
+}
+
+.wifi-walk-source code {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.wifi-walk-source span {
+  color: var(--text-muted);
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  white-space: nowrap;
+}
+
 .wifi-walk-why {
   display: grid;
   grid-template-columns: 8.5rem 1fr;
@@ -3486,7 +3622,9 @@ body[data-guide-track="deep"] .guide-track-quick-only {
 @media (prefers-reduced-motion: reduce) {
   .wifi-walk-stage,
   .wifi-walk-detail,
-  .wifi-walk-progress span {
+  .wifi-walk-progress span,
+  .wifi-seq-event.is-active line,
+  .wifi-seq-event.is-active path {
     animation: none !important;
     transition: none !important;
   }
@@ -3520,6 +3658,15 @@ body[data-guide-track="deep"] .guide-track-quick-only {
   .wifi-walk-why {
     grid-template-columns: 1fr;
     gap: 0.25rem;
+  }
+
+  .wifi-walk-source {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+
+  .wifi-walk-source span {
+    white-space: normal;
   }
 }
 .spec-section-prereq {
