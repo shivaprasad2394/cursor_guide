@@ -434,7 +434,7 @@
     "avl tree": { label: "AVL Tree", icon: "AVL", blurb: "Rotations and rebalancing" },
     "queues & stacks": { label: "Queues & Stacks", icon: "⊟", blurb: "Ring buffer, valid parentheses" },
     "parsing & formatting": { label: "Parsing & Formatting", icon: "%s", blurb: "sscanf, snprintf, CSV" },
-    "buffers & driver patterns": { label: "Buffers & Drivers", icon: "DMA", blurb: "Ring buffers, descriptors" },
+    "buffers & driver patterns": { label: "Buffers & Drivers", icon: "DMA", blurb: "Ring buffers, descriptors, and the ESP32 OpenMAC handbook" },
     "memory, dma, mmap & reimplementing libc": {
       label: "Memory & libc",
       icon: "mem",
@@ -503,6 +503,7 @@
         listEl.innerHTML = `
           ${activeSection === "dsa patterns" ? `<a class="dsa-primer-banner" href="dsa-guide.html"><strong>DSA Handbook</strong> — Quick demos + Deep invariants (read this first)</a>` : ""}
           ${activeSection === "pointers" || activeSection === "bit manipulation" || activeSection === "memory, dma, mmap & reimplementing libc" ? `<a class="dsa-primer-banner" href="c-guide.html"><strong>C Handbook</strong> — pointers, memory layout, UB, systems insights</a>` : ""}
+          ${activeSection === "buffers & driver patterns" ? `<a class="dsa-primer-banner" href="esp32-wifi-guide.html"><strong>ESP32 OpenMAC &amp; Wi-Fi Driver Handbook</strong> — packet paths, DMA ownership, AP lifecycle, and coexistence</a>` : ""}
           <section class="section-group section-group-single">
             <h2 class="section-heading">${escapeHtml(sectionLabel(activeSection))}</h2>
             <div class="section-cards">${renderQuestionCards(items)}</div>
@@ -537,6 +538,11 @@
               <span class="category-title">C Handbook</span>
               <span class="category-count">Systems interview depth</span>
               <span class="category-blurb">Pipeline, pointers, memory, UB, bit tricks — IIT/MIT style</span>
+            </a><a class="category-card category-card-guide" href="esp32-wifi-guide.html">
+              <span class="category-icon">802.11</span>
+              <span class="category-title">ESP32 Wi-Fi Driver</span>
+              <span class="category-count">Quick + Deep tracks</span>
+              <span class="category-blurb">OpenMAC packet paths, DMA ownership, AP lifecycle, and coexistence</span>
             </a>${cards}</div>`;
       }
       document.title = "Lset Prep";

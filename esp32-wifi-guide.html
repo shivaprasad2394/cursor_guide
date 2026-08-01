@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Technically corrected ESP32 OpenMAC and Wi-Fi driver handbook with interactive packet walkthroughs.">
+  <title>ESP32 OpenMAC &amp; Wi-Fi Driver Handbook · Lset Prep</title>
+  <link rel="stylesheet" href="css/style.css?v=44">
+</head>
+<body data-page="guide" data-guide-track="quick">
+  <header class="site-header">
+    <div class="brand">
+      <a href="index.html" class="brand-title">← Lset Prep</a>
+      <span class="brand-sub">ESP32 OpenMAC · Wi-Fi driver handbook</span>
+    </div>
+  </header>
+  <div class="guide-layout">
+    <aside class="guide-sidebar" aria-label="Table of contents">
+      <p class="guide-sidebar-title">On this page</p>
+      <nav class="guide-sidebar-nav"><a href="#scope-evidence-and-project-map">Scope, evidence, and project map</a>
+<a href="#hardware-software-boundary-and-task-ownership">Hardware/software boundary and task ownership</a>
+<a href="#802-11-frame-anatomy-and-address-mapping">802.11 frame anatomy and address mapping</a>
+<a href="#end-to-end-rx-and-descriptor-lifetime">End-to-end RX and descriptor lifetime</a>
+<a href="#end-to-end-tx-plcp-completion-and-timeout-hazards">End-to-end TX, PLCP, completion, and timeout hazards</a>
+<a href="#ap-lifecycle-discovery-through-dhcp">AP lifecycle: discovery through DHCP</a>
+<a href="#lwip-and-esp-netif-handoff">LwIP and esp_netif handoff</a>
+<a href="#dcf-cca-ack-timing-and-phy-boundary">DCF, CCA, ACK timing, and PHY boundary</a>
+<a href="#wi-fi-ble-coexistence-and-recovery">Wi-Fi/BLE coexistence and recovery</a>
+<a href="#hardening-roadmap-wireshark-and-interview-review">Hardening roadmap, Wireshark, and interview review</a></nav>
+      <a class="guide-sidebar-cta btn btn-primary" href="index.html">← Home</a>
+      <a class="guide-sidebar-cta btn" href="c-guide.html">C Handbook →</a>
+    </aside>
+    <main class="guide-content">
+      <header class="guide-hero wifi-guide-hero">
+        <p class="guide-kicker">Experimental driver study · corrected protocol model</p>
+        <h1>ESP32 OpenMAC &amp; Wi-Fi Driver Handbook</h1>
+        <div class="guide-lead"><p class="guide-plain">This handbook combines the two project walkthroughs into one corrected path through the experimental ESP32 OpenMAC build. Use <strong>Quick</strong> for the architecture and packet journey; switch to <strong>Deep</strong> for implementation hazards and interview prompts.</p></div>
+        <div class="guide-track-bar" role="group" aria-label="Reading track">
+          <span class="guide-track-bar-label">Reading track</span>
+          <button type="button" class="guide-track-btn guide-track-active" data-track-set="quick" aria-pressed="true">Quick</button>
+          <button type="button" class="guide-track-btn" data-track-set="deep" aria-pressed="false">Deep</button>
+        </div>
+      </header>
+      <section class="guide-section" id="scope-evidence-and-project-map"><h2>1. Scope, evidence, and project map</h2><p class="guide-plain">This is a study of one experimental, reverse-engineered driver—not a portable ESP32 Wi-Fi API. The inspected build explicitly targets the original ESP32 and ESP-IDF 5.0.1. Its hard-coded MMIO addresses, register bit meanings, timing choices, and PHY recovery sequence are <strong>observations from this source tree</strong>, not an official hardware specification.</p>
+<div class="guide-takeaway">Evidence labels: <strong>802.11 rule</strong> means protocol-defined behavior; <strong>source-observed</strong> means directly visible in this build; <strong>hypothesis</strong> means a useful explanation that still needs measurement.</div>
+
+<figure class="wifi-diagram wifi-boundary">
+  <figcaption>System boundary — protocol rules above, observed hardware contract below</figcaption>
+  <div class="wifi-layer wifi-layer-app">Application / UART bridge / services</div>
+  <div class="wifi-layer wifi-layer-stack">LwIP + esp_netif <span>Ethernet-form packets</span></div>
+  <div class="wifi-layer wifi-layer-mac">OpenMAC C/Rust logic <span>802.11 state + framing</span></div>
+  <div class="wifi-layer wifi-layer-hal">hardware.c <span>DMA descriptors · slots · MMIO</span></div>
+  <div class="wifi-layer wifi-layer-rf">ESP32 MAC / PHY / shared 2.4 GHz RF</div>
+</figure>
+<h3>Project map</h3>
+<div class="guide-table-wrap"><table class="guide-table"><thead><tr><th>Layer</th><th>Build-specific role</th></tr></thead><tbody><tr><td><code>main/main.c</code></td><td>Initializes NVS, <code>esp_netif</code>, events, BLE, then the Wi-Fi hardware task</td></tr><tr><td><code>main/hardware.c</code></td><td>MMIO, RX descriptors, five TX slots, ISR deferral, channel changes, recovery</td></tr><tr><td>Rust/C MAC component</td><td>802.11 state and frame handling behind the C interface</td></tr><tr><td><code>main/mac.c</code></td><td>Adapts Ethernet-form frames between OpenMAC and <code>esp_netif</code>/LwIP</td></tr><tr><td>coexistence files</td><td>Software intent and BLE notifications around the shared 2.4 GHz radio</td></tr></tbody></table></div>
+<div class="guide-track-deep">
+<h3>Interview check</h3>
+<p class="guide-plain"><strong>Q. Why is “works on my ESP32” insufficient evidence for a register claim?</strong></p>
+<p class="guide-plain"><strong>A.</strong> A successful trace validates one chip revision, binary, clock/PHY state, and sequence. It does not establish a stable public register contract. Preserve traces, masks, and version guards; label inferred semantics.</p>
+</div></section>
+<section class="guide-section" id="hardware-software-boundary-and-task-ownership"><h2>2. Hardware/software boundary and task ownership</h2><p class="guide-plain">The interrupt handler does minimal work: read and clear the DMA cause, then enqueue an RX event with a FromISR API. The pinned <code>wifi_hardware</code> task owns MMIO-facing work and creates the MAC task. This is a useful boundary, but it is not automatically race-free: TX-slot state is shared and must have one documented owner or explicit synchronization.</p>
+
+<figure class="wifi-diagram">
+  <figcaption>Two task domains and deferred interrupt work</figcaption>
+  <div class="wifi-topology">
+    <div class="wifi-node"><strong>Wi-Fi ISR</strong><span>read + clear cause</span></div>
+    <span class="wifi-arrow" aria-hidden="true">→</span><div class="wifi-queue">hardware_event_queue<br><small>RX / TX / channel</small></div>
+    <span class="wifi-arrow" aria-hidden="true">→</span><div class="wifi-node wifi-node-hot"><strong>wifi_hardware</strong><span>MMIO + descriptor owner</span></div>
+    <span class="wifi-arrow" aria-hidden="true">⇄</span><div class="wifi-node"><strong>rs_wifi MAC task</strong><span>802.11 policy</span></div>
+  </div>
+  <div class="wifi-topology wifi-topology-secondary">
+    <div class="wifi-node"><strong>LwIP task context</strong><span>Ethernet-form TX/RX</span></div>
+    <span class="wifi-arrow" aria-hidden="true">⇄</span><div class="wifi-queue">esp_netif adapter</div>
+    <span class="wifi-arrow" aria-hidden="true">⇄</span><div class="wifi-node"><strong>OpenMAC</strong><span>explicit ownership boundary</span></div>
+  </div>
+</figure>
+<p class="guide-plain">Source-observed resources are a hardware-event queue, an RX counting semaphore, a TX counting semaphore, ten RX descriptors, and five TX slots. A counting semaphore limits outstanding work; it does not protect arbitrary shared memory like a mutex.</p>
+<div class="guide-takeaway">ISR rule: use only ISR-safe FreeRTOS calls, pass a <code>higherPriorityTaskWoken</code> flag when latency matters, and never block or perform heavy parsing in the ISR.</div></section>
+<section class="guide-section" id="802-11-frame-anatomy-and-address-mapping"><h2>3. 802.11 frame anatomy and address mapping</h2><p class="guide-plain">A basic data MPDU contains MAC header, optional fields, payload, and a four-byte FCS. The LLC/SNAP header (<code>AA AA 03 00 00 00</code> plus EtherType) bridges an Ethernet-style protocol identifier into the 802.11 payload.</p>
+
+<figure class="wifi-diagram">
+  <figcaption>Basic 802.11 data MPDU (sizes vary with optional fields)</figcaption>
+  <div class="wifi-frame">
+    <span style="--w:2"><b>Frame control</b><small>2 B</small></span>
+    <span style="--w:2"><b>Duration</b><small>2 B</small></span>
+    <span style="--w:6"><b>Addr1</b><small>6 B</small></span>
+    <span style="--w:6"><b>Addr2</b><small>6 B</small></span>
+    <span style="--w:6"><b>Addr3</b><small>6 B</small></span>
+    <span style="--w:2"><b>Sequence</b><small>2 B</small></span>
+    <span class="wifi-frame-payload" style="--w:9"><b>LLC/SNAP + payload</b><small>variable</small></span>
+    <span class="wifi-frame-fcs" style="--w:4"><b>FCS</b><small>4 B</small></span>
+  </div>
+</figure>
+<h3>DS bits for an infrastructure BSS</h3>
+<div class="guide-table-wrap"><table class="guide-table"><thead><tr><th>Direction</th><th>To DS</th><th>From DS</th><th>Addr1</th><th>Addr2</th><th>Addr3</th></tr></thead><tbody><tr><td>Station → AP</td><td>1</td><td>0</td><td>BSSID/AP</td><td>station/source</td><td>final destination</td></tr><tr><td>AP → station</td><td>0</td><td>1</td><td>station/destination</td><td>BSSID/AP</td><td>original source</td></tr></tbody></table></div>
+<p class="guide-plain">The inspected AP transmit path correctly emits data frames with <code>From DS = 1</code>, maps Ethernet destination to Addr1, AP/BSSID to Addr2, and Ethernet source to Addr3. Four-address WDS frames use both bits and are outside this build’s normal AP path.</p>
+<p class="guide-plain">Sequence control provides a sequence number and fragment number for duplicate handling. FCS is CRC-32 over the MPDU; whether software or hardware appends/checks it is a driver contract, not something to guess.</p>
+<div class="guide-track-deep">
+<h3>Precision points</h3>
+<ul class="guide-list"><li>DSSS/CCK symbol and chip rates are not interchangeable with payload bit rate.</li><li>OFDM airtime is computed in whole OFDM symbols after service, tail, and padding bits; do not divide bytes by headline Mbps alone.</li><li>WPA authentication is not “an EAPOL packet.” Open-system 802.11 authentication and association happen first; WPA/WPA2 key establishment then uses multiple EAPOL-Key messages.</li></ul>
+</div></section>
+<section class="guide-section" id="end-to-end-rx-and-descriptor-lifetime"><h2>4. End-to-end RX and descriptor lifetime</h2><p class="guide-plain">At boot, this build allocates ten linked DMA descriptors with 1600-byte buffers and gives ownership to hardware. A receive interrupt is deferred through the event queue. The hardware task walks consecutive descriptors marked with data, detaches each, and hands it to the MAC layer. Recycling restores size/flags and appends the descriptor back to the chain.</p>
+
+<figure class="wifi-diagram">
+  <figcaption>RX descriptor lifecycle — logical ring formed by recycling</figcaption>
+  <svg class="wifi-ring-svg" viewBox="0 0 720 210" role="img" aria-label="RX descriptors circulate between hardware, MAC and recycle stages">
+    <defs><marker id="wifiArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z"/></marker></defs>
+    <path class="wifi-ring-path" d="M120 105 C120 25 600 25 600 105 C600 185 120 185 120 105" marker-end="url(#wifiArrow)"/>
+    <g class="wifi-svg-card" transform="translate(45 72)"><rect width="150" height="66" rx="9"/><text x="75" y="27">HW-owned</text><text class="sub" x="75" y="48">owner=1 · empty</text></g>
+    <g class="wifi-svg-card" transform="translate(285 20)"><rect width="150" height="66" rx="9"/><text x="75" y="27">DMA filled</text><text class="sub" x="75" y="48">has_data=1</text></g>
+    <g class="wifi-svg-card" transform="translate(525 72)"><rect width="150" height="66" rx="9"/><text x="75" y="27">MAC consumes</text><text class="sub" x="75" y="48">descriptor detached</text></g>
+    <g class="wifi-svg-card" transform="translate(285 124)"><rect width="150" height="66" rx="9"/><text x="75" y="27">Recycle</text><text class="sub" x="75" y="48">reset · append</text></g>
+  </svg>
+</figure>
+
+<div class="wifi-walkthrough" data-walkthrough="rx">
+  <div class="wifi-walk-toolbar">
+    <button class="btn wifi-walk-prev" type="button">← Previous</button>
+    <span class="wifi-walk-count" aria-live="polite"></span>
+    <button class="btn btn-primary wifi-walk-next" type="button">Next →</button>
+  </div>
+  <div class="wifi-walk-stages" aria-label="RX packet stages"></div>
+  <div class="wifi-walk-detail" aria-live="polite"></div>
+</div>
+<p class="guide-plain">The critical invariant is ownership: <strong>hardware-owned descriptors are not writable by software; stack-owned payloads are not reusable until the release callback or copy contract completes</strong>. A descriptor and its payload are related resources, but not necessarily governed by the same allocator.</p></section>
+<section class="guide-section" id="end-to-end-tx-plcp-completion-and-timeout-hazards"><h2>5. End-to-end TX, PLCP, completion, and timeout hazards</h2><p class="guide-plain">The TX path converts an Ethernet frame to an 802.11 data frame, adds LLC/SNAP, obtains a smart frame, chooses one of five slots, prepares a DMA descriptor, programs observed PLCP/config registers, and starts transmission. This build appends CRC in software and configures its observed path accordingly.</p>
+<div class="wifi-diagram wifi-flow" role="img" aria-label="TX pipeline from Ethernet frame to completion"><div class="wifi-node"><strong>Ethernet</strong><span>14-byte header</span></div><span class="wifi-arrow" aria-hidden="true">→</span><div class="wifi-node"><strong>Encapsulate</strong><span>802.11 + LLC</span></div><span class="wifi-arrow" aria-hidden="true">→</span><div class="wifi-node"><strong>TX slot</strong><span>one of five</span></div><span class="wifi-arrow" aria-hidden="true">→</span><div class="wifi-node"><strong>Descriptor</strong><span>payload + FCS</span></div><span class="wifi-arrow" aria-hidden="true">→</span><div class="wifi-node"><strong>PLCP/MMIO</strong><span>observed sequence</span></div><span class="wifi-arrow" aria-hidden="true">→</span><div class="wifi-node"><strong>Complete</strong><span>recycle once</span></div></div>
+
+<div class="wifi-walkthrough" data-walkthrough="tx">
+  <div class="wifi-walk-toolbar">
+    <button class="btn wifi-walk-prev" type="button">← Previous</button>
+    <span class="wifi-walk-count" aria-live="polite"></span>
+    <button class="btn btn-primary wifi-walk-next" type="button">Next →</button>
+  </div>
+  <div class="wifi-walk-stages" aria-label="TX packet stages"></div>
+  <div class="wifi-walk-detail" aria-live="polite"></div>
+</div>
+<p class="guide-plain">Completion reads a slot bitmap, clears a completion bit, recycles the smart frame, and marks the slot free. The fallback timeout is 50 ms. Timeout recovery is hazardous unless completion and timeout removal are serialized: a late completion can otherwise recycle a frame twice or refer to a reused slot.</p>
+<div class="guide-takeaway">Production rule: model each slot as <code>FREE → PREPARED → IN_FLIGHT → COMPLETING → FREE</code>, attach a generation/cookie, and make exactly one path win completion.</div></section>
+<section class="guide-section" id="ap-lifecycle-discovery-through-dhcp"><h2>6. AP lifecycle: discovery through DHCP</h2><p class="guide-plain">Beacons announce the BSS. A station may also send a probe request and receive a probe response. It then performs 802.11 authentication and association. Only after the link is usable does IP configuration occur.</p>
+
+<figure class="wifi-diagram">
+  <figcaption>AP join is link setup first, IP configuration later</figcaption>
+  <div class="wifi-sequence">
+    <div class="wifi-lane"><strong>Station</strong><strong>ESP32 AP</strong><strong>DHCP server</strong></div>
+    <div class="wifi-message" style="--from:1;--to:2"><span>Probe request</span></div>
+    <div class="wifi-message reverse" style="--from:1;--to:2"><span>Probe response</span></div>
+    <div class="wifi-message" style="--from:1;--to:2"><span>Authentication + association</span></div>
+    <div class="wifi-message" style="--from:1;--to:3"><span>Discover / Request</span></div>
+    <div class="wifi-message reverse" style="--from:1;--to:3"><span>Offer / ACK</span></div>
+  </div>
+</figure>
+
+<div class="wifi-walkthrough" data-walkthrough="ap">
+  <div class="wifi-walk-toolbar">
+    <button class="btn wifi-walk-prev" type="button">← Previous</button>
+    <span class="wifi-walk-count" aria-live="polite"></span>
+    <button class="btn btn-primary wifi-walk-next" type="button">Next →</button>
+  </div>
+  <div class="wifi-walk-stages" aria-label="AP join stages"></div>
+  <div class="wifi-walk-detail" aria-live="polite"></div>
+</div>
+<p class="guide-plain">DHCP direction must stay separate from association:</p>
+<ol class="guide-trace"><li>Client broadcasts <strong>DHCPDISCOVER</strong>.</li><li>AP-side DHCP server sends <strong>DHCPOFFER</strong>.</li><li>Client sends <strong>DHCPREQUEST</strong>.</li><li>Server sends <strong>DHCPACK</strong>.</li><li>ESP-IDF may report <code>IP_EVENT_AP_STAIPASSIGNED</code> after assignment; that event is a local notification, not a DHCP packet traveling to the client.</li></ol>
+<p class="guide-plain">TIM is a bitmap-related indication that the AP buffers unicast traffic for sleeping stations. DTIM is a periodic TIM instance that also coordinates delivery of buffered broadcast/multicast traffic; it is not simply “the beacon where every client wakes.”</p>
+<h3>Intra-BSS forwarding</h3>
+<p class="guide-plain">If one associated station sends to another, an AP normally receives the <code>To DS</code> frame and transmits a separate <code>From DS</code> frame. Delivering only to LwIP is not automatically enough: the bridge/netif policy must explicitly forward local station traffic or intentionally isolate clients.</p></section>
+<section class="guide-section" id="lwip-and-esp-netif-handoff"><h2>7. LwIP and esp_netif handoff</h2><p class="guide-plain">On TX, <code>esp_netif</code> gives the driver an Ethernet-form frame; the driver encapsulates it for 802.11. On RX, the MAC decapsulates 802.11 and presents an Ethernet-form frame to <code>esp_netif</code>.</p>
+
+<figure class="wifi-diagram">
+  <figcaption>Buffer ownership must cross each boundary exactly once</figcaption>
+  <div class="wifi-ownership">
+    <div><strong>DMA pool</strong><span>descriptor + radio buffer</span><em>recycle callback</em></div>
+    <span>→ copy or transfer →</span>
+    <div><strong>OpenMAC</strong><span>802.11 ↔ Ethernet</span><em>document allocator</em></div>
+    <span>→ verified contract →</span>
+    <div><strong>esp_netif / LwIP</strong><span>copy or retained reference</span><em>release exactly once</em></div>
+  </div>
+</figure>
+<p class="guide-plain">The inspected tree contains two receive patterns with different-looking free arguments, including a sentinel marker. That is a warning sign, not a general recipe. The producer, <code>esp_netif_receive</code>, and <code>driver_free_rx_buffer</code> must agree on:</p>
+<div class="guide-table-wrap"><table class="guide-table"><thead><tr><th>Question</th><th>Required answer</th></tr></thead><tbody><tr><td>Who allocated the payload?</td><td>DMA pool, heap, pbuf, or caller</td></tr><tr><td>Does receive copy or retain?</td><td>Verified API/version contract</td></tr><tr><td>What is passed to the free callback?</td><td>Actual buffer/token defined by the adapter</td></tr><tr><td>What happens on enqueue failure?</td><td>Caller releases exactly once</td></tr></tbody></table></div>
+<p class="guide-plain">Never infer ownership from a pointer value or comment alone. Test success, failure, delayed free, and shutdown paths with counters and poisoning in a debug build.</p></section>
+<section class="guide-section" id="dcf-cca-ack-timing-and-phy-boundary"><h2>8. DCF, CCA, ACK timing, and PHY boundary</h2><p class="guide-plain">For ordinary unicast, a station senses the medium, waits the interframe rules, counts down a random backoff while idle, transmits, and expects an ACK after SIFS. Busy medium freezes the counter; a missing ACK drives retry/backoff policy. Broadcast and multicast are not individually ACKed.</p>
+
+<figure class="wifi-diagram">
+  <figcaption>Simplified successful unicast DCF timeline</figcaption>
+  <div class="wifi-timeline">
+    <span class="busy">medium busy</span><span class="wait">DIFS</span>
+    <span class="slot">7</span><span class="slot">6</span><span class="slot frozen">busy: freeze</span>
+    <span class="wait">DIFS</span><span class="slot">5</span><span class="slot">…</span><span class="slot">0</span>
+    <span class="tx">DATA</span><span class="wait">SIFS</span><span class="ack">ACK</span>
+  </div>
+</figure>
+<p class="guide-plain">CCA, modulation, channel filtering, gain control, and precise turnaround live at the PHY/RF boundary. MAC software supplies policy and frame metadata; it should not claim to implement RF facts merely because it writes an inferred register.</p>
+<div class="guide-track-deep">
+<h3>Airtime sanity</h3>
+<p class="guide-plain">At 1 Mb/s DSSS, 100 payload bytes alone represent 800 µs, before PHY preamble/header and MAC overhead. At OFDM rates, add service/tail bits, coding, and round up to whole symbols. Use a standard-aware calculator or packet-capture radiotap timing rather than headline-rate arithmetic.</p>
+</div></section>
+<section class="guide-section" id="wi-fi-ble-coexistence-and-recovery"><h2>9. Wi-Fi/BLE coexistence and recovery</h2><p class="guide-plain">Wi-Fi and BLE share the 2.4 GHz RF resources, but “BLE uses channels 37–39 so Wi-Fi can avoid them” is false. BLE has 40 two-MHz channels: 37 data channels plus three advertising channels. Adaptive Frequency Hopping can reduce use of poor data channels, but coexistence still needs arbitration.</p>
+
+<figure class="wifi-diagram">
+  <figcaption>Observed reactive recovery state flow (experimental)</figcaption>
+  <div class="wifi-state-flow">
+    <div class="wifi-state active"><strong>Shared operation</strong><span>Wi-Fi + BLE advertising</span></div>
+    <span>3 timeout cycles</span>
+    <div class="wifi-state warning"><strong>Pause BLE</strong><span>release outstanding slots</span></div>
+    <span>restore attempt</span>
+    <div class="wifi-state"><strong>Wi-Fi-only window</strong><span>channel / MAC recovery</span></div>
+    <span>after 5 s</span>
+    <div class="wifi-state"><strong>Restart BLE</strong><span>return to shared operation</span></div>
+  </div>
+</figure>
+<p class="guide-plain">The source expresses PTA-like arbitration intent and BLE activity notifications. The observed fallback is reactive: after repeated TX timeout cycles, stop BLE advertising, recycle outstanding slots, attempt PHY/channel restoration, allow a Wi-Fi-only window, then restart advertising. One source comment explicitly marks full PHY reload as unsafe/crashing; therefore this is an experiment, not a production recovery guarantee.</p>
+<p class="guide-plain">Production alternatives include the vendor-supported Wi-Fi/Bluetooth coexistence stack, validated PTA configuration, traffic scheduling at application level, lowering advertising duty cycle, and hardware/module choices with characterized RF coexistence.</p></section>
+<section class="guide-section" id="hardening-roadmap-wireshark-and-interview-review"><h2>10. Hardening roadmap, Wireshark, and interview review</h2><h3>Production-hardening roadmap</h3>
+<ol class="guide-trace"><li>Replace unexplained constants with versioned register evidence and reset-value checks.</li><li>Make descriptor and TX-slot ownership explicit, serialized, and instrumented.</li><li>Bound every queue wait; count drops, retries, stale completions, and recovery entries.</li><li>Add real sequence-number, retry, ACK, rate-control, power-save, security, and fragmentation policies as required.</li><li>Validate AP bridge behavior, client isolation, DHCP lifecycle, and shutdown.</li><li>Prefer supported coexistence APIs; make recovery idempotent and test fault injection.</li></ol>
+<h3>Wireshark workflow</h3>
+<ul class="guide-list"><li>Capture on the AP channel with a monitor-mode adapter; preserve radiotap metadata.</li><li>Filter management traffic with <code>wlan.fc.type == 0</code>; inspect beacon, probe, authentication, and association in order.</li><li>Filter DHCP with <code>bootp</code>; verify Discover/Offer/Request/ACK direction.</li><li>Filter EAPOL with <code>eapol</code>; distinguish 802.11 authentication from WPA key exchange.</li><li>Inspect <code>wlan.fc.tods</code>, <code>wlan.fc.fromds</code>, addresses, sequence/retry bits, and missing ACK symptoms.</li><li>Correlate capture timestamps with firmware slot/descriptor generation IDs.</li></ul>
+<h3>Interview Q&amp;A</h3>
+<div class="guide-track-deep">
+<p class="guide-plain"><strong>Q. Why defer RX from an ISR?</strong></p>
+<p class="guide-plain"><strong>A.</strong> It bounds interrupt latency and moves parsing/allocation into task context. The queue also makes overload visible, provided drops are counted.</p>
+<p class="guide-plain"><strong>Q. What is the strongest descriptor invariant?</strong></p>
+<p class="guide-plain"><strong>A.</strong> At every instant exactly one owner may mutate or recycle a descriptor, and every transfer has an observable state transition.</p>
+<p class="guide-plain"><strong>Q. Does association mean the client has an IP address?</strong></p>
+<p class="guide-plain"><strong>A.</strong> No. Association establishes the 802.11 link. Security negotiation and DHCP may still follow.</p>
+<p class="guide-plain"><strong>Q. Why is a timeout not proof that BLE owns the radio?</strong></p>
+<p class="guide-plain"><strong>A.</strong> Missing completion can come from collision, CCA, register sequencing, interrupt loss, stale state, or RF arbitration. It is a trigger for evidence gathering, not a unique diagnosis.</p>
+</div>
+<h3>Practice next</h3>
+<ul class="guide-list"><li><a href="question.html?id=q77-wifi-driver-pack-unpack-extract">Wi-Fi frame pack/unpack</a></li><li><a href="question.html?id=q76-dma-descriptor-ring-nic-hardware-driver-style">DMA descriptor ring</a></li><li><a href="question.html?id=q75-circular-ring-buffer">Circular ring buffer</a></li><li><a href="question.html?id=q86-dma-style-buffer-copy-descriptor-scatter-gather">Scatter/gather-style DMA copy</a></li></ul></section>
+      <section class="guide-section" id="related-handbooks">
+        <h2>Related handbooks</h2>
+        <div class="guide-cross-links">
+          <a class="btn btn-primary" href="index.html?section=buffers%20%26%20driver%20patterns">Driver practice →</a>
+          <a class="btn" href="c-guide.html">C Handbook →</a>
+          <a class="btn" href="dsa-guide.html">DSA Handbook →</a>
+          <a class="btn" href="index.html">← Home</a>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="js/guide-common.js?v=44"></script>
+  <script src="js/esp32-wifi-guide.js?v=44"></script>
+</body>
+</html>

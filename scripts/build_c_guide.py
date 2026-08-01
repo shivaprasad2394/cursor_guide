@@ -353,6 +353,9 @@ def build_sidebar(sections: list[tuple[str, list[str]]]) -> str:
     html_parts.append(
         '<a class="guide-sidebar-cta btn" href="dsa-guide.html" style="margin-top:0.5rem">DSA Handbook →</a>'
     )
+    html_parts.append(
+        '<a class="guide-sidebar-cta btn" href="esp32-wifi-guide.html" style="margin-top:0.5rem">ESP32 Wi-Fi →</a>'
+    )
     return "\n".join(html_parts)
 
 
@@ -418,7 +421,7 @@ def main() -> None:
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>C Handbook · Lset Prep</title>
-  <link rel="stylesheet" href="css/style.css?v=38">
+  <link rel="stylesheet" href="css/style.css?v=44">
 </head>
 <body data-page="guide" data-guide-track="quick">
   <header class="site-header">
@@ -441,7 +444,8 @@ def main() -> None:
           From the compilation pipeline to undefined behavior: memory layout, pointers,
           structs/padding, bit tricks, and the sharp facts interviewers probe.
           Diagrams and classic algorithms stay learning-friendly; tables and Q&amp;A add rigor.
-          Pair with the <a href="dsa-guide.html">DSA Handbook</a> and live practice questions.
+          Pair with the <a href="dsa-guide.html">DSA Handbook</a>,
+          <a href="esp32-wifi-guide.html">ESP32 Wi-Fi Driver Handbook</a>, and live practice questions.
         </p>
         <div class="guide-track-bar">
           <span class="guide-track-bar-label">Reading track</span>
@@ -463,14 +467,15 @@ def main() -> None:
           <a class="btn btn-primary" href="index.html?section=pointers">Pointers practice →</a>
           <a class="btn" href="index.html?section=bit%20manipulation">Bit manipulation →</a>
           <a class="btn" href="dsa-guide.html">DSA Handbook →</a>
+          <a class="btn" href="esp32-wifi-guide.html">ESP32 Wi-Fi Driver →</a>
           <a class="btn" href="index.html">← Home</a>
         </div>
       </section>
     </main>
   </div>
 
-  <script src="js/guide-common.js?v=38"></script>
-  <script src="js/c-guide.js?v=38"></script>
+  <script src="js/guide-common.js?v=44"></script>
+  <script src="js/c-guide.js?v=44"></script>
 </body>
 </html>
 """

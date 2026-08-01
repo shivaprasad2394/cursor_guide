@@ -28,7 +28,9 @@
   function applyTrack(track) {
     document.body.dataset.guideTrack = track;
     document.querySelectorAll("[data-track-set]").forEach((btn) => {
-      btn.classList.toggle("guide-track-active", btn.dataset.trackSet === track);
+      const active = btn.dataset.trackSet === track;
+      btn.classList.toggle("guide-track-active", active);
+      btn.setAttribute("aria-pressed", String(active));
     });
     try {
       localStorage.setItem(KEY, track);
