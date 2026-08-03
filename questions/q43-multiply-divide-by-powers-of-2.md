@@ -5,7 +5,7 @@ pattern: "bit manipulation"
 difficulty: "easy"
 visualization: "generic"
 vizCategory: "bit manipulation"
-tape: "5*8=%d 40/4=%d\\n"
+tape: "5*8=%u 40/4=%u\\n"
 stdin: ""
 expectedOutput: "5*8=40 40/4=10\n"
 ---
@@ -18,7 +18,7 @@ expectedOutput: "5*8=40 40/4=10\n"
 
 ## Description
 
-Implement **Multiply / Divide by Powers of 2** using the pattern above. Write the helper function(s); `main()` is provided.
+Implement **Multiply / Divide by Powers of 2** for unsigned integers. A shift count outside the type width, or a multiplication that would exceed `UINT_MAX`, returns 0; division uses defined logical right shift.
 
 ## Starter Code
 
@@ -32,7 +32,7 @@ Implement **Multiply / Divide by Powers of 2** using the pattern above. Write th
 /* TODO: implement the helper function(s) your main needs */
 
 int main(void) {
-    printf("5*8=%d 40/4=%d\n", mul2k(5,3), div2k(40,2));
+    printf("5*8=%u 40/4=%u\n", mul2k(5u,3u), div2k(40u,2u));
     return 0;
 }
 ```
@@ -46,12 +46,19 @@ int main(void) {
 #include <ctype.h>
 #include <limits.h>
 
-int mul2k(int n, int k) { return n << k; }
+unsigned int mul2k(unsigned int n, unsigned int k) {
+    const unsigned int width = sizeof n * CHAR_BIT;
+    if (k >= width || n > (UINT_MAX >> k)) return 0u;
+    return n << k;
+}
 
-int div2k(int n, int k) { return n >> k; }
+unsigned int div2k(unsigned int n, unsigned int k) {
+    const unsigned int width = sizeof n * CHAR_BIT;
+    return k < width ? n >> k : 0u;
+}
 
 int main(void) {
-    printf("5*8=%d 40/4=%d\n", mul2k(5,3), div2k(40,2));
+    printf("5*8=%u 40/4=%u\n", mul2k(5u,3u), div2k(40u,2u));
     return 0;
 }
 ```

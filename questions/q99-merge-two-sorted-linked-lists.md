@@ -3,18 +3,20 @@ id: "q99-merge-two-sorted-linked-lists"
 title: "Merge Two Sorted Linked Lists"
 pattern: "linked list"
 difficulty: "medium"
-visualization: "generic"
+visualization: "linked-list"
 vizCategory: "linked list"
+listNodes: "1,2,4"
+listNodesB: "1,3,4"
 stdin: ""
 complexity: "O(n + m) time, O(1) space"
-expectedOutput: "1 -> 1 -> 2 -> 3 -> 4 -> 4 -> NULL\\n"
+expectedOutput: "1 -> 1 -> 2 -> 3 -> 4 -> 4 -> NULL\n"
 ---
 ## At a glance
 
 - **Goal:** Merge Two Sorted Linked Lists
 - **Pattern:** Linked list
 - **Complexity:** O(n + m) time, O(1) space
-- **Expected output:** `1 -> 1 -> 2 -> 3 -> 4 -> 4 -> NULL\n`
+- **Expected output:** `1 -> 1 -> 2 -> 3 -> 4 -> 4 -> NULL`
 
 ## Description
 
@@ -56,18 +58,20 @@ int main(void) {
     Node *a = NULL, *b = NULL;
     int v1[] = {
         4, 2, 1
-    }
-    , v2[] = {
+    };
+    int v2[] = {
         4, 3, 1
     };
     for (int i = 0; i < 3; i++) {
         Node *n = malloc(sizeof *n);
+        if (n == NULL) return 1;
         n->id = v1[i];
         n->next = a;
         a = n;
     }
     for (int i = 0; i < 3; i++) {
         Node *n = malloc(sizeof *n);
+        if (n == NULL) return 1;
         n->id = v2[i];
         n->next = b;
         b = n;
@@ -108,18 +112,20 @@ int main(void) {
     Node *a = NULL, *b = NULL;
     int v1[] = {
         4, 2, 1
-    }
-    , v2[] = {
+    };
+    int v2[] = {
         4, 3, 1
     };
     for (int i = 0; i < 3; i++) {
         Node *n = malloc(sizeof *n);
+        if (n == NULL) return 1;
         n->id = v1[i];
         n->next = a;
         a = n;
     }
     for (int i = 0; i < 3; i++) {
         Node *n = malloc(sizeof *n);
+        if (n == NULL) return 1;
         n->id = v2[i];
         n->next = b;
         b = n;

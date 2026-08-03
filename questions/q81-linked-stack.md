@@ -46,13 +46,17 @@ typedef struct{SNode*top;int size;}Stack;
 int main(void) {
     Stack s={
         NULL,0
+    };
+    if (sPush(&s,100) != 0) return 1;
+    if (sPush(&s,200) != 0) {
+        int discarded;
+        sPop(&s,&discarded);
+        return 1;
     }
-    sPush(&s,100);
-    sPush(&s,200);
     int v;
-    sPop(&s,&v);
+    if (sPop(&s,&v) != 0) return 1;
     printf("pop=%d\n",v);
-    sPop(&s,&v);
+    if (sPop(&s,&v) != 0) return 1;
     printf("pop=%d\n",v);
     return 0;
 }
@@ -88,13 +92,17 @@ int sPop(Stack *s, int *out) {
 int main(void) {
     Stack s={
         NULL,0
+    };
+    if (sPush(&s,100) != 0) return 1;
+    if (sPush(&s,200) != 0) {
+        int discarded;
+        sPop(&s,&discarded);
+        return 1;
     }
-    sPush(&s,100);
-    sPush(&s,200);
     int v;
-    sPop(&s,&v);
+    if (sPop(&s,&v) != 0) return 1;
     printf("pop=%d\n",v);
-    sPop(&s,&v);
+    if (sPop(&s,&v) != 0) return 1;
     printf("pop=%d\n",v);
     return 0;
 }

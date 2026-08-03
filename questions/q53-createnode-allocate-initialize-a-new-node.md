@@ -7,14 +7,14 @@ visualization: "linked-list"
 listNodes: "1,2,3,4,5"
 listHighlight: "2"
 stdin: ""
-expectedOutput: "createNode(42): id=42 next=0x0\n"
+expectedOutput: "createNode(42): id=42 next=NULL\n"
 ---
 ## At a glance
 
 - **Goal:** createNode - allocate + initialize a new node
 - **Pattern:** Linked list
 - **Complexity:** See algorithm
-- **Expected output:** `createNode(42): id=42 next=0x0`
+- **Expected output:** `createNode(42): id=42 next=NULL`
 
 ## Description
 
@@ -43,7 +43,9 @@ typedef struct Node { int id; struct Node *next; } Node;
 
 int main(void) {
     Node*n=createNode(42);
-    printf("createNode(42): id=%d next=%p\n", n->id,(void*)n->next);
+    if (n == NULL) return 1;
+    printf("createNode(42): id=%d next=%s\n", n->id,
+           n->next == NULL ? "NULL" : "non-NULL");
     free(n);
     return 0;
 }
@@ -70,7 +72,9 @@ Node *createNode(int id) {
 
 int main(void) {
     Node*n=createNode(42);
-    printf("createNode(42): id=%d next=%p\n", n->id,(void*)n->next);
+    if (n == NULL) return 1;
+    printf("createNode(42): id=%d next=%s\n", n->id,
+           n->next == NULL ? "NULL" : "non-NULL");
     free(n);
     return 0;
 }

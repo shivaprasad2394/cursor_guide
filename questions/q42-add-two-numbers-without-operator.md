@@ -19,7 +19,7 @@ expectedOutput: "addNoPlus(15,32)=47\n"
 
 ## Description
 
-Implement **Add Two Numbers Without + Operator** using the pattern above. Write the helper function(s); `main()` is provided.
+Implement **Add Two Numbers Without + Operator** using the pattern above. This teaching API accepts non-negative `int` operands whose mathematical sum fits in `int`; it returns 0 outside that safe domain. Carry propagation is performed with unsigned arithmetic so left shifts are defined.
 
 **Walkthrough hint:**
 
@@ -68,12 +68,16 @@ int main(void) {
 #include <limits.h>
 
 int addNoPlus(int a, int b) {
-    while (b != 0) {
-        int carry = (a & b) << 1;
-        a = a ^ b;
-        b = carry;
+    if (a < 0 || b < 0 || a > INT_MAX - b) return 0;
+
+    unsigned int ua = (unsigned int)a;
+    unsigned int ub = (unsigned int)b;
+    while (ub != 0u) {
+        unsigned int carry = (ua & ub) << 1;
+        ua ^= ub;
+        ub = carry;
     }
-    return a;
+    return (int)ua;
 }
 
 int main(void) {

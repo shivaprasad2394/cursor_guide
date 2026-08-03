@@ -44,7 +44,7 @@ typedef struct Node { int data; struct Node *next; } Node;
 int main(void) {
     int vals[] = {
         30, 10, 50, 20, 40
-    }
+    };
     int n = (int)(sizeof(vals) / sizeof(vals[0]));
     Node *asc = NULL, *desc = NULL;
     for (int i = 0; i < n; i++) {
@@ -121,7 +121,7 @@ static void freeList(Node *head) {
 int main(void) {
     int vals[] = {
         30, 10, 50, 20, 40
-    }
+    };
     int n = (int)(sizeof(vals) / sizeof(vals[0]));
     Node *asc = NULL, *desc = NULL;
     for (int i = 0; i < n; i++) {

@@ -18,7 +18,7 @@ expectedOutput: "set bit1 of 12=14\nclear bit2 of 12=8\ntoggle bit1 of 12=14\nch
 
 ## Description
 
-Implement **Set / Clear / Toggle / Check Bit** using the pattern above. Write the helper function(s); `main()` is provided.
+Implement **Set / Clear / Toggle / Check Bit** using a **0-based** bit index (`pos == 0` is the least-significant bit). The helpers use unsigned values and treat an out-of-range index as a no-op (or false for `checkBit`).
 
 ## Starter Code
 
@@ -32,10 +32,10 @@ Implement **Set / Clear / Toggle / Check Bit** using the pattern above. Write th
 /* TODO: implement the helper function(s) your main needs */
 
 int main(void) {
-    printf("set bit1 of 12=%u\n",setBit(12,1));
-    printf("clear bit2 of 12=%u\n",clearBit(12,2));
-    printf("toggle bit1 of 12=%u\n",toggleBit(12,1));
-    printf("check bit2 of 12=%d\n",checkBit(12,2));
+    printf("set bit1 of 12=%u\n",setBit(12u,1u));
+    printf("clear bit2 of 12=%u\n",clearBit(12u,2u));
+    printf("toggle bit1 of 12=%u\n",toggleBit(12u,1u));
+    printf("check bit2 of 12=%d\n",checkBit(12u,2u));
     return 0;
 }
 ```
@@ -49,19 +49,31 @@ int main(void) {
 #include <ctype.h>
 #include <limits.h>
 
-unsigned int setBit    (unsigned int n, int pos) { return n |  (1u << pos); }
+static int validBitIndex(unsigned int pos) {
+    return pos < sizeof(unsigned int) * CHAR_BIT;
+}
 
-unsigned int clearBit  (unsigned int n, int pos) { return n & ~(1u << pos); }
+unsigned int setBit(unsigned int n, unsigned int pos) {
+    return validBitIndex(pos) ? n | (1u << pos) : n;
+}
 
-unsigned int toggleBit (unsigned int n, int pos) { return n ^  (1u << pos); }
+unsigned int clearBit(unsigned int n, unsigned int pos) {
+    return validBitIndex(pos) ? n & ~(1u << pos) : n;
+}
 
-int          checkBit  (unsigned int n, int pos) { return (n >> pos) & 1;   }
+unsigned int toggleBit(unsigned int n, unsigned int pos) {
+    return validBitIndex(pos) ? n ^ (1u << pos) : n;
+}
+
+int checkBit(unsigned int n, unsigned int pos) {
+    return validBitIndex(pos) ? (int)((n >> pos) & 1u) : 0;
+}
 
 int main(void) {
-    printf("set bit1 of 12=%u\n",setBit(12,1));
-    printf("clear bit2 of 12=%u\n",clearBit(12,2));
-    printf("toggle bit1 of 12=%u\n",toggleBit(12,1));
-    printf("check bit2 of 12=%d\n",checkBit(12,2));
+    printf("set bit1 of 12=%u\n",setBit(12u,1u));
+    printf("clear bit2 of 12=%u\n",clearBit(12u,2u));
+    printf("toggle bit1 of 12=%u\n",toggleBit(12u,1u));
+    printf("check bit2 of 12=%d\n",checkBit(12u,2u));
     return 0;
 }
 ```

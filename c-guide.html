@@ -952,39 +952,39 @@ void use(struct Connection *c) {
 <h2>19. Bit Manipulation</h2>
 <p class="guide-plain">The five bitwise operators: <code>&amp;</code> (AND), <code>|</code> (OR), <code>^</code> (XOR), <code>~</code> (NOT), <code>&lt;&lt;</code> (shift left), <code>&gt;&gt;</code> (shift right).</p>
 <h3>The Four Canonical Bit Operations</h3>
-<pre class="guide-code"><code class="language-c">// num is the integer; n is the bit position (0 = LSB)
+<pre class="guide-code"><code class="language-c">// num is unsigned; n is a valid bit position (0 = LSB)
 
-num |=  (1 &lt;&lt; n);         // SET bit n
-num &amp;= ~(1 &lt;&lt; n);         // CLEAR bit n
-num ^=  (1 &lt;&lt; n);         // TOGGLE bit n
-int isSet = (num &gt;&gt; n) &amp; 1;   // CHECK bit n  →  0 or 1</code></pre>
+num |=  (1u &lt;&lt; n);            // SET bit n
+num &amp;= ~(1u &lt;&lt; n);            // CLEAR bit n
+num ^=  (1u &lt;&lt; n);            // TOGGLE bit n
+unsigned isSet = (num &gt;&gt; n) &amp; 1u; // CHECK bit n → 0 or 1</code></pre>
 <h4>Worked Example</h4>
 <pre class="guide-code"><code class="language-c">#include &lt;stdio.h&gt;
 
 int main(void) {
-    int num = 0b00001010;   // = 10
-    int n   = 1;
+    unsigned int num = 0x0Au;   // = 10
+    unsigned int n = 1;          // valid range: 0..width-1
 
-    num |=  (1 &lt;&lt; n);  printf(&quot;Set    bit %d: %d (%#x)\n&quot;, n, num, num); // 10
-    num &amp;= ~(1 &lt;&lt; n);  printf(&quot;Clear  bit %d: %d (%#x)\n&quot;, n, num, num); // 8
-    num ^=  (1 &lt;&lt; n);  printf(&quot;Toggle bit %d: %d (%#x)\n&quot;, n, num, num); // 10
-    printf(&quot;Bit %d is %s\n&quot;, n, ((num &gt;&gt; n) &amp; 1) ? &quot;set&quot; : &quot;clear&quot;);
+    num |=  (1u &lt;&lt; n); printf(&quot;Set    bit %u: %u (%#x)\n&quot;, n, num, num); // 10
+    num &amp;= ~(1u &lt;&lt; n); printf(&quot;Clear  bit %u: %u (%#x)\n&quot;, n, num, num); // 8
+    num ^=  (1u &lt;&lt; n); printf(&quot;Toggle bit %u: %u (%#x)\n&quot;, n, num, num); // 10
+    printf(&quot;Bit %u is %s\n&quot;, n, ((num &gt;&gt; n) &amp; 1u) ? &quot;set&quot; : &quot;clear&quot;);
     return 0;
 }</code></pre>
 <h3>Useful Bit Tricks</h3>
-<pre class="guide-code"><code class="language-c">// Number of bits in an int
-int bits = sizeof(int) * CHAR_BIT;     // CHAR_BIT == 8 normally
+<pre class="guide-code"><code class="language-c">// Number of bits in an unsigned int
+unsigned bits = sizeof(unsigned int) * CHAR_BIT;
 
 // Mask the MSB
-int msb_mask = 1 &lt;&lt; (bits - 1);        // 0x80000000 on 32-bit int
+unsigned int msb_mask = 1u &lt;&lt; (bits - 1);
 if (num &amp; msb_mask) /* MSB is set */ ;
 
-// Power of 2: 1 &lt;&lt; i  ==  2^i
-// Divide by 2^i:  num &gt;&gt; i  (for non-negative integers)
-// Multiply by 2^i:  num &lt;&lt; i  (watch for overflow)
+// Power of 2: 1u &lt;&lt; i == 2^i (provided i &lt; bits)
+// Divide by 2^i: num &gt;&gt; i
+// Multiply modulo 2^bits: num &lt;&lt; i
 
 // Check if x is a power of two
-int isPow2 = (x != 0) &amp;&amp; ((x &amp; (x - 1)) == 0);
+int isPow2 = (x != 0u) &amp;&amp; ((x &amp; (x - 1u)) == 0u);
 
 // Count set bits (Brian Kernighan&#x27;s)
 int popcount(unsigned x) {
@@ -994,24 +994,28 @@ int popcount(unsigned x) {
 }
 
 // Lowest set bit
-unsigned lsb = x &amp; -x;                  // assumes two&#x27;s complement</code></pre>
+unsigned int lsb = x &amp; (0u - x);       // defined modulo unsigned width</code></pre>
 <h3>Bit Rotation</h3>
 <p class="guide-plain">Unlike a shift (which loses bits), a <strong>rotate</strong> wraps the dropped bits back to the other end.</p>
-<pre class="guide-code"><code class="language-c">#define INT_BITS 32
+<pre class="guide-code"><code class="language-c">#include &lt;limits.h&gt;
 
 unsigned int leftRotate(unsigned int n, unsigned int d) {
-    return (n &lt;&lt; d) | (n &gt;&gt; (INT_BITS - d));
+    const unsigned int width = sizeof n * CHAR_BIT;
+    d %= width;
+    return d == 0u ? n : (n &lt;&lt; d) | (n &gt;&gt; (width - d));
 }
 
 unsigned int rightRotate(unsigned int n, unsigned int d) {
-    return (n &gt;&gt; d) | (n &lt;&lt; (INT_BITS - d));
+    const unsigned int width = sizeof n * CHAR_BIT;
+    d %= width;
+    return d == 0u ? n : (n &gt;&gt; d) | (n &lt;&lt; (width - d));
 }</code></pre>
-<p class="guide-plain"><strong>Caveat:</strong> if <code>d == 0</code> or <code>d == 32</code>, <code>n &gt;&gt; 32</code> is <strong>undefined behavior</strong> in C (shifts by ≥ width are UB). Production code masks: <code>d &amp;= INT_BITS - 1;</code> before the rotate, but even then a <code>d == 0</code> case may need a special branch.</p>
+<p class="guide-plain">The modulo normalizes any rotation count, and the explicit zero case prevents a shift by the type width.</p>
 <h3>Nibble &amp; Byte Swap</h3>
 <p class="guide-plain">Swap nibbles within each byte (e.g. <code>0x32</code> → <code>0x23</code>):</p>
-<pre class="guide-code"><code class="language-c">num = ((num &amp; 0xF0F0F0F0) &gt;&gt; 4) | ((num &amp; 0x0F0F0F0F) &lt;&lt; 4);</code></pre>
+<pre class="guide-code"><code class="language-c">num = ((num &amp; 0xF0F0F0F0u) &gt;&gt; 4) | ((num &amp; 0x0F0F0F0Fu) &lt;&lt; 4);</code></pre>
 <p class="guide-plain">Swap adjacent bytes (<code>0x12345678</code> → <code>0x34127856</code>):</p>
-<pre class="guide-code"><code class="language-c">num = ((num &amp; 0xFF00FF00) &gt;&gt; 8) | ((num &amp; 0x00FF00FF) &lt;&lt; 8);</code></pre>
+<pre class="guide-code"><code class="language-c">num = ((num &amp; 0xFF00FF00u) &gt;&gt; 8) | ((num &amp; 0x00FF00FFu) &lt;&lt; 8);</code></pre>
 <p class="guide-plain">Swap halves (<code>0xAAAABBBB</code> → <code>0xBBBBAAAA</code>):</p>
 <pre class="guide-code"><code class="language-c">num = (num &gt;&gt; 16) | (num &lt;&lt; 16);</code></pre>
 <p class="guide-plain">Combine all three → full 32-bit byte reverse (== <code>bswap32</code>).</p>
@@ -1268,7 +1272,7 @@ printf(&quot;%d&quot;, d);        // UB — %d expects int, got double</code></p
 <h3><code>malloc</code> Family Cheat Sheet</h3>
 <table class="guide-table"><thead><tr><th>Function</th><th>Initializes?</th><th>Args</th><th>Resizes?</th></tr></thead><tbody><tr><td><code>malloc(n)</code></td><td>No (garbage)</td><td>bytes</td><td>No</td></tr><tr><td><code>calloc(n, sz)</code></td><td>Yes (zero)</td><td>count, element size</td><td>No</td></tr><tr><td><code>realloc(p, n)</code></td><td>Preserves old, garbage in new</td><td>pointer, new bytes</td><td>Yes (may move)</td></tr><tr><td><code>free(p)</code></td><td>—</td><td>pointer</td><td>Releases</td></tr></tbody></table>
 <h3>Bit-Op Cheat Sheet</h3>
-<table class="guide-table"><thead><tr><th>Operation</th><th>Code</th></tr></thead><tbody><tr><td>Set bit n</td><td>`x</td><td>= (1 &lt;&lt; n)`</td></tr><tr><td>Clear bit n</td><td><code>x &amp;= ~(1 &lt;&lt; n)</code></td></tr><tr><td>Toggle bit n</td><td><code>x ^= (1 &lt;&lt; n)</code></td></tr><tr><td>Test bit n</td><td><code>(x &gt;&gt; n) &amp; 1</code></td></tr><tr><td>Lowest set bit</td><td><code>x &amp; -x</code></td></tr><tr><td>Clear lowest set bit</td><td><code>x &amp; (x - 1)</code></td></tr><tr><td>Power of 2?</td><td><code>x &amp;&amp; !(x &amp; (x - 1))</code></td></tr></tbody></table>
+<table class="guide-table"><thead><tr><th>Operation</th><th>Code</th></tr></thead><tbody><tr><td>Set bit n</td><td><code>x |= (1u &lt;&lt; n)</code></td></tr><tr><td>Clear bit n</td><td><code>x &amp;= ~(1u &lt;&lt; n)</code></td></tr><tr><td>Toggle bit n</td><td><code>x ^= (1u &lt;&lt; n)</code></td></tr><tr><td>Test bit n</td><td><code>(x &gt;&gt; n) &amp; 1u</code></td></tr><tr><td>Lowest set bit</td><td><code>x &amp; (0u - x)</code></td></tr><tr><td>Clear lowest set bit</td><td><code>x &amp; (x - 1u)</code></td></tr><tr><td>Power of 2?</td><td><code>x &amp;&amp; !(x &amp; (x - 1u))</code></td></tr></tbody></table>
 <h3><code>memcpy</code> / <code>memmove</code> / <code>memset</code></h3>
 <table class="guide-table"><thead><tr><th>Function</th><th>Overlap-safe?</th><th>Use when</th></tr></thead><tbody><tr><td><code>memcpy</code></td><td>No</td><td>Source/dest known disjoint, max speed</td></tr><tr><td><code>memmove</code></td><td>Yes</td><td>Regions may overlap</td></tr><tr><td><code>memset</code></td><td>n/a</td><td>Filling with byte value (<code>0</code>, <code>-1</code>)</td></tr></tbody></table>
 <h3>Format Specifiers Quick-Reference</h3>

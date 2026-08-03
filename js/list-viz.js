@@ -40,6 +40,7 @@ function inferOp(meta) {
   if (/middle|slow|fast/i.test(t)) return "middle";
   if (/cycle|floyd|tortoise|hare/i.test(t)) return "cycle";
   if (/merge/i.test(t)) return "merge";
+  if (/remove.*first|first.*nodes/i.test(t)) return "remove-first";
   if (/remove.*nth|nth.*end/i.test(t)) return "remove-nth";
   if (/insertathead|insert.*head|prepend/i.test(t)) return "insert-head";
   if (/insertatend|insert.*tail|insert.*end/i.test(t)) return "insert-tail";
@@ -105,6 +106,17 @@ const SNIPPETS = {
     { id: 5, text: "    slow->next = slow->next->next;" },
     { id: 6, text: "    return dummy.next;" },
     { id: 7, text: "}" },
+  ],
+  "remove-first": [
+    { id: 1, text: "Node *removeFirstN(Node *head, size_t n) {" },
+    { id: 2, text: "    while (head != NULL && n > 0) {" },
+    { id: 3, text: "        Node *removed = head;" },
+    { id: 4, text: "        head = head->next;" },
+    { id: 5, text: "        free(removed);" },
+    { id: 6, text: "        --n;" },
+    { id: 7, text: "    }" },
+    { id: 8, text: "    return head;" },
+    { id: 9, text: "}" },
   ],
   "insert-head": [
     { id: 1, text: "void prependNode(Node **head, Node *local) {" },
@@ -531,6 +543,89 @@ function simulateRemoveNth(values, n) {
   return steps;
 }
 
+function simulateRemoveFirst(values, n) {
+  const heap = buildLinear(values);
+  const snippet = SNIPPETS["remove-first"];
+  const steps = [];
+  let head = heap.length > 0 ? 0 : null;
+  const freed = [];
+
+  const push = (patch) =>
+    steps.push(
+      snap({
+        func: "removeFirstN",
+        snippet,
+        heap: cloneHeap(heap),
+        vars: {
+          head,
+          removed: patch.removedPtr !== undefined ? patch.removedPtr : null,
+        },
+        hot: patch.hot || [],
+        prevLine: patch.prevLine,
+        currLine: patch.currLine,
+        note: patch.note,
+        phaseLabel: patch.phaseLabel,
+        removed: patch.removed,
+        freed: [...freed],
+      })
+    );
+
+  push({
+    prevLine: 1,
+    currLine: 2,
+    note: `Start at head with N=${n}; remove from the front`,
+    phaseLabel: "Enter",
+    hot: [head].filter((id) => id !== null),
+  });
+
+  let remaining = n;
+  while (head !== null && remaining > 0) {
+    const victim = head;
+    const next = heap[victim].next;
+    push({
+      prevLine: 3,
+      currLine: 4,
+      note: `Save node@${victim} (value=${heap[victim].val}) before changing head`,
+      phaseLabel: "Save old head",
+      removedPtr: victim,
+      hot: [victim],
+    });
+
+    head = next;
+    push({
+      prevLine: 4,
+      currLine: 5,
+      note: head === null ? "Advance head to NULL" : `Advance head to node@${head}`,
+      phaseLabel: "Advance head",
+      removedPtr: victim,
+      hot: [victim, head].filter((id) => id !== null),
+    });
+
+    freed.push(victim);
+    remaining -= 1;
+    push({
+      prevLine: 5,
+      currLine: 6,
+      note: `free(node@${victim}); ${remaining} removal(s) still requested`,
+      phaseLabel: "Free old head",
+      removed: victim,
+      hot: [head].filter((id) => id !== null),
+    });
+  }
+
+  push({
+    prevLine: 7,
+    currLine: 8,
+    note:
+      head === null
+        ? "Return NULL — the list was exhausted"
+        : `Return node@${head} as the new head`,
+    phaseLabel: "Done",
+    hot: [head].filter((id) => id !== null),
+  });
+  return steps;
+}
+
 function simulateDelete(values, key) {
   const heap = buildLinear(values);
   const snippet = SNIPPETS.delete;
@@ -947,6 +1042,10 @@ export function createListSession(meta) {
     case "remove-nth":
       steps = simulateRemoveNth(values.length >= 5 ? values : ["1", "2", "3", "4", "5"], 2);
       break;
+    case "remove-first":
+      steps = simulateRemoveFirst(values, Math.max(0, Number(meta.listRemoveCount) || 0));
+      snippet = SNIPPETS["remove-first"];
+      break;
     case "insert-head":
       steps = simulateInsertHead();
       break;
@@ -1063,7 +1162,7 @@ function renderNode(id, heap, hot, ptrOn, step) {
   const badges = (ptrOn[id] || [])
     .map((name, i) => `<span class="viz-ll-ptr-badge viz-ptr-${["left", "right", "mid", "low", "high"][i % 5]}">${escapeHtml(name)}</span>`)
     .join("");
-  const removed = step.removed === id;
+  const removed = step.removed === id || (step.freed || []).includes(id);
   return `<div class="viz-ll-node ${hot.has(id) ? "viz-ll-hot" : ""} ${removed ? "viz-ll-removed" : ""}">
     <div class="viz-ll-ptr-slot">${badges}</div>
     <div class="viz-ll-node-head">node@${id}</div>

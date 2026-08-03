@@ -81,6 +81,38 @@ def inline_md(text: str) -> str:
     return text
 
 
+def split_table_row(line: str) -> list[str]:
+    """Split Markdown table cells, ignoring pipes inside backtick code spans."""
+    text = line.strip()
+    if text.startswith("|"):
+        text = text[1:]
+    if text.endswith("|"):
+        text = text[:-1]
+
+    cells: list[str] = []
+    cell: list[str] = []
+    in_code = False
+    i = 0
+    while i < len(text):
+        char = text[i]
+        if char == "`":
+            tick_count = 1
+            while i + tick_count < len(text) and text[i + tick_count] == "`":
+                tick_count += 1
+            cell.extend("`" * tick_count)
+            in_code = not in_code
+            i += tick_count
+            continue
+        if char == "|" and not in_code:
+            cells.append("".join(cell).strip())
+            cell = []
+        else:
+            cell.append(char)
+        i += 1
+    cells.append("".join(cell).strip())
+    return cells
+
+
 def practice_links(title: str) -> str:
     tl = title.lower()
     keys = []
@@ -248,7 +280,7 @@ def render_body(body_lines: list[str]) -> str:
                 if re.match(r"^\s*\|?\s*[-:| ]+\s*$", body_lines[i]):
                     i += 1
                     continue
-                cells = [c.strip() for c in body_lines[i].strip().strip("|").split("|")]
+                cells = split_table_row(body_lines[i])
                 rows.append(cells)
                 i += 1
             if rows:

@@ -18,7 +18,7 @@ expectedOutput: "setRange[1..3] of 0=0xE\nclearRange[1..3] of 0xFF=0xF1\nwrite 5
 
 ## Description
 
-Implement **Bit Range Operations (Set / Clear / Write bits in [start..end])** using the pattern above. Write the helper function(s); `main()` is provided.
+Implement **Bit Range Operations (Set / Clear / Write bits in [start..end])** with 0-based, inclusive indices. Invalid ranges (`start < 0`, `end < start`, or `end` outside the unsigned-int width) leave the register unchanged.
 
 ## Starter Code
 
@@ -48,18 +48,31 @@ int main(void) {
 #include <ctype.h>
 #include <limits.h>
 
-static unsigned int rangeMask(int start, int end) {
-    int nbits = end - start + 1;
-    return ((1u << nbits) - 1u) << start;
+static int rangeMask(int start, int end, unsigned int *mask) {
+    const int width = (int)(sizeof(unsigned int) * CHAR_BIT);
+    if (mask == NULL || start < 0 || end < start || end >= width) return 0;
+
+    const unsigned int nbits = (unsigned int)(end - start + 1);
+    *mask = nbits == (unsigned int)width
+        ? ~0u
+        : ((1u << nbits) - 1u) << (unsigned int)start;
+    return 1;
 }
 
-unsigned int setBitsInRange  (unsigned int reg, int s, int e) { return reg | rangeMask(s,e); }
+unsigned int setBitsInRange(unsigned int reg, int s, int e) {
+    unsigned int mask;
+    return rangeMask(s, e, &mask) ? reg | mask : reg;
+}
 
-unsigned int clearBitsInRange(unsigned int reg, int s, int e) { return reg & ~rangeMask(s,e); }
+unsigned int clearBitsInRange(unsigned int reg, int s, int e) {
+    unsigned int mask;
+    return rangeMask(s, e, &mask) ? reg & ~mask : reg;
+}
 
 unsigned int writeBitsInRange(unsigned int reg, int s, int e, unsigned int val) {
-    unsigned int mask = rangeMask(s, e);
-    val = (val << s) & mask;
+    unsigned int mask;
+    if (!rangeMask(s, e, &mask)) return reg;
+    val = (val << (unsigned int)s) & mask;
     return (reg & ~mask) | val;
 }
 

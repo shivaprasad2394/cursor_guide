@@ -1470,12 +1470,12 @@ The five bitwise operators: `&` (AND), `|` (OR), `^` (XOR), `~` (NOT), `<<` (shi
 ### The Four Canonical Bit Operations
 
 ```c
-// num is the integer; n is the bit position (0 = LSB)
+// num is unsigned; n is a valid bit position (0 = LSB)
 
-num |=  (1 << n);         // SET bit n
-num &= ~(1 << n);         // CLEAR bit n
-num ^=  (1 << n);         // TOGGLE bit n
-int isSet = (num >> n) & 1;   // CHECK bit n  →  0 or 1
+num |=  (1u << n);            // SET bit n
+num &= ~(1u << n);            // CLEAR bit n
+num ^=  (1u << n);            // TOGGLE bit n
+unsigned isSet = (num >> n) & 1u; // CHECK bit n → 0 or 1
 ```
 
 #### Worked Example
@@ -1483,13 +1483,13 @@ int isSet = (num >> n) & 1;   // CHECK bit n  →  0 or 1
 #include <stdio.h>
 
 int main(void) {
-    int num = 0b00001010;   // = 10
-    int n   = 1;
+    unsigned int num = 0x0Au;   // = 10
+    unsigned int n = 1;          // valid range: 0..width-1
 
-    num |=  (1 << n);  printf("Set    bit %d: %d (%#x)\n", n, num, num); // 10
-    num &= ~(1 << n);  printf("Clear  bit %d: %d (%#x)\n", n, num, num); // 8
-    num ^=  (1 << n);  printf("Toggle bit %d: %d (%#x)\n", n, num, num); // 10
-    printf("Bit %d is %s\n", n, ((num >> n) & 1) ? "set" : "clear");
+    num |=  (1u << n); printf("Set    bit %u: %u (%#x)\n", n, num, num); // 10
+    num &= ~(1u << n); printf("Clear  bit %u: %u (%#x)\n", n, num, num); // 8
+    num ^=  (1u << n); printf("Toggle bit %u: %u (%#x)\n", n, num, num); // 10
+    printf("Bit %u is %s\n", n, ((num >> n) & 1u) ? "set" : "clear");
     return 0;
 }
 ```
@@ -1497,19 +1497,19 @@ int main(void) {
 ### Useful Bit Tricks
 
 ```c
-// Number of bits in an int
-int bits = sizeof(int) * CHAR_BIT;     // CHAR_BIT == 8 normally
+// Number of bits in an unsigned int
+unsigned bits = sizeof(unsigned int) * CHAR_BIT;
 
 // Mask the MSB
-int msb_mask = 1 << (bits - 1);        // 0x80000000 on 32-bit int
+unsigned int msb_mask = 1u << (bits - 1);
 if (num & msb_mask) /* MSB is set */ ;
 
-// Power of 2: 1 << i  ==  2^i
-// Divide by 2^i:  num >> i  (for non-negative integers)
-// Multiply by 2^i:  num << i  (watch for overflow)
+// Power of 2: 1u << i == 2^i (provided i < bits)
+// Divide by 2^i: num >> i
+// Multiply modulo 2^bits: num << i
 
 // Check if x is a power of two
-int isPow2 = (x != 0) && ((x & (x - 1)) == 0);
+int isPow2 = (x != 0u) && ((x & (x - 1u)) == 0u);
 
 // Count set bits (Brian Kernighan's)
 int popcount(unsigned x) {
@@ -1519,35 +1519,39 @@ int popcount(unsigned x) {
 }
 
 // Lowest set bit
-unsigned lsb = x & -x;                  // assumes two's complement
+unsigned int lsb = x & (0u - x);       // defined modulo unsigned width
 ```
 
 ### Bit Rotation
 Unlike a shift (which loses bits), a **rotate** wraps the dropped bits back to the other end.
 
 ```c
-#define INT_BITS 32
+#include <limits.h>
 
 unsigned int leftRotate(unsigned int n, unsigned int d) {
-    return (n << d) | (n >> (INT_BITS - d));
+    const unsigned int width = sizeof n * CHAR_BIT;
+    d %= width;
+    return d == 0u ? n : (n << d) | (n >> (width - d));
 }
 
 unsigned int rightRotate(unsigned int n, unsigned int d) {
-    return (n >> d) | (n << (INT_BITS - d));
+    const unsigned int width = sizeof n * CHAR_BIT;
+    d %= width;
+    return d == 0u ? n : (n >> d) | (n << (width - d));
 }
 ```
-**Caveat:** if `d == 0` or `d == 32`, `n >> 32` is **undefined behavior** in C (shifts by ≥ width are UB). Production code masks: `d &= INT_BITS - 1;` before the rotate, but even then a `d == 0` case may need a special branch.
+The modulo normalizes any rotation count, and the explicit zero case prevents a shift by the type width.
 
 ### Nibble & Byte Swap
 
 Swap nibbles within each byte (e.g. `0x32` → `0x23`):
 ```c
-num = ((num & 0xF0F0F0F0) >> 4) | ((num & 0x0F0F0F0F) << 4);
+num = ((num & 0xF0F0F0F0u) >> 4) | ((num & 0x0F0F0F0Fu) << 4);
 ```
 
 Swap adjacent bytes (`0x12345678` → `0x34127856`):
 ```c
-num = ((num & 0xFF00FF00) >> 8) | ((num & 0x00FF00FF) << 8);
+num = ((num & 0xFF00FF00u) >> 8) | ((num & 0x00FF00FFu) << 8);
 ```
 
 Swap halves (`0xAAAABBBB` → `0xBBBBAAAA`):
@@ -2016,13 +2020,13 @@ These short, sharp facts are the kind of thing senior interviewers love to probe
 ### Bit-Op Cheat Sheet
 | Operation | Code |
 |---|---|
-| Set bit n | `x |= (1 << n)` |
-| Clear bit n | `x &= ~(1 << n)` |
-| Toggle bit n | `x ^= (1 << n)` |
-| Test bit n | `(x >> n) & 1` |
-| Lowest set bit | `x & -x` |
-| Clear lowest set bit | `x & (x - 1)` |
-| Power of 2? | `x && !(x & (x - 1))` |
+| Set bit n | `x |= (1u << n)` |
+| Clear bit n | `x &= ~(1u << n)` |
+| Toggle bit n | `x ^= (1u << n)` |
+| Test bit n | `(x >> n) & 1u` |
+| Lowest set bit | `x & (0u - x)` |
+| Clear lowest set bit | `x & (x - 1u)` |
+| Power of 2? | `x && !(x & (x - 1u))` |
 
 ### `memcpy` / `memmove` / `memset`
 | Function | Overlap-safe? | Use when |

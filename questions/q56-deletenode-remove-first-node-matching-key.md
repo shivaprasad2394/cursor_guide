@@ -4,8 +4,8 @@ title: "deleteNode - remove first node matching 'key'"
 pattern: "linked list"
 difficulty: "medium"
 visualization: "linked-list"
-listNodes: "1,2,3,4,5"
-listHighlight: "2"
+listNodes: "30,20,10"
+listHighlight: "20"
 stdin: ""
 expectedOutput: "30 -> 10 -> NULL\n"
 ---
@@ -22,7 +22,7 @@ Implement **deleteNode - remove first node matching 'key'** using the pattern ab
 
 **Walkthrough hint:**
 
-head -> [10] -> [20] -> [30], delete 20
+head -> [30] -> [20] -> [10], delete 20
 
 ## Algorithm
 
@@ -35,10 +35,11 @@ step3: Bypass: prev->next = cur->next, then free(cur)
 ## Example Trace
 
 ```text
-head -> [10] -> [20] -> [30], delete 20
-  prev=[10], cur=[20]: match!
-  [10]->next = [30], free [20]
-  Result: head -> [10] -> [30] -> NULL
+The loop prepends 10, then 20, then 30, so it builds:
+head -> [30] -> [20] -> [10], delete 20
+  prev=[30], cur=[20]: match!
+  [30]->next = [10], free [20]
+  Result: head -> [30] -> [10] -> NULL
 ```
 
 ## Starter Code
@@ -57,6 +58,7 @@ int main(void) {
     Node*h=NULL;
     for (int i=1; i<=3; i++) {
         Node*n=createNode(i*10);
+        if (n == NULL) return 1;
         n->next=h;
         h=n;
     }
@@ -109,6 +111,7 @@ int main(void) {
     Node*h=NULL;
     for (int i=1;i<=3;i++){
         Node*n=createNode(i*10);
+        if (n == NULL) return 1;
         n->next=h;
         h=n;
     }

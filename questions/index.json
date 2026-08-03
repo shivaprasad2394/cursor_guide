@@ -785,6 +785,14 @@
       "section": "linked list"
     },
     {
+      "id": "q124-remove-first-n-nodes",
+      "file": "q124-remove-first-n-nodes.md",
+      "title": "Remove the First N Nodes from a Singly Linked List",
+      "pattern": "linked list (head advancement)",
+      "difficulty": "easy",
+      "section": "linked list"
+    },
+    {
       "id": "q101-valid-parentheses",
       "file": "q101-valid-parentheses.md",
       "title": "Valid Parentheses",

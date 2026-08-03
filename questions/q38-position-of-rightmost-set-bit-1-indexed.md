@@ -19,7 +19,7 @@ expectedOutput: "rightmostSetBit(12)=3\n"
 
 ## Description
 
-Implement **Position of Rightmost Set Bit (1-indexed)** using the pattern above. Write the helper function(s); `main()` is provided.
+Return the **1-based result position** required by the title: the least-significant bit is result position 1, and zero has no set bit so it returns 0. Internally, bit indices remain 0-based, consistent with the bit-operation APIs.
 
 **Walkthrough hint:**
 
@@ -28,8 +28,8 @@ n = 12 = 1100
 ## Algorithm
 
 ```text
-step1: Isolate lowest set bit: iso = n & -n
-       In two's complement: -n = ~n + 1, so only the lowest 1 survives
+step1: Isolate lowest set bit: iso = n & (0u - n)
+       Unsigned subtraction wraps modulo the type width, so this is defined
 step2: Count shifts until iso == 1: that's the 0-indexed position
 step3: Return position + 1 (1-indexed)
 ```
@@ -38,8 +38,8 @@ step3: Return position + 1 (1-indexed)
 
 ```text
 n = 12 = 1100
-  -n = ...0100 (two's complement)
-  n & -n = 0100 = 4 -> isolated bit at position 2
+  0u - n wraps to ...0100
+  n & (0u - n) = 0100 = 4 -> isolated 0-based bit index 2
   Shift: 4 >> 1 = 2, 2 >> 1 = 1 -> 2 shifts -> position 2+1 = 3
 ```
 
@@ -71,7 +71,7 @@ int main(void) {
 
 int positionOfRightmostSetBit(unsigned int n) {
     if (n == 0) return 0;
-    unsigned int iso = n & -n;
+    unsigned int iso = n & (0u - n);
     int pos = 0;
     while (iso > 1) { iso >>= 1; pos++; }
     return pos + 1;

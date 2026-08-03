@@ -3,18 +3,20 @@ id: "q100-remove-nth-node-from-end"
 title: "Remove Nth Node From End of List"
 pattern: "linked list (two-pointer / dummy head)"
 difficulty: "medium"
-visualization: "generic"
+visualization: "linked-list"
 vizCategory: "linked list"
+listNodes: "1,2,3,4,5"
+listHighlight: "2"
 stdin: ""
 complexity: "O(n) time, O(1) space"
-expectedOutput: "1 -> 2 -> 4 -> NULL\\n"
+expectedOutput: "1 -> 2 -> 3 -> 5 -> NULL\n"
 ---
 ## At a glance
 
 - **Goal:** Remove Nth Node From End of List
 - **Pattern:** Linked list (two-pointer / dummy head)
 - **Complexity:** O(n) time, O(1) space
-- **Expected output:** `1 -> 2 -> 4 -> NULL\n`
+- **Expected output:** `1 -> 2 -> 3 -> 5 -> NULL`
 
 ## Description
 
@@ -55,6 +57,7 @@ int main(void) {
     Node *h = NULL;
     for (int i = 5; i >= 1; i--) {
         Node *n=malloc(sizeof*n);
+        if (n == NULL) return 1;
         n->id=i;
         n->next=h;
         h=n;
@@ -81,12 +84,16 @@ int main(void) {
 #include <limits.h>
 typedef struct Node { int id; struct Node *next; } Node;
 Node *removeNthFromEnd(Node *head, int n) {
+    if (n <= 0) return head;
     Node dummy = {0, head}, *slow = &dummy, *fast = &dummy;
-    for (int i = 0; i <= n; i++) fast = fast->next;
+    for (int i = 0; i <= n; i++) {
+        if (fast == NULL) return head;
+        fast = fast->next;
+    }
     while (fast) { slow = slow->next; fast = fast->next; }
     Node *del = slow->next;
-    slow->next = del ? del->next : NULL;
-    if (del) free(del);
+    slow->next = del->next;
+    free(del);
     return dummy.next;
 }
 
@@ -94,6 +101,7 @@ int main(void) {
     Node *h = NULL;
     for (int i = 5; i >= 1; i--) {
         Node *n=malloc(sizeof*n);
+        if (n == NULL) return 1;
         n->id=i;
         n->next=h;
         h=n;
