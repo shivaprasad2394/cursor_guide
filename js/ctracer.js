@@ -888,7 +888,7 @@ class Interp {
             ptr = { arrIdx: ai, off: effOff, name: idx ? idx.name : name };
           } else if (isStructPtr(v)) {
             text = this.structFieldText(v.stIdx);
-            ptr = { structIdx: v.stIdx, name };
+            ptr = { structIdx: v.stIdx, embedPath: v.embedPath || [], name };
           } else if (isPtr(v) && v.box) {
             text = "→ (ref)";
           } else if (box.isChar && typeof v === "number" && v > 0) {

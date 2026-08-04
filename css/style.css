@@ -713,6 +713,22 @@ button:focus-visible {
   grid-template-columns: minmax(160px, 0.95fr) minmax(200px, 1.05fr);
   gap: 0.65rem;
   align-items: start;
+  position: relative;
+}
+
+.viz-ptr-arrows {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 4;
+  overflow: visible;
+}
+
+.viz-ptr-link {
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
 }
 
 .viz-stack-pane,
