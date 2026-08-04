@@ -1855,6 +1855,128 @@ button:focus-visible {
   grid-template-columns: minmax(320px, 1.1fr) minmax(300px, 1fr);
 }
 
+/* Visualize page — 50% code | 50% stack+memory, full viewport height */
+body[data-page="visualize"] .studio-main {
+  max-width: none;
+  width: 100%;
+  padding: 0.75rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 3.25rem);
+  box-sizing: border-box;
+}
+
+body[data-page="visualize"] #studio-stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+body[data-page="visualize"] .viz-studio.studio-full {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+body[data-page="visualize"] .studio-full .viz-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+body[data-page="visualize"] .studio-split {
+  flex: 1;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+  align-items: stretch;
+  min-height: 0;
+}
+
+body[data-page="visualize"] .studio-code-rail {
+  max-height: none;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+body[data-page="visualize"] .studio-code-rail .viz-code {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+body[data-page="visualize"] .viz-memory {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+body[data-page="visualize"] .viz-state-split {
+  flex: 1;
+  min-height: 0;
+  grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+}
+
+body[data-page="visualize"] .viz-stack-pane,
+body[data-page="visualize"] .viz-mem-pane {
+  max-height: none;
+  min-height: 0;
+  overflow: auto;
+}
+
+body[data-page="visualize"] .viz-output-pane {
+  flex-shrink: 0;
+}
+
+/* Pattern demo on visualize page: code 50% | stack+heap 50% */
+body[data-page="visualize"] .viz-list-studio-grid {
+  flex: 1;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  grid-template-areas:
+    "code stack"
+    "code heap";
+  min-height: 0;
+}
+
+body[data-page="visualize"] .viz-list-studio-grid > .studio-code-rail {
+  grid-area: code;
+}
+
+body[data-page="visualize"] .viz-list-studio-grid > .viz-stack-pane {
+  grid-area: stack;
+}
+
+body[data-page="visualize"] .viz-list-studio-grid > .viz-list-heap-pane {
+  grid-area: heap;
+}
+
+@media (max-width: 900px) {
+  body[data-page="visualize"] .studio-split,
+  body[data-page="visualize"] .viz-list-studio-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    grid-template-areas: none;
+  }
+
+  body[data-page="visualize"] .studio-code-rail {
+    max-height: 40vh;
+  }
+
+  body[data-page="visualize"] .viz-stack-pane,
+  body[data-page="visualize"] .viz-mem-pane {
+    max-height: 35vh;
+  }
+}
+
 .viz-list-studio-grid {
   grid-template-columns:
     minmax(240px, 0.8fr)
