@@ -20,6 +20,7 @@ const TYPES = new Set([
   "float", "double", "size_t", "bool",
   "uint8_t", "uint16_t", "uint32_t", "uint64_t",
   "int8_t", "int16_t", "int32_t", "int64_t",
+  "size_t",
 ]);
 
 const UNSUPPORTED_KEYWORDS = new Set(["struct", "typedef", "enum", "union", "switch", "goto"]);
@@ -307,7 +308,10 @@ class Parser {
             if (this.at(",")) this.next();
           }
           this.eat("}");
-          init = { k: "list", items };
+          init = {
+            k: base.structName && !isArray ? "compound" : "list",
+            items,
+          };
         } else {
           init = this.parseAssign();
         }
@@ -321,6 +325,7 @@ class Parser {
         isPtr: stars > 0,
         ptrStars: stars,
         structName: base.structName,
+        isStructValue: !!base.structName && stars === 0 && !isArray,
       });
       if (this.at(",")) { this.next(); continue; }
       break;
@@ -470,7 +475,12 @@ class Parser {
         e = { k: "member", op: "->", base: e, field };
         continue;
       }
-      if (this.at(".")) throw new CUnsupported("struct dot access");
+      if (this.at(".")) {
+        this.next();
+        const field = this.parseName();
+        e = { k: "member", op: ".", base: e, field };
+        continue;
+      }
       break;
     }
     return e;
@@ -568,14 +578,37 @@ class Interp {
     return this.makeArray(data, true, label);
   }
 
-  allocStruct(name) {
+  allocStruct(name, onStack = false) {
     const def = this.structDefs?.get(name);
     if (!def) throw new CUnsupported(`unknown struct '${name}'`);
     const idx = this.structHeap.length;
     const fields = {};
     for (const f of def.fields) fields[f.name] = 0;
-    this.structHeap.push({ name, idx, fields });
+    this.structHeap.push({ name, idx, fields, onStack: !!onStack });
     return { stIdx: idx, structName: name };
+  }
+
+  evalInitValue(expr, fieldType) {
+    if (expr.k === "id" && expr.name === "NULL") return 0;
+    const v = this.evalExpr(expr);
+    if (fieldType === "ptr") {
+      if (v === 0 || v === null) return 0;
+      if (isStructPtr(v)) return v;
+      if (isPtr(v) && v.box) {
+        const inner = v.box.v;
+        if (isStructPtr(inner)) return inner;
+      }
+      return v;
+    }
+    return typeof v === "number" ? v : toNum(v);
+  }
+
+  initStructFields(st, structName, items) {
+    const def = this.structDefs?.get(structName);
+    if (!def || !items) return;
+    def.fields.forEach((f, i) => {
+      if (i < items.length) st.fields[f.name] = this.evalInitValue(items[i], f.type);
+    });
   }
 
   structFieldText(stIdx) {
@@ -600,7 +633,7 @@ class Interp {
         else if (ptrFields.has(k) && val === 0) fields[k] = { type: "ptr", stIdx: null };
         else fields[k] = { type: "scalar", val };
       }
-      return { idx: node.idx, name: node.name, fields };
+      return { idx: node.idx, name: node.name, fields, onStack: !!node.onStack };
     });
   }
 
@@ -865,15 +898,27 @@ class Interp {
         const target = this.frames.length ? this.frame().vars : this.globals;
         for (const d of stmt.decls) {
           let box;
+          if (d.isStructValue) {
+            const st = this.allocStruct(d.structName, true);
+            box = { v: st, isChar: false };
+            target.set(d.name, box);
+            if (d.init && (d.init.k === "compound" || d.init.k === "list")) {
+              this.initStructFields(st, d.structName, d.init.items);
+            }
+            continue;
+          }
           if (d.isArray) {
             let arr;
             if (d.init && d.init.k === "str") {
               arr = this.strToArray(d.init.v, d.name);
             } else if (d.init && d.init.k === "list") {
-              const data = d.init.items.map((it) => toNum(this.evalExpr(it)));
+              const data = d.isPtr
+                ? d.init.items.map((it) => this.evalInitValue(it, "ptr"))
+                : d.init.items.map((it) => toNum(this.evalExpr(it)));
               const size = d.size ? toNum(this.evalExpr(d.size)) : data.length;
-              while (data.length < size) data.push(0);
+              while (data.length < size) data.push(d.isPtr ? 0 : 0);
               arr = this.makeArray(data, d.isChar, d.name);
+              arr.isPtrArray = !!d.isPtr;
             } else {
               const size = d.size ? toNum(this.evalExpr(d.size)) : 0;
               arr = this.makeArray(new Array(Math.max(size, 0)).fill(0), d.isChar, d.name);
@@ -965,8 +1010,8 @@ class Interp {
 
   readLvalue(e) {
     if (e.k === "id") return { box: this.lookup(e.name) };
-    if (e.k === "member" && e.op === "->") {
-      const base = this.evalExpr(e.base);
+    if (e.k === "member" && (e.op === "->" || e.op === ".")) {
+      const base = e.op === "->" ? this.evalExpr(e.base) : this.structLvalue(e.base);
       if (base === 0) {
         this.stopNote = "null pointer dereference — trace stopped";
         this.truncated = true;
@@ -1022,6 +1067,19 @@ class Interp {
     loc.arr.data[loc.at] = v;
   }
 
+  structLvalue(e) {
+    if (e.k === "id") {
+      const v = this.lookup(e.name).v;
+      if (isStructPtr(v)) return v;
+      throw new CUnsupported("member access on non-struct value");
+    }
+    if (e.k === "un" && e.op === "*") {
+      const val = this.evalUnary(e);
+      if (isStructPtr(val)) return val;
+    }
+    return this.evalExpr(e);
+  }
+
   evalExpr(e) {
     switch (e.k) {
       case "num": return e.v;
@@ -1031,7 +1089,7 @@ class Interp {
       }
       case "id": return this.lookup(e.name).v;
       case "member": {
-        const base = this.evalExpr(e.base);
+        const base = e.op === "->" ? this.evalExpr(e.base) : this.structLvalue(e.base);
         if (base === 0) {
           this.stopNote = "null pointer dereference — trace stopped";
           this.truncated = true;
@@ -1079,6 +1137,7 @@ class Interp {
     if (op === "&") {
       if (e.e.k === "id") {
         const box = this.lookup(e.e.name);
+        if (isStructPtr(box.v)) return box.v;
         if (isPtr(box.v) && box.v.arr) return { arr: box.v.arr, off: box.v.off };
         return { box };
       }

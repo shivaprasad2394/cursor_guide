@@ -719,8 +719,8 @@
       let mods;
       try {
         mods = await Promise.all([
-          import("./ctracer.js?v=32"),
-          import("./tracer-view.js?v=32"),
+          import("./ctracer.js?v=35"),
+          import("./tracer-view.js?v=35"),
           import("./viz-preprocess.js?v=32"),
         ]);
       } catch (_) {

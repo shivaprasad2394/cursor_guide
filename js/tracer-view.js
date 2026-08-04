@@ -103,7 +103,14 @@ function fieldNextIdx(fields) {
   return f.stIdx;
 }
 
-function renderStructNode(node, hot, ptrOn, changed) {
+function fieldLinkIdx(fields, name) {
+  const f = fields[name];
+  if (!f || f.type !== "ptr" || f.stIdx === null || f.stIdx === undefined) return null;
+  return f.stIdx;
+}
+
+function renderStructNode(node, hot, ptrOn, changed, opts = {}) {
+  const { doubly = false } = opts;
   const badges = (ptrOn[node.idx] || [])
     .map(
       (name, i) =>
@@ -118,11 +125,35 @@ function renderStructNode(node, hot, ptrOn, changed) {
       return `<div class="viz-ll-row"><span>${escapeHtml(fname)}</span><span class="viz-ll-val">${escapeHtml(text)}</span></div>`;
     })
     .join("");
-  return `<div class="viz-ll-node ${hot.has(node.idx) ? "viz-ll-hot" : ""} ${changed ? "viz-cell-changed" : ""}">
+  const stackTag = node.onStack ? " · stack" : "";
+  const body = doubly
+    ? `<div class="viz-ll-row"><span>prev</span><span class="viz-ll-val">${fieldLinkIdx(node.fields, "prev") === null ? "NULL" : `← @${fieldLinkIdx(node.fields, "prev")}`}</span></div>
+       <div class="viz-ll-row"><span>value</span><span class="viz-ll-val">${escapeHtml(String(node.fields.value?.val ?? node.fields.id?.val ?? "—"))}</span></div>
+       <div class="viz-ll-row"><span>next</span><span class="viz-ll-val">${fieldLinkIdx(node.fields, "next") === null ? "NULL" : `@${fieldLinkIdx(node.fields, "next")} →`}</span></div>`
+    : rows;
+  return `<div class="viz-ll-node ${doubly ? "viz-dll-node" : ""} ${hot.has(node.idx) ? "viz-ll-hot" : ""} ${changed ? "viz-cell-changed" : ""}">
     <div class="viz-ll-ptr-slot">${badges}</div>
-    <div class="viz-ll-node-head">${escapeHtml(node.name)}@${node.idx}</div>
-    ${rows}
+    <div class="viz-ll-node-head">${escapeHtml(node.name)}@${node.idx}${stackTag}</div>
+    ${body}
   </div>`;
+}
+
+function renderDllChain(startIdx, byIdx, hot, ptrOn, nodeChanged, inChain) {
+  let html = "";
+  let cur = startIdx;
+  const seen = new Set();
+  while (cur !== null && !seen.has(cur)) {
+    seen.add(cur);
+    inChain.add(cur);
+    const node = byIdx.get(cur);
+    if (!node) break;
+    html += renderStructNode(node, hot, ptrOn, nodeChanged(node), { doubly: true });
+    const next = fieldLinkIdx(node.fields, "next");
+    if (next !== null) html += '<div class="viz-dll-edge"><span>next →</span><span>← prev</span></div>';
+    cur = next;
+  }
+  html += '<div class="viz-ll-null">NULL</div>';
+  return html;
 }
 
 function renderStructHeap(step, prev) {
@@ -151,15 +182,24 @@ function renderStructHeap(step, prev) {
     return prevNodes.has(key) && prevNodes.get(key) !== JSON.stringify(node.fields);
   };
 
+  const hasPrev = heap.some((n) => n.fields.prev !== undefined);
+  const hasNext = heap.some((n) => n.fields.next !== undefined);
+  const isDoubly = hasPrev && hasNext;
+
   const pointedTo = new Set();
   heap.forEach((n) => {
-    const next = fieldNextIdx(n.fields);
+    const next = fieldLinkIdx(n.fields, "next");
+    const prev = fieldLinkIdx(n.fields, "prev");
     if (next !== null) pointedTo.add(next);
+    if (prev !== null) pointedTo.add(prev);
   });
-  const heads = heap.filter((n) => !pointedTo.has(n.idx));
+  const heads = isDoubly
+    ? heap.filter((n) => fieldLinkIdx(n.fields, "prev") === null)
+    : heap.filter((n) => !pointedTo.has(n.idx));
 
   const inChain = new Set();
   const renderChain = (startIdx) => {
+    if (isDoubly) return renderDllChain(startIdx, byIdx, hot, ptrOn, nodeChanged, inChain);
     let html = "";
     let cur = startIdx;
     const seen = new Set();
@@ -169,7 +209,7 @@ function renderStructHeap(step, prev) {
       const node = byIdx.get(cur);
       if (!node) break;
       html += renderStructNode(node, hot, ptrOn, nodeChanged(node));
-      const next = fieldNextIdx(node.fields);
+      const next = fieldLinkIdx(node.fields, "next");
       if (next !== null) html += '<div class="viz-ll-edge">→</div>';
       cur = next;
     }
@@ -180,26 +220,30 @@ function renderStructHeap(step, prev) {
   let chainsHtml = "";
   if (heads.length) {
     chainsHtml = heads
-      .map((h) => `<div class="viz-ll-canvas">${renderChain(h.idx)}</div>`)
+      .map((h) => `<div class="viz-ll-canvas ${isDoubly ? "viz-dll-canvas" : ""}">${renderChain(h.idx)}</div>`)
       .join("");
   }
 
-  const orphans = heap.filter((n) => !inChain.has(n.idx));
+  const orphans = heap.filter((n) => !inChain.has(n.idx) && !heads.some((h) => h.idx === n.idx));
   let orphanHtml = "";
   if (orphans.length) {
-    orphanHtml = `<div class="viz-ll-row-label">allocated (not linked yet)</div><div class="viz-ll-canvas">${orphans
-      .map((n) => renderStructNode(n, hot, ptrOn, nodeChanged(n)))
+    orphanHtml = `<div class="viz-ll-row-label">detached / unlinked</div><div class="viz-ll-canvas">${orphans
+      .map((n) => renderStructNode(n, hot, ptrOn, nodeChanged(n), { doubly: isDoubly }))
       .join("")}</div>`;
   }
 
   if (!chainsHtml && !orphanHtml) {
     orphanHtml = `<div class="viz-ll-canvas">${heap
-      .map((n) => renderStructNode(n, hot, ptrOn, nodeChanged(n)))
+      .map((n) => renderStructNode(n, hot, ptrOn, nodeChanged(n), { doubly: isDoubly }))
       .join("")}</div>`;
   }
 
+  const label = heap.some((n) => n.onStack)
+    ? "stack + heap · linked nodes"
+    : "heap · linked nodes";
+
   return `<div class="viz-array-block">
-    <div class="viz-array-caption">heap · linked nodes</div>
+    <div class="viz-array-caption">${label}</div>
     ${chainsHtml}${orphanHtml}
   </div>`;
 }
