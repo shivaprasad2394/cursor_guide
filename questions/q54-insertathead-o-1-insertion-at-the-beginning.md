@@ -4,6 +4,9 @@ title: "insertAtHead - O(1) insertion at the beginning"
 pattern: "linked list"
 difficulty: "medium"
 visualization: "linked-list"
+vizOperation: "insert-head-local"
+pointerStyle: "Node **"
+nodeStorage: "automatic (caller-owned)"
 listNodes: "1,2,3,4,5"
 listHighlight: "2"
 stdin: ""
@@ -20,6 +23,14 @@ expectedOutput: "5 -> 10 -> NULL\n"
 
 Implement **insertAtHead - O(1) insertion at the beginning** using the pattern above. Write the helper function(s); `main()` is provided.
 
+## Pointer API and ownership
+
+`void insertAtHead(Node **head, Node *node)` receives both the address of the caller's head variable and the address of a caller-owned node. The function reads the old head through `*head` and replaces it through `*head = node`, so the caller uses `insertAtHead(&h, &five)`.
+
+A plain `Node *head` would only copy the current node address into a local parameter. Assigning that local copy would not update `h`; a single-pointer version would instead need to return the new head and require `h = insertAtHead(h, 5)`.
+
+`ten` and `five` have automatic storage duration: they remain alive until `main` returns. Linking their addresses is safe within that lifetime, but they must never be passed to `free`, and no pointer to them may escape `main`. The insertion helper borrows these nodes; it does not allocate or take ownership.
+
 **Walkthrough hint:**
 
 head -> [10] -> [20] -> NULL
@@ -27,9 +38,9 @@ head -> [10] -> [20] -> NULL
 ## Algorithm
 
 ```text
-step1: Create a new node
-step2: Point new node's next to current head: newNode->next = *head
-step3: Update head to point to new node: *head = newNode
+step1: Receive the address of a live caller-owned node
+step2: Point that node's next to current head: node->next = *head
+step3: Update head to point to that node: *head = node
 
 Why Node **head (double pointer)?
   Because we need to MODIFY the caller's head pointer.
@@ -40,7 +51,7 @@ Why Node **head (double pointer)?
 
 ```text
 head -> [10] -> [20] -> NULL
-  insertAtHead(&head, 5)
+  Node five = {5, NULL}; insertAtHead(&head, &five)
   Result: head -> [5] -> [10] -> [20] -> NULL
 ```
 
@@ -58,15 +69,12 @@ typedef struct Node { int id; struct Node *next; } Node;
 
 int main(void) {
     Node*h=NULL;
-    insertAtHead(&h,10);
-    insertAtHead(&h,5);
+    Node ten = {10, NULL};
+    Node five = {5, NULL};
+    insertAtHead(&h, &ten);
+    insertAtHead(&h, &five);
     for (Node*c=h; c; c=c->next) printf("%d -> ",c->id);
     printf("NULL\n");
-    while (h){
-        Node*t=h->next;
-        free(h);
-        h=t;
-    }
     return 0;
 }
 ```
@@ -81,33 +89,19 @@ int main(void) {
 #include <limits.h>
 
 typedef struct Node { int id; struct Node *next; } Node;
-Node *createNode(int id) {
-    Node *newNode = (Node *)malloc(sizeof(*newNode));
-    if (newNode == NULL) return NULL;
-    newNode->id   = id;
-    newNode->next = NULL;
-    return newNode;
-}
-
-int insertAtHead(Node **head, int id) {
-    Node *newNode = createNode(id);
-    if (newNode == NULL) return -1;
-    newNode->next = *head;
-    *head = newNode;
-    return 0;
+void insertAtHead(Node **head, Node *node) {
+    node->next = *head;
+    *head = node;
 }
 
 int main(void) {
     Node*h=NULL;
-    insertAtHead(&h,10);
-    insertAtHead(&h,5);
+    Node ten = {10, NULL};
+    Node five = {5, NULL};
+    insertAtHead(&h, &ten);
+    insertAtHead(&h, &five);
     for (Node*c=h;c;c=c->next)printf("%d -> ",c->id);
     printf("NULL\n");
-    while (h){
-        Node*t=h->next;
-        free(h);
-        h=t;
-    }
     return 0;
 }
 ```

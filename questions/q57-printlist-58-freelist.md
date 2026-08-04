@@ -4,6 +4,8 @@ title: "printList & 58. freeList"
 pattern: "linked list"
 difficulty: "medium"
 visualization: "linked-list"
+pointerStyle: "Node *"
+nodeStorage: "dynamic (malloc)"
 listNodes: "1,2,3,4,5"
 listHighlight: "2"
 stdin: ""
@@ -19,6 +21,12 @@ expectedOutput: "1 -> 2 -> 3 -> NULL\n"
 ## Description
 
 Implement **printList & 58. freeList** using the pattern above. Write the helper function(s); `main()` is provided.
+
+## Pointer API and ownership
+
+Both helpers intentionally take single pointers. `printList(const Node *head)` borrows the list read-only; advancing its local pointer cannot alter the caller's `h`. `freeList(Node *head)` consumes and frees the nodes by advancing its own local copy. The caller uses `printList(h)` and `freeList(h)`.
+
+`createNode` gives every node dynamic storage duration. After `freeList(h)`, all three owned heap nodes have been freed exactly once, while the caller's variable still contains a stale address and must not be dereferenced. A `Node **` cleanup API could additionally set the caller's pointer to `NULL`, but this question demonstrates the common single-pointer ownership contract; `main` does not use `h` after transferring the list to `freeList`.
 
 ## Starter Code
 
@@ -36,6 +44,10 @@ int main(void) {
     Node*h=NULL;
     for (int i=3; i>=1; i--) {
         Node*n=createNode(i);
+        if (n == NULL) {
+            freeList(h);
+            return 1;
+        }
         n->next=h;
         h=n;
     }
@@ -77,6 +89,10 @@ int main(void) {
     Node*h=NULL;
     for (int i=3;i>=1;i--){
         Node*n=createNode(i);
+        if (n == NULL) {
+            freeList(h);
+            return 1;
+        }
         n->next=h;
         h=n;
     }

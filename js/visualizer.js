@@ -1,7 +1,7 @@
 /**
  * Execution Studio — step-through memory visualizer (Python Tutor inspired).
  */
-import { createListSession, renderListStudioRich } from "./list-viz.js?v=32";
+import { createListSession, renderListStudioRich } from "./list-viz.js?v=34";
 import { createAvlSession, renderAvlStudioRich } from "./avl-viz.js?v=32";
 import {
   createGridDfsSession,

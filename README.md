@@ -1,6 +1,6 @@
 # C Interview Prep
 
-All **91 programs** from `interview_all_guide_v2.md` — strings, arrays, bits, linked lists, BST, **AVL tree**, queues, parsing, drivers, and libc reimplementations.
+All **122 programs** — strings, arrays, pointers, DSA patterns, bits, linked lists, BST, **AVL tree**, queues, parsing, drivers, and libc reimplementations.
 
 **Live site:** https://shivaprasad2394.github.io/cursor_guide/
 
@@ -10,7 +10,7 @@ All **91 programs** from `interview_all_guide_v2.md` — strings, arrays, bits, 
 |------|----------------|
 | **Starter code** | `#include`s, struct typedefs if needed, and **`main()` only** — you write the helper functions |
 | **Algorithm / trace** | From your guide |
-| **Prev / Next** | Move through all 91 questions in order |
+| **Prev / Next** | Move through all 122 questions in order |
 | **Load solution** | Full working program from the guide |
 | **Run / Check** | In-browser Clang (no API key; ~60 MB download once) |
 
@@ -48,9 +48,9 @@ Use **Deploy from a branch** (recommended for this static site). Do **not** use 
 5. Wait 2–3 minutes after that run succeeds, then hard refresh the site (**Ctrl+Shift+R**).
 
 6. Confirm deploy worked:
-   - Home page shows **91 programs** and an **avl tree** section
+   - Home page shows **122 programs** and an **avl tree** section
    - Question page shows **← Previous** / **Next →**
-   - Footer on a question page: **Site build: v8**
+   - Footer on a question page: **Site build: v32**
 
 ### If Pages is stuck on an old build
 
@@ -60,18 +60,20 @@ Use **Deploy from a branch** (recommended for this static site). Do **not** use 
 
 The Node.js 20 deprecation warning in Actions logs is harmless and **not** why deploys fail.
 
-## Sections (91 total)
+## Sections (122 total)
 
 | Section | Count |
 |---------|------:|
-| Strings | 13 |
-| Arrays | 13 |
+| Strings | 15 |
+| Arrays | 16 |
+| Pointers | 8 |
 | Bit manipulation | 13 |
-| Math / number | 8 |
-| Linked list | 8 |
+| Math / number | 9 |
+| Linked list | 12 |
+| DSA patterns | 12 |
 | Binary search tree | 7 |
 | AVL tree | 4 |
-| Queues & stacks | 3 |
+| Queues & stacks | 4 |
 | Parsing & formatting | 8 |
 | Buffers & driver patterns | 4 |
 | Memory / DMA / mmap / libc | 10 |

@@ -4,6 +4,8 @@ title: "findMiddle - slow & fast pointer"
 pattern: "linked list"
 difficulty: "medium"
 visualization: "linked-list"
+pointerStyle: "Node *"
+nodeStorage: "dynamic (malloc)"
 listNodes: "1,2,3,4,5"
 listHighlight: "2"
 stdin: ""
@@ -20,6 +22,14 @@ expectedOutput: "middle=3\n"
 ## Description
 
 Implement **findMiddle - slow & fast pointer** using the pattern above. Write the helper function(s); `main()` is provided.
+
+## Pointer API and ownership
+
+`Node *findMiddle(Node *head)` borrows a starting address, walks with local `slow` and `fast` pointers, and returns a borrowed pointer to a node already owned by the caller. The caller uses `Node *m = findMiddle(h)` and must not free `m` separately; it remains part of `h`.
+
+The algorithm does not replace the head or any link, so `Node **` would falsely imply that the function may update the caller's pointer. For a read-only traversal, one pointer is the honest API (and the parameter could also be `const Node *` if the return type were correspondingly const).
+
+The test chain is dynamically allocated with `malloc`. `m` is only a borrowed interior pointer; freeing it separately would split the ownership graph and cause a later double free. Instead, `main` frees every node exactly once by walking from the owning head `h`.
 
 **Walkthrough hint:**
 
@@ -58,6 +68,10 @@ int main(void) {
     Node*h=NULL;
     for (int i=5; i>=1; i--) {
         Node*n=malloc(sizeof*n);
+        if (n == NULL) {
+            while (h) { Node *t=h->next; free(h); h=t; }
+            return 1;
+        }
         n->id=i;
         n->next=h;
         h=n;
@@ -98,6 +112,10 @@ int main(void) {
     Node*h=NULL;
     for (int i=5;i>=1;i--){
         Node*n=malloc(sizeof*n);
+        if (n == NULL) {
+            while (h) { Node *t=h->next; free(h); h=t; }
+            return 1;
+        }
         n->id=i;
         n->next=h;
         h=n;

@@ -5,7 +5,7 @@
  * Mode 2 "Pattern demo": falls back to the algorithm-pattern simulators.
  */
 import { traceC, CUnsupported } from "./ctracer.js?v=32";
-import { createSession, renderStudio, stepCount } from "./visualizer.js?v=32";
+import { createSession, renderStudio, stepCount } from "./visualizer.js?v=34";
 import { renderTraceStep } from "./tracer-view.js?v=32";
 import { preprocessVizSource } from "./viz-preprocess.js?v=32";
 

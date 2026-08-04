@@ -4,6 +4,8 @@ title: "createNode - allocate + initialize a new node"
 pattern: "linked list"
 difficulty: "medium"
 visualization: "linked-list"
+pointerStyle: "Node *"
+nodeStorage: "dynamic (malloc)"
 listNodes: "1,2,3,4,5"
 listHighlight: "2"
 stdin: ""
@@ -19,6 +21,12 @@ expectedOutput: "createNode(42): id=42 next=NULL\n"
 ## Description
 
 Implement **createNode - allocate + initialize a new node** using the pattern above. Write the helper function(s); `main()` is provided.
+
+## Pointer API and ownership
+
+`Node *createNode(int id)` returns the address of one newly allocated node. A single pointer is the right API because the function creates a value for the caller; it does not receive or replace an existing caller-owned head variable. The caller writes `Node *n = createNode(42)`, checks `n` for allocation failure, and owns the returned node until it passes ownership elsewhere or calls `free(n)`.
+
+By contrast, a `Node **` parameter is useful when a function must write a new address into a pointer variable supplied by its caller. There is no such input pointer variable in this factory operation, so adding `Node **` would make the API less direct.
 
 ## Algorithm
 

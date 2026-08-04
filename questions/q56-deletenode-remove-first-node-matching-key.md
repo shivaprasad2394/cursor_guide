@@ -4,6 +4,8 @@ title: "deleteNode - remove first node matching 'key'"
 pattern: "linked list"
 difficulty: "medium"
 visualization: "linked-list"
+pointerStyle: "Node **"
+nodeStorage: "automatic (caller-owned)"
 listNodes: "30,20,10"
 listHighlight: "20"
 stdin: ""
@@ -20,6 +22,14 @@ expectedOutput: "30 -> 10 -> NULL\n"
 
 Implement **deleteNode - remove first node matching 'key'** using the pattern above. Write the helper function(s); `main()` is provided.
 
+## Pointer API and ownership
+
+`Node *deleteNode(Node **head, int key)` can unlink any matching node, including the head. The caller passes `&h`; inside the function, `*head` is the caller's current head and writing through the current link changes the real chain. The function returns the detached node, or `NULL` if no key matches.
+
+With only `Node *head`, bypassing a non-head node would work, but replacing the caller's head would not. Such an API would have to return a new head and be called with an assignment.
+
+This version links the addresses of `n30`, `n20`, and `n10`, which have automatic storage duration in `main`. `deleteNode` borrows and detaches them; it must not call `free`. The returned `removed` pointer remains valid until `main` returns, and the function clears `removed->next` so it is visibly outside the list. Returning one of these addresses from `main` or retaining it past `main` would be invalid.
+
 **Walkthrough hint:**
 
 head -> [30] -> [20] -> [10], delete 20
@@ -27,18 +37,18 @@ head -> [30] -> [20] -> [10], delete 20
 ## Algorithm
 
 ```text
-step1: Special case: if head itself matches, update *head and free old head
-step2: Else walk with prev and cur pointers until cur->id == key
-step3: Bypass: prev->next = cur->next, then free(cur)
+step1: Start with a Node **link that points at the caller's head slot.
+step2: Advance link to the address of each next field until (*link)->id matches.
+step3: Save *link, replace that link with removed->next, and detach removed.
+step4: Return the borrowed removed node; do not free automatic-storage nodes.
 ```
 
 ## Example Trace
 
 ```text
-The loop prepends 10, then 20, then 30, so it builds:
 head -> [30] -> [20] -> [10], delete 20
-  prev=[30], cur=[20]: match!
-  [30]->next = [10], free [20]
+  link=&[30].next, *link=[20]: match!
+  [30]->next = [10], detach [20]
   Result: head -> [30] -> [10] -> NULL
 ```
 
@@ -55,21 +65,14 @@ typedef struct Node { int id; struct Node *next; } Node;
 /* TODO: implement the helper function(s) your main needs */
 
 int main(void) {
-    Node*h=NULL;
-    for (int i=1; i<=3; i++) {
-        Node*n=createNode(i*10);
-        if (n == NULL) return 1;
-        n->next=h;
-        h=n;
-    }
-    /* h: 30 20 10 */ deleteNode(&h,20);
+    Node n10 = {10, NULL};
+    Node n20 = {20, &n10};
+    Node n30 = {30, &n20};
+    Node *h = &n30;
+    Node *removed = deleteNode(&h, 20);
+    (void)removed;
     for (Node*c=h; c; c=c->next) printf("%d -> ",c->id);
     printf("NULL\n");
-    while (h){
-        Node*t=h->next;
-        free(h);
-        h=t;
-    }
     return 0;
 }
 ```
@@ -84,45 +87,27 @@ int main(void) {
 #include <limits.h>
 
 typedef struct Node { int id; struct Node *next; } Node;
-Node *createNode(int id) {
-    Node *newNode = (Node *)malloc(sizeof(*newNode));
-    if (newNode == NULL) return NULL;
-    newNode->id   = id;
-    newNode->next = NULL;
-    return newNode;
-}
-
-void deleteNode(Node **head, int key) {
-    if (*head == NULL) return;
-    if ((*head)->id == key) {
-        Node *dead = *head;
-        *head = (*head)->next;
-        free(dead);
-        return;
+Node *deleteNode(Node **head, int key) {
+    Node **link = head;
+    while (*link != NULL && (*link)->id != key) {
+        link = &(*link)->next;
     }
-    Node *prev = *head, *cur = (*head)->next;
-    while (cur != NULL && cur->id != key) { prev = cur; cur = cur->next; }
-    if (cur == NULL) return;
-    prev->next = cur->next;
-    free(cur);
+    if (*link == NULL) return NULL;
+    Node *removed = *link;
+    *link = removed->next;
+    removed->next = NULL;
+    return removed;
 }
 
 int main(void) {
-    Node*h=NULL;
-    for (int i=1;i<=3;i++){
-        Node*n=createNode(i*10);
-        if (n == NULL) return 1;
-        n->next=h;
-        h=n;
-    }
-    /* h: 30 20 10 */ deleteNode(&h,20);
+    Node n10 = {10, NULL};
+    Node n20 = {20, &n10};
+    Node n30 = {30, &n20};
+    Node *h = &n30;
+    Node *removed = deleteNode(&h, 20);
+    (void)removed;
     for (Node*c=h;c;c=c->next)printf("%d -> ",c->id);
     printf("NULL\n");
-    while (h){
-        Node*t=h->next;
-        free(h);
-        h=t;
-    }
     return 0;
 }
 ```

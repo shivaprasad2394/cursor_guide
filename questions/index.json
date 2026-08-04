@@ -382,7 +382,10 @@
       "title": "createNode - allocate + initialize a new node",
       "pattern": "linked list",
       "difficulty": "medium",
-      "section": "linked list"
+      "section": "linked list",
+      "listType": "sll",
+      "pointerStyle": "Node *",
+      "nodeStorage": "dynamic"
     },
     {
       "id": "q54-insertathead-o-1-insertion-at-the-beginning",
@@ -390,7 +393,10 @@
       "title": "insertAtHead - O(1) insertion at the beginning",
       "pattern": "linked list",
       "difficulty": "medium",
-      "section": "linked list"
+      "section": "linked list",
+      "listType": "sll",
+      "pointerStyle": "Node **",
+      "nodeStorage": "automatic"
     },
     {
       "id": "q55-insertatend-o-n-insertion-at-the-tail",
@@ -398,7 +404,10 @@
       "title": "insertAtEnd - O(n) insertion at the tail",
       "pattern": "linked list",
       "difficulty": "medium",
-      "section": "linked list"
+      "section": "linked list",
+      "listType": "sll",
+      "pointerStyle": "Node *",
+      "nodeStorage": "dynamic"
     },
     {
       "id": "q56-deletenode-remove-first-node-matching-key",
@@ -406,7 +415,10 @@
       "title": "deleteNode - remove first node matching 'key'",
       "pattern": "linked list",
       "difficulty": "medium",
-      "section": "linked list"
+      "section": "linked list",
+      "listType": "sll",
+      "pointerStyle": "Node **",
+      "nodeStorage": "automatic"
     },
     {
       "id": "q57-printlist-58-freelist",
@@ -414,7 +426,10 @@
       "title": "printList & 58. freeList",
       "pattern": "linked list",
       "difficulty": "medium",
-      "section": "linked list"
+      "section": "linked list",
+      "listType": "sll",
+      "pointerStyle": "Node *",
+      "nodeStorage": "dynamic"
     },
     {
       "id": "q59-reverselist-the-three-pointer-classic",
@@ -422,7 +437,10 @@
       "title": "reverseList - THE three-pointer classic",
       "pattern": "linked list",
       "difficulty": "medium",
-      "section": "linked list"
+      "section": "linked list",
+      "listType": "sll",
+      "pointerStyle": "Node **",
+      "nodeStorage": "automatic"
     },
     {
       "id": "q60-findmiddle-slow-fast-pointer",
@@ -430,7 +448,10 @@
       "title": "findMiddle - slow & fast pointer",
       "pattern": "linked list",
       "difficulty": "medium",
-      "section": "linked list"
+      "section": "linked list",
+      "listType": "sll",
+      "pointerStyle": "Node *",
+      "nodeStorage": "dynamic"
     },
     {
       "id": "q61-hascycle-floyd-s-tortoise-and-hare",
@@ -438,7 +459,10 @@
       "title": "hasCycle - Floyd's Tortoise and Hare",
       "pattern": "linked list",
       "difficulty": "medium",
-      "section": "linked list"
+      "section": "linked list",
+      "listType": "sll",
+      "pointerStyle": "Node ** (borrowed-handle companion)",
+      "nodeStorage": "automatic"
     },
     {
       "id": "q62-createbstnode",
@@ -774,7 +798,10 @@
       "title": "Merge Two Sorted Linked Lists",
       "pattern": "linked list",
       "difficulty": "medium",
-      "section": "linked list"
+      "section": "linked list",
+      "listType": "sll",
+      "pointerStyle": "Node *",
+      "nodeStorage": "dynamic"
     },
     {
       "id": "q100-remove-nth-node-from-end",
@@ -782,7 +809,10 @@
       "title": "Remove Nth Node From End of List",
       "pattern": "linked list (two-pointer / dummy head)",
       "difficulty": "medium",
-      "section": "linked list"
+      "section": "linked list",
+      "listType": "sll",
+      "pointerStyle": "Node **",
+      "nodeStorage": "automatic"
     },
     {
       "id": "q124-remove-first-n-nodes",
@@ -790,7 +820,87 @@
       "title": "Remove the First N Nodes from a Singly Linked List",
       "pattern": "linked list (head advancement)",
       "difficulty": "easy",
-      "section": "linked list"
+      "section": "linked list",
+      "listType": "sll",
+      "pointerStyle": "Node *",
+      "nodeStorage": "dynamic"
+    },
+    {
+      "id": "q125-remove-first-n-nodes-doubly-linked-list",
+      "file": "q125-remove-first-n-nodes-doubly-linked-list.md",
+      "title": "Remove the First N Nodes from a Doubly Linked List",
+      "pattern": "doubly linked list (head advancement)",
+      "difficulty": "easy",
+      "section": "linked list",
+      "listType": "dll",
+      "pointerStyle": "Node **",
+      "nodeStorage": "automatic"
+    },
+    {
+      "id": "q126-remove-linked-list-elements",
+      "file": "q126-remove-linked-list-elements.md",
+      "title": "Remove Linked List Elements (LeetCode 203 adaptation)",
+      "pattern": "linked list (filter / remove by value)",
+      "difficulty": "easy",
+      "section": "linked list",
+      "listType": "sll",
+      "pointerStyle": "Node *",
+      "nodeStorage": "dynamic"
+    },
+    {
+      "id": "q127-insert-node-at-position",
+      "file": "q127-insert-node-at-position.md",
+      "title": "Insert a Node at a Specific Position (HackerRank adaptation)",
+      "pattern": "linked list (link traversal by address)",
+      "difficulty": "easy",
+      "section": "linked list",
+      "listType": "sll",
+      "pointerStyle": "Node **",
+      "nodeStorage": "automatic"
+    },
+    {
+      "id": "q128-merge-sorted-lists-with-comparator",
+      "file": "q128-merge-sorted-lists-with-comparator.md",
+      "title": "Merge Two Sorted Lists with Comparator (LeetCode 21 adaptation)",
+      "pattern": "linked list (dummy head + function pointer)",
+      "difficulty": "medium",
+      "section": "linked list",
+      "listType": "sll",
+      "pointerStyle": "Node *",
+      "nodeStorage": "dynamic"
+    },
+    {
+      "id": "q129-partition-list-block-local",
+      "file": "q129-partition-list-block-local.md",
+      "title": "Partition List with Block-Local Type (LeetCode 86 adaptation)",
+      "pattern": "linked list (two-chain partition / tail handles)",
+      "difficulty": "medium",
+      "section": "linked list",
+      "listType": "sll",
+      "pointerStyle": "Node **",
+      "nodeStorage": "automatic"
+    },
+    {
+      "id": "q130-copy-list-with-random-pointer",
+      "file": "q130-copy-list-with-random-pointer.md",
+      "title": "Copy List with Random Pointer (LeetCode 138 adaptation)",
+      "pattern": "linked list (deep copy + rollback)",
+      "difficulty": "hard",
+      "section": "linked list",
+      "listType": "sll",
+      "pointerStyle": "Node *",
+      "nodeStorage": "dynamic"
+    },
+    {
+      "id": "q131-intrusive-circular-doubly-linked-list",
+      "file": "q131-intrusive-circular-doubly-linked-list.md",
+      "title": "Intrusive Circular Doubly Linked List (systems C variant)",
+      "pattern": "intrusive list (embedded node + container_of)",
+      "difficulty": "medium",
+      "section": "linked list",
+      "listType": "dll",
+      "pointerStyle": "Node **",
+      "nodeStorage": "automatic"
     },
     {
       "id": "q101-valid-parentheses",

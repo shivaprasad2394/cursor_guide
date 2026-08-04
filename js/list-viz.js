@@ -26,6 +26,15 @@ function buildLinear(values) {
   }));
 }
 
+function buildDoubly(values) {
+  return values.map((val, i) => ({
+    id: i,
+    val: String(val),
+    prev: i > 0 ? i - 1 : null,
+    next: i < values.length - 1 ? i + 1 : null,
+  }));
+}
+
 function cloneHeap(heap) {
   return heap.map((n) => ({ ...n }));
 }
@@ -35,6 +44,7 @@ function snap(base) {
 }
 
 function inferOp(meta) {
+  if (meta.vizOperation) return String(meta.vizOperation);
   const t = `${meta.id || ""} ${meta.title || ""}`.toLowerCase();
   if (/reverse/i.test(t)) return "reverse";
   if (/middle|slow|fast/i.test(t)) return "middle";
@@ -54,15 +64,15 @@ function inferOp(meta) {
 
 const SNIPPETS = {
   reverse: [
-    { id: 1, text: "Node *reverseList(Node *head) {" },
-    { id: 2, text: "    Node *prev = NULL, *cur = head;" },
+    { id: 1, text: "void reverseList(Node **head) {" },
+    { id: 2, text: "    Node *prev = NULL, *cur = *head;" },
     { id: 3, text: "    while (cur != NULL) {" },
     { id: 4, text: "        Node *next = cur->next;" },
     { id: 5, text: "        cur->next = prev;" },
     { id: 6, text: "        prev = cur;" },
     { id: 7, text: "        cur = next;" },
     { id: 8, text: "    }" },
-    { id: 9, text: "    return prev;" },
+    { id: 9, text: "    *head = prev;" },
     { id: 10, text: "}" },
   ],
   middle: [
@@ -99,13 +109,16 @@ const SNIPPETS = {
     { id: 10, text: "}" },
   ],
   "remove-nth": [
-    { id: 1, text: "Node *removeNthFromEnd(Node *head, int n) {" },
-    { id: 2, text: "    Node dummy = {0, head}, *slow = &dummy, *fast = &dummy;" },
+    { id: 1, text: "Node *removeNthFromEnd(Node **head, int n) {" },
+    { id: 2, text: "    Node dummy = {0, *head}, *slow = &dummy, *fast = &dummy;" },
     { id: 3, text: "    for (int i=0; i<=n; i++) fast = fast->next;" },
     { id: 4, text: "    while (fast) { slow=slow->next; fast=fast->next; }" },
-    { id: 5, text: "    slow->next = slow->next->next;" },
-    { id: 6, text: "    return dummy.next;" },
-    { id: 7, text: "}" },
+    { id: 5, text: "    Node *removed = slow->next;" },
+    { id: 6, text: "    slow->next = removed->next;" },
+    { id: 7, text: "    removed->next = NULL;" },
+    { id: 8, text: "    *head = dummy.next;" },
+    { id: 9, text: "    return removed;" },
+    { id: 10, text: "}" },
   ],
   "remove-first": [
     { id: 1, text: "Node *removeFirstN(Node *head, size_t n) {" },
@@ -118,10 +131,30 @@ const SNIPPETS = {
     { id: 8, text: "    return head;" },
     { id: 9, text: "}" },
   ],
+  "remove-first-dll": [
+    { id: 1, text: "void removeFirstN(Node **head, size_t n) {" },
+    { id: 2, text: "    while (*head != NULL && n > 0) {" },
+    { id: 3, text: "        Node *removed = *head;" },
+    { id: 4, text: "        *head = removed->next;" },
+    { id: 5, text: "        if (*head != NULL)" },
+    { id: 6, text: "            (*head)->prev = NULL;" },
+    { id: 7, text: "        removed->prev = NULL;" },
+    { id: 8, text: "        removed->next = NULL;" },
+    { id: 9, text: "        --n;" },
+    { id: 10, text: "    }" },
+    { id: 11, text: "    return;" },
+    { id: 12, text: "}" },
+  ],
   "insert-head": [
     { id: 1, text: "void prependNode(Node **head, Node *local) {" },
     { id: 2, text: "    local->next = *head;" },
     { id: 3, text: "    *head = local;" },
+    { id: 4, text: "}" },
+  ],
+  "insert-head-local": [
+    { id: 1, text: "void insertAtHead(Node **head, Node *node) {" },
+    { id: 2, text: "    node->next = *head;" },
+    { id: 3, text: "    *head = node;" },
     { id: 4, text: "}" },
   ],
   traverse: [
@@ -132,18 +165,16 @@ const SNIPPETS = {
     { id: 5, text: "}" },
   ],
   delete: [
-    { id: 1, text: "void deleteNode(Node **head, int key) {" },
-    { id: 2, text: "    if (*head == NULL) return;" },
-    { id: 3, text: "    if ((*head)->id == key) {" },
-    { id: 4, text: "        Node *dead = *head;" },
-    { id: 5, text: "        *head = (*head)->next;" },
-    { id: 6, text: "        free(dead); return;" },
-    { id: 7, text: "    }" },
-    { id: 8, text: "    Node *prev = *head, *cur = (*head)->next;" },
-    { id: 9, text: "    while (cur && cur->id != key) { prev = cur; cur = cur->next; }" },
-    { id: 10, text: "    if (cur == NULL) return;" },
-    { id: 11, text: "    prev->next = cur->next; free(cur);" },
-    { id: 12, text: "}" },
+    { id: 1, text: "Node *deleteNode(Node **head, int key) {" },
+    { id: 2, text: "    Node **link = head;" },
+    { id: 3, text: "    while (*link && (*link)->id != key)" },
+    { id: 4, text: "        link = &(*link)->next;" },
+    { id: 5, text: "    if (*link == NULL) return NULL;" },
+    { id: 6, text: "    Node *removed = *link;" },
+    { id: 7, text: "    *link = removed->next;" },
+    { id: 8, text: "    removed->next = NULL;" },
+    { id: 9, text: "    return removed;" },
+    { id: 10, text: "}" },
   ],
   "delete-target": [
     { id: 1, text: "void deleteNode(Node **head, Node *target) {" },
@@ -166,12 +197,12 @@ const SNIPPETS = {
     { id: 6, text: "}" },
   ],
   "insert-tail": [
-    { id: 1, text: "int insertAtEnd(Node **head, int id) {" },
+    { id: 1, text: "Node *insertAtEnd(Node *head, int id) {" },
     { id: 2, text: "    Node *n = createNode(id);" },
-    { id: 3, text: "    if (*head == NULL) { *head = n; return 0; }" },
-    { id: 4, text: "    Node *cur = *head;" },
+    { id: 3, text: "    if (head == NULL) return n;" },
+    { id: 4, text: "    Node *cur = head;" },
     { id: 5, text: "    while (cur->next) cur = cur->next;" },
-    { id: 6, text: "    cur->next = n; return 0;" },
+    { id: 6, text: "    cur->next = n; return head;" },
     { id: 7, text: "}" },
   ],
   print: [
@@ -213,6 +244,7 @@ function simulateReverse(values) {
           cur,
           next: patch.next !== undefined ? patch.next : null,
         },
+        pointerTypes: { head: "Node **" },
         hot: patch.hot || [],
         prevLine: patch.prevLine ?? line,
         currLine: patch.currLine ?? line + 1,
@@ -261,7 +293,7 @@ function simulateReverse(values) {
     cur: null,
     prevLine: 8,
     currLine: 9,
-    note: "Return prev — new head of reversed list",
+    note: "Store prev through *head — update the caller's head",
     phaseLabel: "Done",
     hot: [prev].filter((x) => x !== null),
   });
@@ -366,9 +398,9 @@ function simulateTraverse(values) {
   );
 }
 
-function simulateInsertHead() {
+function simulateInsertHead(op = "insert-head") {
   const heap = [];
-  const snippet = SNIPPETS["insert-head"];
+  const snippet = SNIPPETS[op];
   const steps = [];
   let head = null;
 
@@ -378,10 +410,11 @@ function simulateInsertHead() {
     head = id;
     steps.push(
       snap({
-        func: "prependNode",
+        func: op === "insert-head-local" ? "insertAtHead" : "prependNode",
         snippet,
         heap,
-        vars: { head, newNode: id },
+        vars: { head, [op === "insert-head-local" ? "node" : "local"]: id },
+        pointerTypes: { head: "Node **" },
         hot: [id],
         prevLine: currLine - 1,
         currLine,
@@ -391,8 +424,8 @@ function simulateInsertHead() {
     );
   };
 
-  addNode(10, "Create node(10), link to old head, update head", "Insert 10", 4);
-  addNode(5, "Create node(5), prepend before 10", "Insert 5", 4);
+  addNode(10, "Borrow caller's local ten node, link it, update *head", "Insert 10", 4);
+  addNode(5, "Borrow caller's local five node and prepend it before ten", "Insert 5", 4);
   return steps;
 }
 
@@ -486,6 +519,7 @@ function simulateRemoveNth(values, n) {
         heap: cloneHeap(heap),
         dummyNode: true,
         vars: { dummy: -1, head: 0, slow: patch.slow ?? slow, fast: patch.fast ?? fast },
+        pointerTypes: { head: "Node **" },
         hot: patch.hot || [],
         prevLine: patch.prevLine,
         currLine: patch.currLine,
@@ -532,14 +566,16 @@ function simulateRemoveNth(values, n) {
   push({
     prevLine: 4,
     currLine: 5,
-    note: victim !== null ? `Unlink node@${victim} (id=${heap[victim]?.val})` : "Unlink target node",
-    phaseLabel: "Remove",
+    note: victim !== null ? `Save borrowed node@${victim} (id=${heap[victim]?.val})` : "Save target node",
+    phaseLabel: "Save target",
     slow,
     fast,
     hot: [slow, victim].filter((x) => x !== null),
     removed: victim,
   });
-  push({ prevLine: 5, currLine: 6, note: "Return head (via dummy.next)", phaseLabel: "Done", slow, fast: null, hot: [0] });
+  push({ prevLine: 6, currLine: 7, note: "Detach removed->next; automatic-storage node stays alive", phaseLabel: "Detach", slow, fast: null, hot: [victim].filter((x) => x !== null), removed: victim });
+  push({ prevLine: 7, currLine: 8, note: "Store dummy.next through *head", phaseLabel: "Update head", slow, fast: null, hot: [0] });
+  push({ prevLine: 8, currLine: 9, note: "Return the borrowed detached node; do not free it", phaseLabel: "Done", slow, fast: null, hot: [victim].filter((x) => x !== null), removed: victim });
   return steps;
 }
 
@@ -626,6 +662,104 @@ function simulateRemoveFirst(values, n) {
   return steps;
 }
 
+function simulateRemoveFirstDll(values, n) {
+  const heap = buildDoubly(values);
+  const snippet = SNIPPETS["remove-first-dll"];
+  const steps = [];
+  let head = heap.length > 0 ? 0 : null;
+  const freed = [];
+
+  const push = (patch) =>
+    steps.push(
+      snap({
+        func: "removeFirstN",
+        snippet,
+        heap: cloneHeap(heap),
+        vars: {
+          head,
+          removed: patch.removedPtr !== undefined ? patch.removedPtr : null,
+        },
+        pointerTypes: { head: "Node **" },
+        hot: patch.hot || [],
+        prevLine: patch.prevLine,
+        currLine: patch.currLine,
+        note: patch.note,
+        phaseLabel: patch.phaseLabel,
+        removed: patch.removed,
+        freed: [...freed],
+      })
+    );
+
+  push({
+    prevLine: 1,
+    currLine: 2,
+    note: `Start with N=${n}; five caller-owned local nodes form a valid DLL`,
+    phaseLabel: "Enter DLL",
+    hot: [head].filter((id) => id !== null),
+  });
+
+  let remaining = n;
+  while (head !== null && remaining > 0) {
+    const victim = head;
+    const next = heap[victim].next;
+    push({
+      prevLine: 3,
+      currLine: 4,
+      note: `Save old head node@${victim} (value=${heap[victim].val})`,
+      phaseLabel: "Save old head",
+      removedPtr: victim,
+      hot: [victim],
+    });
+
+    head = next;
+    push({
+      prevLine: 4,
+      currLine: 5,
+      note: head === null ? "Advance head to NULL" : `Advance head to node@${head}; its prev still needs repair`,
+      phaseLabel: "Advance head",
+      removedPtr: victim,
+      hot: [victim, head].filter((id) => id !== null),
+    });
+
+    if (head !== null) {
+      heap[head].prev = null;
+      push({
+        prevLine: 5,
+        currLine: 6,
+        note: `Set node@${head}.prev = NULL — it is now a valid list head`,
+        phaseLabel: "Repair prev",
+        removedPtr: victim,
+        hot: [head],
+      });
+    }
+
+    heap[victim].prev = null;
+    heap[victim].next = null;
+    freed.push(victim);
+    remaining -= 1;
+    push({
+      prevLine: 7,
+      currLine: 8,
+      note: `Clear node@${victim}'s links; ${remaining} detachment(s) still requested`,
+      phaseLabel: "Detach old head",
+      removed: victim,
+      hot: [head].filter((id) => id !== null),
+    });
+  }
+
+  push({
+    prevLine: 10,
+    currLine: 11,
+    note:
+      head === null
+        ? "The caller's *head is NULL — all local nodes were detached, not freed"
+        : `The caller's *head is node@${head}; detached locals remain alive`,
+    phaseLabel: "Done",
+    hot: [head].filter((id) => id !== null),
+  });
+  return steps;
+}
+
 function simulateDelete(values, key) {
   const heap = buildLinear(values);
   const snippet = SNIPPETS.delete;
@@ -648,6 +782,7 @@ function simulateDelete(values, key) {
           cur: patch.cur !== undefined ? patch.cur : cur,
           dead: patch.dead !== undefined ? patch.dead : null,
         },
+        pointerTypes: { head: "Node **" },
         hot: patch.hot || [],
         prevLine: patch.prevLine,
         currLine: patch.currLine,
@@ -660,7 +795,7 @@ function simulateDelete(values, key) {
   push({
     prevLine: 1,
     currLine: 2,
-    note: `List ${values.join(" → ")} → NULL — delete key ${key}`,
+    note: `Automatic-storage nodes ${values.join(" → ")} → NULL — detach key ${key}`,
     phaseLabel: "Enter",
     hot: [head],
   });
@@ -669,20 +804,39 @@ function simulateDelete(values, key) {
     removed = head;
     const next = heap[head].next;
     push({
-      prevLine: 2,
-      currLine: 3,
-      note: `Head node id=${key} matches — remove from front`,
+      prevLine: 3,
+      currLine: 6,
+      note: `*link is head and id=${key} matches — save borrowed node`,
       phaseLabel: "Head match",
       hot: [head],
     });
     head = next;
     push({
-      prevLine: 4,
-      currLine: 5,
-      note: "*head = head->next — advance head past deleted node",
+      prevLine: 6,
+      currLine: 7,
+      note: "*link = removed->next — advance caller head",
       phaseLabel: "Advance head",
       cur: head,
       hot: [head].filter((x) => x !== null),
+      removed,
+    });
+    heap[removed].next = null;
+    push({
+      prevLine: 7,
+      currLine: 8,
+      note: "Clear removed->next; the local node remains alive",
+      phaseLabel: "Detach",
+      cur: null,
+      hot: [removed],
+      removed,
+    });
+    push({
+      prevLine: 8,
+      currLine: 9,
+      note: "Return the borrowed detached head node",
+      phaseLabel: "Done",
+      cur: null,
+      hot: [removed],
       removed,
     });
     return steps;
@@ -691,9 +845,9 @@ function simulateDelete(values, key) {
   prev = head;
   cur = heap[head].next;
   push({
-    prevLine: 7,
-    currLine: 8,
-    note: "Head does not match — walk with prev and cur",
+    prevLine: 2,
+    currLine: 3,
+    note: "Head does not match — link points at each pointer slot",
     phaseLabel: "Scan",
     prev,
     cur,
@@ -704,9 +858,9 @@ function simulateDelete(values, key) {
     prev = cur;
     cur = heap[cur].next;
     push({
-      prevLine: 8,
-      currLine: 9,
-      note: `cur->id=${heap[prev]?.val} ≠ ${key} — advance`,
+      prevLine: 3,
+      currLine: 4,
+      note: `(*link)->id=${heap[prev]?.val} ≠ ${key} — advance link`,
       phaseLabel: "Advance",
       prev,
       cur,
@@ -716,8 +870,8 @@ function simulateDelete(values, key) {
 
   if (cur === null) {
     push({
-      prevLine: 9,
-      currLine: 10,
+      prevLine: 3,
+      currLine: 5,
       note: `Key ${key} not found`,
       phaseLabel: "Not found",
       prev,
@@ -731,23 +885,34 @@ function simulateDelete(values, key) {
   const after = heap[cur].next;
   heap[prev].next = after;
   push({
-    prevLine: 10,
-    currLine: 11,
-    note: `Unlink node@${cur} (id=${key}): prev->next = cur->next`,
+    prevLine: 6,
+    currLine: 7,
+    note: `Unlink borrowed node@${cur} (id=${key}): *link = removed->next`,
     phaseLabel: "Unlink",
     prev,
     cur,
     hot: [prev, cur, after].filter((x) => x !== null),
     removed,
   });
+  heap[removed].next = null;
   push({
-    prevLine: 11,
-    currLine: 12,
-    note: "free(cur) — node removed from heap",
-    phaseLabel: "Done",
+    prevLine: 7,
+    currLine: 8,
+    note: "Clear removed->next; never free an automatic-storage node",
+    phaseLabel: "Detach",
     prev,
     cur: null,
     hot: [prev, head],
+    removed,
+  });
+  push({
+    prevLine: 8,
+    currLine: 9,
+    note: "Return the borrowed detached node to the caller",
+    phaseLabel: "Done",
+    prev,
+    cur: null,
+    hot: [removed],
     removed,
   });
   return steps;
@@ -1022,6 +1187,10 @@ function simulateDeleteByTarget(values, targetVal) {
 export function createListSession(meta) {
   const values = parseValues(meta);
   const op = inferOp(meta);
+  const listType = meta.listType === "dll" ? "dll" : "sll";
+  const nodeStorage = String(meta.nodeStorage || "dynamic").startsWith("automatic")
+    ? "automatic"
+    : "dynamic";
   let steps;
   let snippet = SNIPPETS[op] || SNIPPETS.traverse;
 
@@ -1043,11 +1212,18 @@ export function createListSession(meta) {
       steps = simulateRemoveNth(values.length >= 5 ? values : ["1", "2", "3", "4", "5"], 2);
       break;
     case "remove-first":
-      steps = simulateRemoveFirst(values, Math.max(0, Number(meta.listRemoveCount) || 0));
-      snippet = SNIPPETS["remove-first"];
+      if (listType === "dll") {
+        steps = simulateRemoveFirstDll(values, Math.max(0, Number(meta.listRemoveCount) || 0));
+        snippet = SNIPPETS["remove-first-dll"];
+      } else {
+        steps = simulateRemoveFirst(values, Math.max(0, Number(meta.listRemoveCount) || 0));
+        snippet = SNIPPETS["remove-first"];
+      }
       break;
     case "insert-head":
-      steps = simulateInsertHead();
+    case "insert-head-local":
+      steps = simulateInsertHead(op);
+      snippet = SNIPPETS[op];
       break;
     case "insert-tail":
       steps = simulateInsertTail(values.length >= 3 ? values : ["1", "2", "3"], 4);
@@ -1080,7 +1256,7 @@ export function createListSession(meta) {
       break;
   }
 
-  return { kind: "linked-list", steps, snippet, op, values };
+  return { kind: "linked-list", steps, snippet, op, values, listType, nodeStorage };
 }
 
 function renderCodeRail(snippet, step) {
@@ -1106,7 +1282,68 @@ function renderCodeRail(snippet, step) {
   </div>`;
 }
 
+function renderDllHeap(step, session) {
+  const heap = step.heap || [];
+  const vars = step.vars || {};
+  const hot = new Set(step.hot || []);
+  const freed = new Set(step.freed || []);
+  if (step.removed !== null && step.removed !== undefined) freed.add(step.removed);
+
+  const liveIds = [];
+  const seen = new Set();
+  let current = vars.head ?? null;
+  while (current !== null && !seen.has(current) && !freed.has(current)) {
+    seen.add(current);
+    liveIds.push(current);
+    current = heap.find((node) => node.id === current)?.next ?? null;
+  }
+  const tail = liveIds.length ? liveIds[liveIds.length - 1] : null;
+  const ptrOn = {};
+  Object.entries(vars).forEach(([name, target]) => {
+    if (target !== null && target !== undefined && target !== -1) {
+      if (!ptrOn[target]) ptrOn[target] = [];
+      ptrOn[target].push(name);
+    }
+  });
+  if (tail !== null) {
+    if (!ptrOn[tail]) ptrOn[tail] = [];
+    ptrOn[tail].push("tail");
+  }
+
+  const renderDllNode = (id) => {
+    const node = heap.find((candidate) => candidate.id === id);
+    if (!node) return "";
+    const badges = (ptrOn[id] || [])
+      .map((name) => `<span class="viz-ll-ptr-badge">${escapeHtml(name)}</span>`)
+      .join("");
+    const removalLabel = session.nodeStorage === "automatic" ? "DETACHED" : "FREED";
+    return `<div class="viz-ll-node viz-dll-node ${hot.has(id) ? "viz-ll-hot" : ""} ${freed.has(id) ? "viz-ll-removed" : ""}">
+      <div class="viz-ll-ptr-slot">${badges}</div>
+      <div class="viz-ll-node-head">node@${id}${freed.has(id) ? ` · ${removalLabel}` : ""}</div>
+      <div class="viz-ll-row"><span>prev</span><span class="viz-ll-val">${node.prev === null ? "NULL" : `← ${node.prev}`}</span></div>
+      <div class="viz-ll-row"><span>value</span><span class="viz-ll-val">${escapeHtml(node.val)}</span></div>
+      <div class="viz-ll-row"><span>next</span><span class="viz-ll-val">${node.next === null ? "NULL" : `${node.next} →`}</span></div>
+    </div>`;
+  };
+
+  const chain = liveIds.length
+    ? `<div class="viz-dll-end"><span>head.prev</span>NULL</div>${liveIds
+        .map((id, index) => `${index ? '<div class="viz-dll-edge"><span>next →</span><span>← prev</span></div>' : ""}${renderDllNode(id)}`)
+        .join("")}<div class="viz-dll-end"><span>tail.next</span>NULL</div>`
+    : `<div class="viz-dll-empty">head = NULL · tail = NULL</div>`;
+
+  const detachedIds = heap.map((node) => node.id).filter((id) => !liveIds.includes(id));
+  const detached = detachedIds.length
+    ? `<div class="viz-ll-row-label">${session.nodeStorage === "automatic" ? "Detached automatic-storage nodes" : "Detached / freed nodes"}</div><div class="viz-ll-canvas viz-dll-detached">${detachedIds
+        .map(renderDllNode)
+        .join("")}</div>`
+    : "";
+
+  return `<div class="viz-ll-row-label">Live doubly linked chain</div><div class="viz-ll-canvas viz-dll-canvas">${chain}</div>${detached}`;
+}
+
 function renderHeap(step, session) {
+  if (session.listType === "dll") return renderDllHeap(step, session);
   const heap = step.heap || [];
   const hot = new Set(step.hot || []);
   const vars = step.vars || {};
@@ -1181,7 +1418,7 @@ function renderStack(step) {
       else if (target !== null && target !== undefined) text = `→ node@${target}`;
       return `<div class="viz-var-row">
         <span class="viz-var-name">${escapeHtml(name)}</span>
-        <span class="viz-var-type">Node*</span>
+        <span class="viz-var-type">${escapeHtml(step.pointerTypes?.[name] || "Node *")}</span>
         <span class="viz-var-val viz-var-pointer">${escapeHtml(text)}</span>
       </div>`;
     })
@@ -1191,23 +1428,19 @@ function renderStack(step) {
 export function renderListStudioRich(body, step, session) {
   const snippet = step.snippet || session.snippet || SNIPPETS.traverse;
   body.innerHTML = `
-    <div class="viz-split studio-split">
+    <div class="viz-split studio-split viz-list-studio-grid">
       ${renderCodeRail(snippet, step)}
-      <div class="viz-memory">
-        <div class="viz-state-split">
-          <div class="viz-stack-pane">
-            <div class="viz-stack-label">STACK</div>
-            <div class="viz-frame viz-frame-active">
-              <div class="viz-frame-head">${escapeHtml(step.func || "list")}()</div>
-              ${renderStack(step)}
-            </div>
-          </div>
-          <div class="viz-mem-pane">
-            <div class="viz-stack-label">HEAP · linked nodes</div>
-            ${renderHeap(step, session)}
-            ${step.mergeOut ? `<p class="viz-ll-merge-out">Merged: ${escapeHtml(step.mergeOut)}</p>` : ""}
-          </div>
+      <div class="viz-stack-pane">
+        <div class="viz-stack-label">STACK</div>
+        <div class="viz-frame viz-frame-active">
+          <div class="viz-frame-head">${escapeHtml(step.func || "list")}()</div>
+          ${renderStack(step)}
         </div>
+      </div>
+      <div class="viz-mem-pane viz-list-heap-pane">
+        <div class="viz-stack-label">${session.nodeStorage === "automatic" ? "AUTOMATIC STORAGE · caller-owned linked nodes" : "HEAP · owned linked nodes"}</div>
+        ${renderHeap(step, session)}
+        ${step.mergeOut ? `<p class="viz-ll-merge-out">Merged: ${escapeHtml(step.mergeOut)}</p>` : ""}
       </div>
     </div>`;
 }

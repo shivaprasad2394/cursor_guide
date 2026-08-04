@@ -4,6 +4,8 @@ title: "Merge Two Sorted Linked Lists"
 pattern: "linked list"
 difficulty: "medium"
 visualization: "linked-list"
+pointerStyle: "Node *"
+nodeStorage: "dynamic (malloc)"
 vizCategory: "linked list"
 listNodes: "1,2,4"
 listNodesB: "1,3,4"
@@ -21,6 +23,14 @@ expectedOutput: "1 -> 1 -> 2 -> 3 -> 4 -> 4 -> NULL\n"
 ## Description
 
 Merge two sorted singly linked lists into one sorted list.
+
+## Pointer API and ownership
+
+`Node *mergeLists(Node *a, Node *b)` receives two local traversal pointers and returns the head of the rewired result. The caller transfers both input chains to the function and writes `Node *h = mergeLists(a, b)`; after that it treats `h` as the owner and does not use `a` or `b` as independent lists.
+
+No caller head variable needs to be modified in place, so two `Node **` parameters would add indirection without improving the contract. The returned `Node *` naturally represents the one merged ownership root. This implementation reuses every node and allocates or frees none.
+
+The test setup allocates both input chains with `malloc`. After merging, all six allocations are reachable exactly once from `h`; the final loop frees that combined owned chain exactly once. The old `a` and `b` variables must not be treated as separate owners after the transfer.
 
 **Walkthrough hint:**
 
@@ -64,14 +74,21 @@ int main(void) {
     };
     for (int i = 0; i < 3; i++) {
         Node *n = malloc(sizeof *n);
-        if (n == NULL) return 1;
+        if (n == NULL) {
+            while (a) { Node *t = a->next; free(a); a = t; }
+            return 1;
+        }
         n->id = v1[i];
         n->next = a;
         a = n;
     }
     for (int i = 0; i < 3; i++) {
         Node *n = malloc(sizeof *n);
-        if (n == NULL) return 1;
+        if (n == NULL) {
+            while (a) { Node *t = a->next; free(a); a = t; }
+            while (b) { Node *t = b->next; free(b); b = t; }
+            return 1;
+        }
         n->id = v2[i];
         n->next = b;
         b = n;
@@ -118,14 +135,21 @@ int main(void) {
     };
     for (int i = 0; i < 3; i++) {
         Node *n = malloc(sizeof *n);
-        if (n == NULL) return 1;
+        if (n == NULL) {
+            while (a) { Node *t = a->next; free(a); a = t; }
+            return 1;
+        }
         n->id = v1[i];
         n->next = a;
         a = n;
     }
     for (int i = 0; i < 3; i++) {
         Node *n = malloc(sizeof *n);
-        if (n == NULL) return 1;
+        if (n == NULL) {
+            while (a) { Node *t = a->next; free(a); a = t; }
+            while (b) { Node *t = b->next; free(b); b = t; }
+            return 1;
+        }
         n->id = v2[i];
         n->next = b;
         b = n;

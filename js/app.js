@@ -386,7 +386,7 @@
 
   async function getVisualizer() {
     if (!visualizerModule) {
-      visualizerModule = await import("./visualizer.js?v=32");
+      visualizerModule = await import("./visualizer.js?v=34");
     }
     return visualizerModule;
   }
@@ -467,6 +467,10 @@
       .join("");
   }
 
+  function normalizeListType(value) {
+    return value === "sll" || value === "dll" ? value : "all";
+  }
+
   async function initIndexPage() {
     const gridEl = document.getElementById("category-grid");
     const listEl = document.getElementById("question-list");
@@ -500,14 +504,60 @@
       if (listEl) {
         listEl.hidden = false;
         const items = bySection.get(activeSection);
+        const isLinkedList = activeSection === "linked list";
+        const listType = normalizeListType(params.get("list"));
+        const sllCount = isLinkedList ? items.filter((q) => q.listType === "sll").length : 0;
+        const dllCount = isLinkedList ? items.filter((q) => q.listType === "dll").length : 0;
+        const filterControls = isLinkedList
+          ? `<div class="list-type-filter" role="group" aria-label="Filter linked-list questions">
+              <button type="button" class="list-type-filter-btn" data-list-type="all">All <span>${items.length}</span></button>
+              <button type="button" class="list-type-filter-btn" data-list-type="sll">Singly (SLL) <span>${sllCount}</span></button>
+              <button type="button" class="list-type-filter-btn" data-list-type="dll">Doubly (DLL) <span>${dllCount}</span></button>
+            </div>`
+          : "";
         listEl.innerHTML = `
           ${activeSection === "dsa patterns" ? `<a class="dsa-primer-banner" href="dsa-guide.html"><strong>DSA Handbook</strong> — Quick demos + Deep invariants (read this first)</a>` : ""}
           ${activeSection === "pointers" || activeSection === "bit manipulation" || activeSection === "memory, dma, mmap & reimplementing libc" ? `<a class="dsa-primer-banner" href="c-guide.html"><strong>C Handbook</strong> — pointers, memory layout, UB, systems insights</a>` : ""}
           ${activeSection === "buffers & driver patterns" ? `<a class="dsa-primer-banner" href="esp32-wifi-guide.html"><strong>ESP32 OpenMAC &amp; Wi-Fi Driver Handbook</strong> — packet paths, DMA ownership, AP lifecycle, and coexistence</a>` : ""}
           <section class="section-group section-group-single">
             <h2 class="section-heading">${escapeHtml(sectionLabel(activeSection))}</h2>
-            <div class="section-cards">${renderQuestionCards(items)}</div>
+            ${filterControls}
+            <div class="section-cards" data-question-cards>${renderQuestionCards(items)}</div>
+            <p class="list-filter-empty" data-list-filter-empty hidden>No questions match this list type.</p>
           </section>`;
+
+        if (isLinkedList) {
+          const cardsEl = listEl.querySelector("[data-question-cards]");
+          const emptyEl = listEl.querySelector("[data-list-filter-empty]");
+          const buttons = [...listEl.querySelectorAll("[data-list-type]")];
+
+          const applyListFilter = (requestedType, updateHistory) => {
+            const type = normalizeListType(requestedType);
+            const filtered = type === "all" ? items : items.filter((q) => q.listType === type);
+            cardsEl.innerHTML = renderQuestionCards(filtered);
+            emptyEl.hidden = filtered.length !== 0;
+            buttons.forEach((button) => {
+              const pressed = button.dataset.listType === type;
+              button.setAttribute("aria-pressed", String(pressed));
+            });
+
+            if (updateHistory) {
+              const nextParams = new URLSearchParams(window.location.search);
+              nextParams.set("section", activeSection);
+              if (type === "all") nextParams.delete("list");
+              else nextParams.set("list", type);
+              window.history.pushState({ listType: type }, "", `${window.location.pathname}?${nextParams}`);
+            }
+          };
+
+          buttons.forEach((button) => {
+            button.addEventListener("click", () => applyListFilter(button.dataset.listType, true));
+          });
+          window.addEventListener("popstate", () => {
+            applyListFilter(new URLSearchParams(window.location.search).get("list"), false);
+          });
+          applyListFilter(listType, false);
+        }
       }
       document.title = `${sectionLabel(activeSection)} · Lset Prep`;
     } else {
@@ -628,8 +678,16 @@
 
     if (titleEl) titleEl.textContent = meta.title || entry.title;
     if (metaEl) {
+      const pointerTag = meta.pointerStyle
+        ? `<span class="tag tag-pointer">${escapeHtml(meta.pointerStyle)}</span>`
+        : "";
+      const storageTag = meta.nodeStorage
+        ? `<span class="tag tag-storage">${escapeHtml(meta.nodeStorage)}</span>`
+        : "";
       metaEl.innerHTML = `
         <span class="tag">${escapeHtml(meta.pattern || entry.pattern)}</span>
+        ${pointerTag}
+        ${storageTag}
         <span class="tag diff-${escapeHtml(meta.difficulty || entry.difficulty)}">${escapeHtml(meta.difficulty || entry.difficulty)}</span>
         <span class="tag muted">${escapeHtml(meta.complexity || "")}</span>`;
     }

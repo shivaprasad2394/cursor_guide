@@ -252,6 +252,48 @@ button:focus-visible {
   border-bottom: 1px solid var(--border);
 }
 
+.list-type-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.list-type-filter-btn {
+  appearance: none;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-panel);
+  color: var(--text-muted);
+  padding: 0.35rem 0.7rem;
+  font: 600 0.7rem/1 var(--sans);
+  cursor: pointer;
+}
+
+.list-type-filter-btn span {
+  color: var(--amber);
+  margin-left: 0.2rem;
+}
+
+.list-type-filter-btn:hover,
+.list-type-filter-btn:focus-visible {
+  border-color: var(--blue);
+  color: var(--text);
+}
+
+.list-type-filter-btn[aria-pressed="true"] {
+  border-color: var(--blue);
+  background: rgba(91, 140, 255, 0.14);
+  color: var(--blue);
+}
+
+.list-filter-empty {
+  margin: 0;
+  padding: 1rem;
+  border: 1px dashed var(--border);
+  color: var(--text-muted);
+  text-align: center;
+}
+
 .section-cards {
   display: grid;
   gap: 0.75rem;
@@ -306,7 +348,7 @@ button:focus-visible {
 
 .practice-layout {
   display: grid;
-  grid-template-columns: minmax(280px, 42%) 1fr;
+  grid-template-columns: minmax(300px, 30vw) minmax(0, 1fr);
   min-height: calc(100vh - 57px);
 }
 
@@ -326,6 +368,7 @@ button:focus-visible {
 .work-pane {
   display: flex;
   flex-direction: column;
+  min-width: 0;
   min-height: calc(100vh - 57px);
 }
 
@@ -500,7 +543,9 @@ button:focus-visible {
 }
 
 #pointer-tape {
-  padding: 0.75rem 1rem 0;
+  width: 100%;
+  min-width: 0;
+  padding: 0.75rem clamp(0.5rem, 1.2vw, 1rem) 0;
 }
 
 #pointer-tape[hidden] {
@@ -554,6 +599,7 @@ button:focus-visible {
 
 .viz-body {
   padding: 0.75rem;
+  min-width: 0;
 }
 
 .viz-split {
@@ -561,6 +607,7 @@ button:focus-visible {
   grid-template-columns: minmax(200px, 42%) 1fr;
   gap: 0.75rem;
   align-items: start;
+  min-width: 0;
 }
 
 .viz-split-single {
@@ -576,6 +623,7 @@ button:focus-visible {
 .viz-code-rail {
   border: 1px solid var(--border);
   background: #0a0e14;
+  min-width: 0;
   overflow: hidden;
 }
 
@@ -1123,6 +1171,53 @@ button:focus-visible {
   font-size: 1rem;
   font-weight: 700;
   padding: 0 0.1rem;
+}
+
+.viz-dll-canvas {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding: 0.6rem 0.25rem;
+}
+
+.viz-dll-node {
+  min-width: 4.8rem;
+  flex: 0 0 auto;
+}
+
+.viz-dll-edge {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  color: var(--blue);
+  font: 600 0.54rem/1 var(--mono);
+}
+
+.viz-dll-end {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  color: var(--text-muted);
+  font: 700 0.62rem/1 var(--mono);
+}
+
+.viz-dll-end span {
+  color: var(--amber);
+  font-size: 0.55rem;
+}
+
+.viz-dll-detached {
+  opacity: 0.8;
+}
+
+.viz-dll-empty {
+  padding: 0.65rem;
+  border: 1px dashed var(--border);
+  color: var(--text-muted);
+  font-size: 0.7rem;
 }
 
 .viz-ll-merge-out {
@@ -1760,6 +1855,44 @@ button:focus-visible {
   grid-template-columns: minmax(320px, 1.1fr) minmax(300px, 1fr);
 }
 
+.viz-list-studio-grid {
+  grid-template-columns:
+    minmax(240px, 0.8fr)
+    minmax(145px, 0.45fr)
+    minmax(360px, 1.75fr);
+  align-items: stretch;
+}
+
+.viz-list-studio-grid > .viz-stack-pane,
+.viz-list-studio-grid > .viz-mem-pane {
+  max-height: none;
+  overflow: visible;
+}
+
+.viz-list-heap-pane {
+  min-width: 0;
+}
+
+body[data-page="question"] #pointer-tape .viz-studio {
+  display: flex;
+  flex-direction: column;
+  min-height: clamp(30rem, calc(100vh - 13rem), 46rem);
+}
+
+body[data-page="question"] #pointer-tape .viz-body {
+  display: flex;
+  flex: 1;
+}
+
+body[data-page="question"] #pointer-tape .viz-split {
+  flex: 1;
+  width: 100%;
+}
+
+body[data-page="question"] #pointer-tape .studio-code-rail {
+  max-height: none;
+}
+
 .studio-code-rail {
   max-height: 65vh;
   overflow: auto;
@@ -1786,9 +1919,41 @@ button:focus-visible {
   overflow: auto;
 }
 
+@media (max-width: 1200px) and (min-width: 901px) {
+  .viz-list-studio-grid {
+    grid-template-columns: minmax(240px, 1fr) minmax(160px, 0.55fr);
+  }
+
+  .viz-list-heap-pane {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 1600px) and (min-width: 901px) {
+  body[data-page="question"] .viz-list-studio-grid {
+    grid-template-columns: minmax(240px, 1fr) minmax(160px, 0.55fr);
+  }
+
+  body[data-page="question"] .viz-list-heap-pane {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (max-width: 900px) {
   .studio-split {
     grid-template-columns: 1fr;
+  }
+
+  .viz-list-studio-grid {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="question"] #pointer-tape .viz-studio {
+    min-height: 0;
+  }
+
+  body[data-page="question"] #pointer-tape .viz-body {
+    display: block;
   }
 
   .studio-code-rail {
@@ -1802,6 +1967,27 @@ button:focus-visible {
   .viz-stack-pane,
   .viz-mem-pane {
     max-height: 35vh;
+  }
+
+  .viz-list-studio-grid > .viz-stack-pane,
+  .viz-list-studio-grid > .viz-mem-pane {
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+@media (max-width: 600px) {
+  #pointer-tape {
+    padding-inline: 0.35rem;
+  }
+
+  .viz-body {
+    padding: 0.5rem;
+  }
+
+  .viz-dll-canvas {
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
   }
 }
 

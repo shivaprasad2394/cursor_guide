@@ -4,7 +4,11 @@ title: "Remove the First N Nodes from a Singly Linked List"
 pattern: "linked list (head advancement)"
 difficulty: "easy"
 visualization: "linked-list"
+pointerStyle: "Node *"
+nodeStorage: "dynamic (malloc)"
 vizCategory: "linked list"
+vizOperation: "remove-first"
+listType: "sll"
 listNodes: "10,20,30,40,50"
 listRemoveCount: "3"
 stdin: ""
@@ -30,7 +34,13 @@ The function returns the new head:
 Node *removeFirstN(Node *head, size_t n);
 ```
 
-Returning `Node *` makes head ownership explicit: the caller passes ownership of the current list to the function and must assign the returned pointer back to its head. A `Node **` API would also work, but the return-new-head pattern is compact and makes `head = removeFirstN(head, n)` hard to overlook.
+## Pointer API and ownership
+
+Returning `Node *` makes head ownership explicit: the caller passes the current ownership root by value and must assign the returned pointer back with `head = removeFirstN(head, n)`. The function owns and frees each removed node; the caller owns the returned remainder. Its local `head` can advance safely, but that local assignment alone cannot change the caller's variable.
+
+A `Node **` API would instead be called as `removeFirstN(&head, n)` and update the caller directly. This question uses the return-new-head pattern because it is compact and makes the ownership transfer visible in the assignment.
+
+`append` dynamically allocates every node with `malloc`. Removed nodes are owned by `removeFirstN` and freed there exactly once; the caller then frees the returned remainder with `freeList`. No pointer into a freed prefix is used afterward.
 
 ## Algorithm
 
