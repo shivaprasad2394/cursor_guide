@@ -23,7 +23,7 @@ const TYPES = new Set([
   "int8_t", "int16_t", "int32_t", "int64_t",
 ]);
 
-const UNSUPPORTED_KEYWORDS = new Set(["struct", "typedef", "enum", "union", "goto"]);
+const UNSUPPORTED_KEYWORDS = new Set(["typedef", "enum", "union", "goto"]);
 
 /* ── Tokenizer ────────────────────────────────────────────── */
 
@@ -133,10 +133,10 @@ class Parser {
     const globals = [];
     while (this.peek().t !== "eof") {
       const t = this.peek();
+      if (t.t === "id" && t.v === "static") { this.next(); continue; }
       if (t.t === "id" && UNSUPPORTED_KEYWORDS.has(t.v)) {
         throw new CUnsupported(`'${t.v}' is not supported by the tracer`);
       }
-      if (t.t === "id" && t.v === "static") { this.next(); continue; }
       if (!this.isTypeStart()) this.err(`unexpected '${t.v}' at top level`);
 
       const save = this.p;
@@ -229,12 +229,14 @@ class Parser {
     const t = this.peek();
     const line = t.line;
 
+    if (this.at("{")) return this.parseBlock();
+    if (this.at(";")) { this.next(); return { k: "block", body: [] }; }
+
+    if (this.isTypeStart()) return this.parseDeclStmt();
+
     if (t.t === "id" && UNSUPPORTED_KEYWORDS.has(t.v)) {
       throw new CUnsupported(`'${t.v}' is not supported by the tracer`);
     }
-
-    if (this.at("{")) return this.parseBlock();
-    if (this.at(";")) { this.next(); return { k: "block", body: [] }; }
 
     if (t.t === "id") {
       switch (t.v) {
@@ -319,8 +321,6 @@ class Parser {
         default: break;
       }
     }
-
-    if (this.isTypeStart()) return this.parseDeclStmt();
 
     const e = this.parseExpr();
     this.eat(";");
