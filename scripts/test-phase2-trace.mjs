@@ -8,6 +8,9 @@ function traceSolution(file) {
   if (!m) throw new Error("no solution");
   const code = m[1].trim();
   const { source, structDefs, fnPtrTypes } = preprocessVizSource(code);
+  if (/^\s*\(\(type\s*\*/m.test(source)) {
+    throw new Error("container_of macro body leaked into preprocessed source");
+  }
   return traceC(code, {
     vizStructs: structDefs.size > 0,
     structDefs,

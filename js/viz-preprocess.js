@@ -87,8 +87,12 @@ function stripSimpleMacros(source) {
   let out = source;
   out = out.replace(/#define\s+EXIT_SUCCESS\s+\d+\s*\n?/g, "");
   out = out.replace(/#define\s+EXIT_FAILURE\s+\d+\s*\n?/g, "");
+  /* single-line and backslash-continued container_of definitions */
+  out = out.replace(/#define\s+container_of\s*\([^)]*\)\s*\\\s*\n\s*[^\n]+\n?/g, "");
+  out = out.replace(/#define\s+container_of\s*\([^)]*\)[^\n\\]*\n?/g, "");
+  /* orphan macro body if a prior partial strip left it behind */
   out = out.replace(
-    /#define\s+container_of\s*\(\s*ptr\s*,\s*type\s*,\s*member\s*\)[^\n]*\n?/g,
+    /^\s*\(\(type\s*\*\)\(\(char\s*\*\)\(ptr\)\s*-\s*offsetof\(type,\s*member\)\)\)\s*$/gm,
     ""
   );
   return out;
