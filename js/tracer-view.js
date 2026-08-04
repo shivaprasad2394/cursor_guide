@@ -103,10 +103,20 @@ function fieldNextIdx(fields) {
   return f.stIdx;
 }
 
-function fieldLinkIdx(fields, name) {
+function ptrRefKey(ref) {
+  if (!ref || ref.stIdx === null || ref.stIdx === undefined) return null;
+  return `${ref.stIdx}:${(ref.embedPath || []).join(".")}`;
+}
+
+function fieldLinkRef(fields, name) {
   const f = fields[name];
   if (!f || f.type !== "ptr" || f.stIdx === null || f.stIdx === undefined) return null;
-  return f.stIdx;
+  return { stIdx: f.stIdx, embedPath: f.embedPath || [] };
+}
+
+function embeddedFields(node) {
+  if (node.fields.node && node.fields.node.type === "embedded") return node.fields.node.fields;
+  return node.fields;
 }
 
 function renderStructNode(node, hot, ptrOn, changed, opts = {}) {
@@ -117,19 +127,24 @@ function renderStructNode(node, hot, ptrOn, changed, opts = {}) {
         `<span class="viz-ll-ptr-badge ${PTR_COLORS[i % PTR_COLORS.length]}">${escapeHtml(name)}</span>`
     )
     .join("");
+  const links = embeddedFields(node);
   const rows = Object.entries(node.fields)
     .map(([fname, fval]) => {
+      if (fval.type === "embedded") {
+        return `<div class="viz-ll-row"><span>${escapeHtml(fname)}</span><span class="viz-ll-val">embedded ${escapeHtml(fval.structName || "struct")}</span></div>`;
+      }
       let text = "—";
       if (fval.type === "scalar") text = String(fval.val);
-      else if (fval.type === "ptr") text = fval.stIdx === null || fval.stIdx === undefined ? "NULL" : `→ @${fval.stIdx}`;
+      else if (fval.type === "ptr") text = fval.stIdx === null || fval.stIdx === undefined ? "NULL" : `→ ${ptrRefKey({ stIdx: fval.stIdx, embedPath: fval.embedPath || [] })}`;
       return `<div class="viz-ll-row"><span>${escapeHtml(fname)}</span><span class="viz-ll-val">${escapeHtml(text)}</span></div>`;
     })
     .join("");
   const stackTag = node.onStack ? " · stack" : "";
+  const label = node.fields.id?.val ?? node.fields.value?.val ?? node.name;
   const body = doubly
-    ? `<div class="viz-ll-row"><span>prev</span><span class="viz-ll-val">${fieldLinkIdx(node.fields, "prev") === null ? "NULL" : `← @${fieldLinkIdx(node.fields, "prev")}`}</span></div>
-       <div class="viz-ll-row"><span>value</span><span class="viz-ll-val">${escapeHtml(String(node.fields.value?.val ?? node.fields.id?.val ?? "—"))}</span></div>
-       <div class="viz-ll-row"><span>next</span><span class="viz-ll-val">${fieldLinkIdx(node.fields, "next") === null ? "NULL" : `@${fieldLinkIdx(node.fields, "next")} →`}</span></div>`
+    ? `<div class="viz-ll-row"><span>prev</span><span class="viz-ll-val">${fieldLinkRef(links, "prev") ? `← ${ptrRefKey(fieldLinkRef(links, "prev"))}` : "NULL"}</span></div>
+       <div class="viz-ll-row"><span>${node.fields.id ? "id" : "value"}</span><span class="viz-ll-val">${escapeHtml(String(label))}</span></div>
+       <div class="viz-ll-row"><span>next</span><span class="viz-ll-val">${fieldLinkRef(links, "next") ? `${ptrRefKey(fieldLinkRef(links, "next"))} →` : "NULL"}</span></div>`
     : rows;
   return `<div class="viz-ll-node ${doubly ? "viz-dll-node" : ""} ${hot.has(node.idx) ? "viz-ll-hot" : ""} ${changed ? "viz-cell-changed" : ""}">
     <div class="viz-ll-ptr-slot">${badges}</div>
@@ -138,21 +153,26 @@ function renderStructNode(node, hot, ptrOn, changed, opts = {}) {
   </div>`;
 }
 
-function renderDllChain(startIdx, byIdx, hot, ptrOn, nodeChanged, inChain) {
+function renderDllChain(startRef, byIdx, hot, ptrOn, nodeChanged, inChain, anchorKey = null) {
   let html = "";
-  let cur = startIdx;
+  let cur = startRef;
   const seen = new Set();
-  while (cur !== null && !seen.has(cur)) {
-    seen.add(cur);
-    inChain.add(cur);
-    const node = byIdx.get(cur);
+  while (cur && !seen.has(ptrRefKey(cur))) {
+    seen.add(ptrRefKey(cur));
+    inChain.add(ptrRefKey(cur));
+    const node = byIdx.get(cur.stIdx);
     if (!node) break;
     html += renderStructNode(node, hot, ptrOn, nodeChanged(node), { doubly: true });
-    const next = fieldLinkIdx(node.fields, "next");
-    if (next !== null) html += '<div class="viz-dll-edge"><span>next →</span><span>← prev</span></div>';
+    const next = fieldLinkRef(embeddedFields(node), "next");
+    if (!next) break;
+    if (anchorKey && ptrRefKey(next) === anchorKey) {
+      html += '<div class="viz-dll-edge viz-dll-cycle">↺ circular · back to anchor</div>';
+      break;
+    }
+    html += '<div class="viz-dll-edge"><span>next →</span><span>← prev</span></div>';
     cur = next;
   }
-  html += '<div class="viz-ll-null">NULL</div>';
+  if (!anchorKey) html += '<div class="viz-ll-null">NULL</div>';
   return html;
 }
 
@@ -182,36 +202,48 @@ function renderStructHeap(step, prev) {
     return prevNodes.has(key) && prevNodes.get(key) !== JSON.stringify(node.fields);
   };
 
-  const hasPrev = heap.some((n) => n.fields.prev !== undefined);
-  const hasNext = heap.some((n) => n.fields.next !== undefined);
+  const hasPrev = heap.some((n) => embeddedFields(n).prev !== undefined);
+  const hasNext = heap.some((n) => embeddedFields(n).next !== undefined);
   const isDoubly = hasPrev && hasNext;
 
   const pointedTo = new Set();
   heap.forEach((n) => {
-    const next = fieldLinkIdx(n.fields, "next");
-    const prev = fieldLinkIdx(n.fields, "prev");
-    if (next !== null) pointedTo.add(next);
-    if (prev !== null) pointedTo.add(prev);
+    const lf = embeddedFields(n);
+    const next = fieldLinkRef(lf, "next");
+    const prev = fieldLinkRef(lf, "prev");
+    if (next) pointedTo.add(ptrRefKey(next));
+    if (prev) pointedTo.add(ptrRefKey(prev));
   });
+
+  const isCircular = heap.some((n) => {
+    const lf = embeddedFields(n);
+    const next = fieldLinkRef(lf, "next");
+    const prev = fieldLinkRef(lf, "prev");
+    const self = { stIdx: n.idx, embedPath: n.fields.node?.type === "embedded" ? ["node"] : [] };
+    return (next && ptrRefKey(next) === ptrRefKey(self)) || (prev && ptrRefKey(prev) === ptrRefKey(self));
+  });
+
   const heads = isDoubly
-    ? heap.filter((n) => fieldLinkIdx(n.fields, "prev") === null)
-    : heap.filter((n) => !pointedTo.has(n.idx));
+    ? heap.filter((n) => !fieldLinkRef(embeddedFields(n), "prev"))
+    : heap.filter((n) => !pointedTo.has(`${n.idx}:`));
 
   const inChain = new Set();
-  const renderChain = (startIdx) => {
-    if (isDoubly) return renderDllChain(startIdx, byIdx, hot, ptrOn, nodeChanged, inChain);
+  const renderChain = (startNode) => {
+    const startRef = { stIdx: startNode.idx, embedPath: startNode.fields.node?.type === "embedded" ? ["node"] : [] };
+    const anchorKey = isCircular ? ptrRefKey(startRef) : null;
+    if (isDoubly) return renderDllChain(startRef, byIdx, hot, ptrOn, nodeChanged, inChain, anchorKey);
     let html = "";
-    let cur = startIdx;
+    let cur = startNode.idx;
     const seen = new Set();
     while (cur !== null && !seen.has(cur)) {
       seen.add(cur);
-      inChain.add(cur);
+      inChain.add(String(cur));
       const node = byIdx.get(cur);
       if (!node) break;
       html += renderStructNode(node, hot, ptrOn, nodeChanged(node));
-      const next = fieldLinkIdx(node.fields, "next");
-      if (next !== null) html += '<div class="viz-ll-edge">→</div>';
-      cur = next;
+      const next = fieldLinkRef(embeddedFields(node), "next");
+      if (next) html += '<div class="viz-ll-edge">→</div>';
+      cur = next ? next.stIdx : null;
     }
     html += '<div class="viz-ll-null">NULL</div>';
     return html;
@@ -219,12 +251,22 @@ function renderStructHeap(step, prev) {
 
   let chainsHtml = "";
   if (heads.length) {
-    chainsHtml = heads
-      .map((h) => `<div class="viz-ll-canvas ${isDoubly ? "viz-dll-canvas" : ""}">${renderChain(h.idx)}</div>`)
-      .join("");
+    if (isCircular) {
+      const anchor = heap.find((n) => n.fields.id?.val === 0) || heap[0];
+      const anchorRef = { stIdx: anchor.idx, embedPath: anchor.fields.node?.type === "embedded" ? ["node"] : [] };
+      const first = fieldLinkRef(embeddedFields(anchor), "next");
+      const body = first
+        ? renderDllChain(first, byIdx, hot, ptrOn, nodeChanged, inChain, ptrRefKey(anchorRef))
+        : renderStructNode(anchor, hot, ptrOn, nodeChanged(anchor), { doubly: true });
+      chainsHtml = `<div class="viz-ll-row-label">circular intrusive list (anchor ${escapeHtml(String(anchor.name))}@${anchor.idx})</div><div class="viz-ll-canvas viz-dll-canvas">${body}</div>`;
+    } else {
+      chainsHtml = heads
+        .map((h) => `<div class="viz-ll-canvas ${isDoubly ? "viz-dll-canvas" : ""}">${renderChain(h)}</div>`)
+        .join("");
+    }
   }
 
-  const orphans = heap.filter((n) => !inChain.has(n.idx) && !heads.some((h) => h.idx === n.idx));
+  const orphans = heap.filter((n) => !inChain.has(String(n.idx)) && !inChain.has(ptrRefKey({ stIdx: n.idx, embedPath: ["node"] })));
   let orphanHtml = "";
   if (orphans.length) {
     orphanHtml = `<div class="viz-ll-row-label">detached / unlinked</div><div class="viz-ll-canvas">${orphans

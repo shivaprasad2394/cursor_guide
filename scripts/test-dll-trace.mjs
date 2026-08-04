@@ -51,8 +51,8 @@ int main(void) {
 }
 `;
 
-const { source, structDefs } = preprocessVizSource(code);
-const trace = traceC(code, { vizStructs: true, structDefs, preprocessedSource: source, maxSteps: 3000 });
+const { source, structDefs, fnPtrTypes } = preprocessVizSource(code);
+const trace = traceC(code, { vizStructs: true, structDefs, fnPtrTypes: [...fnPtrTypes], preprocessedSource: source, maxSteps: 3000 });
 console.log("steps:", trace.steps.length);
 console.log("output:", trace.output.trim());
 console.log("heap nodes:", trace.steps.at(-2)?.heap?.length ?? 0);

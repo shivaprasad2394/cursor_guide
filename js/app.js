@@ -719,9 +719,9 @@
       let mods;
       try {
         mods = await Promise.all([
-          import("./ctracer.js?v=35"),
-          import("./tracer-view.js?v=35"),
-          import("./viz-preprocess.js?v=32"),
+          import("./ctracer.js?v=36"),
+          import("./tracer-view.js?v=36"),
+          import("./viz-preprocess.js?v=33"),
         ]);
       } catch (_) {
         return false;
@@ -734,10 +734,15 @@
       if (solutionCode) candidates.push(solutionCode);
       for (const code of candidates) {
         try {
-          const { source, structDefs, simplified } = vp.preprocessVizSource(code);
+          const { source, structDefs, fnPtrTypes, simplified } = vp.preprocessVizSource(code);
           const opts =
-            structDefs.size || simplified
-              ? { vizStructs: structDefs.size > 0, structDefs, preprocessedSource: source }
+            structDefs.size || fnPtrTypes.size || simplified
+              ? {
+                  vizStructs: structDefs.size > 0,
+                  structDefs,
+                  fnPtrTypes: [...fnPtrTypes],
+                  preprocessedSource: source,
+                }
               : {};
           const t = ct.traceC(code, opts);
           if (!t.steps.length) continue;

@@ -109,10 +109,11 @@ function tokenize(src) {
 /* ── Parser ───────────────────────────────────────────────── */
 
 class Parser {
-  constructor(toks, structNames = null) {
+  constructor(toks, structNames = null, fnPtrTypeNames = null) {
     this.toks = toks;
     this.p = 0;
     this.structNames = structNames;
+    this.fnPtrTypeNames = fnPtrTypeNames;
   }
 
   peek(k = 0) { return this.toks[this.p + k]; }
@@ -123,7 +124,8 @@ class Parser {
 
   isTypeStart() {
     const t = this.peek();
-    return t.t === "id" && (TYPES.has(t.v) || (this.structNames && this.structNames.has(t.v)));
+    if (t.t === "id" && t.v === "struct") return true;
+    return t.t === "id" && (TYPES.has(t.v) || (this.structNames && this.structNames.has(t.v)) || (this.fnPtrTypeNames && this.fnPtrTypeNames.has(t.v)));
   }
 
   parseProgram() {
@@ -154,14 +156,26 @@ class Parser {
 
   parseType() {
     const words = [];
-    while (this.isTypeStart()) words.push(this.next().v);
     let structName = null;
-    if (words.length === 1 && this.structNames && this.structNames.has(words[0])) {
-      structName = words[0];
+    let isFnPtr = false;
+
+    if (this.at("struct")) {
+      this.next();
+      const name = this.parseName();
+      words.push("struct", name);
+      if (this.structNames && this.structNames.has(name)) structName = name;
+    } else {
+      while (this.isTypeStart()) {
+        const w = this.next().v;
+        words.push(w);
+        if (this.structNames && this.structNames.has(w)) structName = w;
+        if (this.fnPtrTypeNames && this.fnPtrTypeNames.has(w)) isFnPtr = true;
+      }
     }
+
     let stars = 0;
     while (this.at("*")) { this.next(); stars += 1; }
-    return { words, stars, isChar: words.includes("char"), structName };
+    return { words, stars, isChar: words.includes("char"), structName, isFnPtr };
   }
 
   parseName() {
@@ -304,7 +318,14 @@ class Parser {
           this.next();
           const items = [];
           while (!this.at("}")) {
-            items.push(this.parseAssign());
+            if (this.at(".")) {
+              this.next();
+              const field = this.parseName();
+              this.eat("=");
+              items.push({ k: "designated", field, value: this.parseAssign() });
+            } else {
+              items.push(this.parseAssign());
+            }
             if (this.at(",")) this.next();
           }
           this.eat("}");
@@ -326,6 +347,7 @@ class Parser {
         ptrStars: stars,
         structName: base.structName,
         isStructValue: !!base.structName && stars === 0 && !isArray,
+        isFnPtr: !!base.isFnPtr && stars === 0 && !isArray,
       });
       if (this.at(",")) { this.next(); continue; }
       break;
@@ -527,9 +549,12 @@ function pickIndexVar(indices) {
 }
 
 function structPtrEq(a, b) {
-  const na = a === 0 || a === null || a === undefined ? -1 : a.stIdx;
-  const nb = b === 0 || b === null || b === undefined ? -1 : b.stIdx;
-  return na === nb;
+  if (a === 0 || a === null || a === undefined) return b === 0 || b === null || b === undefined;
+  if (b === 0 || b === null || b === undefined) return false;
+  if (!isStructPtr(a) || !isStructPtr(b)) return false;
+  const pa = a.embedPath || [];
+  const pb = b.embedPath || [];
+  return a.stIdx === b.stIdx && pa.length === pb.length && pa.every((x, i) => x === pb[i]);
 }
 
 function toNum(v) {
@@ -541,7 +566,7 @@ function toNum(v) {
 }
 
 class Interp {
-  constructor(prog, source, maxSteps, structDefs = null) {
+  constructor(prog, source, maxSteps, structDefs = null, fnPtrTypeNames = null) {
     this.fns = new Map(prog.fns.map((f) => [f.name, f]));
     this.globals = new Map();
     this.frames = [];
@@ -549,6 +574,7 @@ class Interp {
     this.output = "";
     this.arrays = [];
     this.structDefs = structDefs;
+    this.fnPtrTypeNames = fnPtrTypeNames || new Set();
     this.structHeap = [];
     this.maxSteps = maxSteps;
     this.truncated = false;
@@ -557,6 +583,8 @@ class Interp {
     this.lastIdxAccess = null;
 
     this.globals.set("NULL", { v: 0 });
+    this.globals.set("EXIT_SUCCESS", { v: 0 });
+    this.globals.set("EXIT_FAILURE", { v: 1 });
     this.globals.set("INT_MAX", { v: 2147483647 });
     this.globals.set("INT_MIN", { v: -2147483648 });
     this.globals.set("UINT_MAX", { v: 4294967295 });
@@ -582,10 +610,85 @@ class Interp {
     const def = this.structDefs?.get(name);
     if (!def) throw new CUnsupported(`unknown struct '${name}'`);
     const idx = this.structHeap.length;
-    const fields = {};
-    for (const f of def.fields) fields[f.name] = 0;
+    const fields = this.createEmbeddedFields(name);
     this.structHeap.push({ name, idx, fields, onStack: !!onStack });
-    return { stIdx: idx, structName: name };
+    return { stIdx: idx, structName: name, embedPath: [] };
+  }
+
+  createEmbeddedFields(structName) {
+    const def = this.structDefs?.get(structName);
+    if (!def) return {};
+    const fields = {};
+    for (const f of def.fields) {
+      if (f.type === "embedded") {
+        fields[f.name] = {
+          _embedded: true,
+          structName: f.structName,
+          fields: this.createEmbeddedFields(f.structName),
+        };
+      } else if (f.type === "ptr") {
+        fields[f.name] = 0;
+      } else {
+        fields[f.name] = 0;
+      }
+    }
+    return fields;
+  }
+
+  makeStructRef(stIdx, structName, embedPath = []) {
+    return { stIdx, structName, embedPath: [...embedPath] };
+  }
+
+  fieldMapAt(stIdx, embedPath = []) {
+    const node = this.structHeap[stIdx];
+    if (!node) return null;
+    let fields = node.fields;
+    for (const seg of embedPath) {
+      const slot = fields[seg];
+      if (!slot || !slot._embedded) return null;
+      fields = slot.fields;
+    }
+    return fields;
+  }
+
+  structDefAt(stIdx, embedPath = []) {
+    const node = this.structHeap[stIdx];
+    if (!node) return null;
+    let structName = node.name;
+    let fields = node.fields;
+    for (const seg of embedPath) {
+      const slot = fields[seg];
+      if (!slot || !slot._embedded) return null;
+      structName = slot.structName;
+      fields = slot.fields;
+    }
+    return { structName, fields };
+  }
+
+  readStructField(ref, fieldName) {
+    const ctx = this.structDefAt(ref.stIdx, ref.embedPath || []);
+    if (!ctx) return 0;
+    const val = ctx.fields[fieldName];
+    return val !== undefined ? val : 0;
+  }
+
+  writeStructField(ref, fieldName, value) {
+    const ctx = this.structDefAt(ref.stIdx, ref.embedPath || []);
+    if (!ctx) return;
+    ctx.fields[fieldName] = value;
+  }
+
+  extendStructRef(ref, fieldName) {
+    const inner = this.structDefAt(ref.stIdx, ref.embedPath || []);
+    const lookupDef = inner
+      ? this.structDefs?.get(inner.structName)
+      : this.structDefs?.get(this.structHeap[ref.stIdx]?.name);
+    const f = lookupDef?.fields.find((x) => x.name === fieldName);
+    if (!f) throw new CUnsupported(`unknown field '${fieldName}'`);
+    if (f.type === "embedded") {
+      return this.makeStructRef(ref.stIdx, f.structName, [...(ref.embedPath || []), fieldName]);
+    }
+    return null;
   }
 
   evalInitValue(expr, fieldType) {
@@ -603,12 +706,53 @@ class Interp {
     return typeof v === "number" ? v : toNum(v);
   }
 
-  initStructFields(st, structName, items) {
+  zeroStructFields(fields, structName) {
     const def = this.structDefs?.get(structName);
-    if (!def || !items) return;
-    def.fields.forEach((f, i) => {
-      if (i < items.length) st.fields[f.name] = this.evalInitValue(items[i], f.type);
+    if (!def) return;
+    for (const f of def.fields) {
+      if (f.type === "embedded") {
+        fields[f.name].fields = this.createEmbeddedFields(f.structName);
+      } else if (f.type === "ptr") {
+        fields[f.name] = 0;
+      } else {
+        fields[f.name] = 0;
+      }
+    }
+  }
+
+  initStructFields(stRef, structName, items) {
+    const def = this.structDefs?.get(structName);
+    const node = this.structHeap[stRef.stIdx];
+    if (!def || !items || !node) return;
+    if (items.length === 1 && items[0].k === "num" && items[0].v === 0) {
+      this.zeroStructFields(node.fields, structName);
+      return;
+    }
+    items.forEach((item, i) => {
+      if (item.k === "designated") {
+        const f = def.fields.find((x) => x.name === item.field);
+        if (f) node.fields[item.field] = this.evalInitValue(item.value, f.type);
+      } else {
+        const f = def.fields[i];
+        if (f) node.fields[f.name] = this.evalInitValue(item, f.type);
+      }
     });
+  }
+
+  serializeFieldValue(val, fieldType) {
+    if (fieldType === "embedded" && val && val._embedded) {
+      const def = this.structDefs.get(val.structName);
+      const fields = {};
+      for (const f of def?.fields || []) {
+        fields[f.name] = this.serializeFieldValue(val.fields[f.name], f.type);
+      }
+      return { type: "embedded", structName: val.structName, fields };
+    }
+    if (fieldType === "ptr") {
+      if (isStructPtr(val)) return { type: "ptr", stIdx: val.stIdx, embedPath: val.embedPath || [] };
+      return { type: "ptr", stIdx: null };
+    }
+    return { type: "scalar", val: typeof val === "number" ? val : toNum(val) };
   }
 
   structFieldText(stIdx) {
@@ -626,12 +770,9 @@ class Interp {
     if (!this.structHeap.length) return [];
     return this.structHeap.map((node) => {
       const def = this.structDefs?.get(node.name);
-      const ptrFields = new Set((def?.fields || []).filter((f) => f.type === "ptr").map((f) => f.name));
       const fields = {};
-      for (const [k, val] of Object.entries(node.fields)) {
-        if (isStructPtr(val)) fields[k] = { type: "ptr", stIdx: val.stIdx };
-        else if (ptrFields.has(k) && val === 0) fields[k] = { type: "ptr", stIdx: null };
-        else fields[k] = { type: "scalar", val };
+      for (const f of def?.fields || []) {
+        fields[f.name] = this.serializeFieldValue(node.fields[f.name], f.type);
       }
       return { idx: node.idx, name: node.name, fields, onStack: !!node.onStack };
     });
@@ -907,6 +1048,12 @@ class Interp {
             }
             continue;
           }
+          if (d.isFnPtr) {
+            box = { v: 0, isChar: false };
+            target.set(d.name, box);
+            if (d.init) box.v = this.evalExpr(d.init);
+            continue;
+          }
           if (d.isArray) {
             let arr;
             if (d.init && d.init.k === "str") {
@@ -1018,7 +1165,7 @@ class Interp {
         throw new StopTrace();
       }
       if (!isStructPtr(base)) throw new CUnsupported("member access on non-struct pointer");
-      return { stField: { stIdx: base.stIdx, field: e.field } };
+      return { stField: { stIdx: base.stIdx, embedPath: base.embedPath || [], field: e.field } };
     }
     if (e.k === "idx") {
       const base = this.evalExpr(e.base);
@@ -1043,14 +1190,14 @@ class Interp {
 
   readLoc(loc) {
     if (loc.stField) {
-      const node = this.structHeap[loc.stField.stIdx];
-      return node ? node.fields[loc.stField.field] : 0;
+      const ref = this.makeStructRef(loc.stField.stIdx, this.structHeap[loc.stField.stIdx]?.name || "", loc.stField.embedPath || []);
+      return this.readStructField(ref, loc.stField.field);
     }
     if (loc.box) {
       const v = loc.box.v;
       if (v && v.fieldAddr) {
-        const node = this.structHeap[v.fieldAddr.stIdx];
-        return node ? node.fields[v.fieldAddr.field] : 0;
+        const ref = this.makeStructRef(v.fieldAddr.stIdx, this.structHeap[v.fieldAddr.stIdx]?.name || "", v.fieldAddr.embedPath || []);
+        return this.readStructField(ref, v.fieldAddr.field);
       }
       return loc.box.v;
     }
@@ -1059,8 +1206,8 @@ class Interp {
 
   writeLoc(loc, v) {
     if (loc.stField) {
-      const node = this.structHeap[loc.stField.stIdx];
-      if (node) node.fields[loc.stField.field] = v;
+      const ref = this.makeStructRef(loc.stField.stIdx, this.structHeap[loc.stField.stIdx]?.name || "", loc.stField.embedPath || []);
+      this.writeStructField(ref, loc.stField.field, v);
       return;
     }
     if (loc.box) { loc.box.v = v; return; }
@@ -1072,6 +1219,12 @@ class Interp {
       const v = this.lookup(e.name).v;
       if (isStructPtr(v)) return v;
       throw new CUnsupported("member access on non-struct value");
+    }
+    if (e.k === "member" && e.op === ".") {
+      const base = this.structLvalue(e.base);
+      const extended = this.extendStructRef(base, e.field);
+      if (extended) return extended;
+      throw new CUnsupported("member access on non-embedded field");
     }
     if (e.k === "un" && e.op === "*") {
       const val = this.evalUnary(e);
@@ -1087,7 +1240,10 @@ class Interp {
         if (!e._arr) e._arr = this.strToArray(e.v, `"${e.v.slice(0, 12)}"`);
         return { arr: e._arr, off: 0 };
       }
-      case "id": return this.lookup(e.name).v;
+      case "id": {
+        if (this.fns.has(e.name)) return { fnTarget: e.name };
+        return this.lookup(e.name).v;
+      }
       case "member": {
         const base = e.op === "->" ? this.evalExpr(e.base) : this.structLvalue(e.base);
         if (base === 0) {
@@ -1096,9 +1252,11 @@ class Interp {
           throw new StopTrace();
         }
         if (!isStructPtr(base)) throw new CUnsupported("member access on non-struct pointer");
-        const node = this.structHeap[base.stIdx];
-        const val = node ? node.fields[e.field] : 0;
-        return val !== undefined ? val : 0;
+        if (e.op === ".") {
+          const extended = this.extendStructRef(base, e.field);
+          if (extended) return extended;
+        }
+        return this.readStructField(base, e.field);
       }
       case "seq": { this.evalExpr(e.l); return this.evalExpr(e.r); }
       case "idx": {
@@ -1146,10 +1304,15 @@ class Interp {
         const i = toNum(this.evalExpr(e.e.i));
         if (isPtr(base) && base.arr) return { arr: base.arr, off: base.off + i };
       }
+      if (e.e.k === "member" && e.e.op === ".") {
+        const baseRef = this.structLvalue(e.e.base);
+        const extended = this.extendStructRef(baseRef, e.e.field);
+        if (extended) return extended;
+      }
       if (e.e.k === "member" && e.e.op === "->") {
         const base = this.evalExpr(e.e.base);
         if (!isStructPtr(base)) throw new CUnsupported("address-of member on non-struct pointer");
-        return { fieldAddr: { stIdx: base.stIdx, field: e.e.field } };
+        return { fieldAddr: { stIdx: base.stIdx, embedPath: base.embedPath || [], field: e.e.field } };
       }
       throw new CUnsupported("address-of expression");
     }
@@ -1395,10 +1558,29 @@ class Interp {
     const args = e.args.map((a) => this.evalExpr(a));
     const name = e.name;
 
+    try {
+      const box = this.lookup(name);
+      if (box.v && box.v.fnTarget && this.fns.has(box.v.fnTarget)) {
+        return this.callFn(this.fns.get(box.v.fnTarget), args);
+      }
+    } catch (_) {
+      /* not a variable — fall through to named function */
+    }
+
     const user = this.fns.get(name);
     if (user) return this.callFn(user, args);
 
     switch (name) {
+      case "viz_container_of": {
+        const ptr = args[0];
+        const typeName = typeof args[1] === "string" ? args[1] : this.readCStr(args[1]);
+        const member = typeof args[2] === "string" ? args[2] : this.readCStr(args[2]);
+        if (!isStructPtr(ptr)) return 0;
+        const path = ptr.embedPath || [];
+        if (!path.length || path[path.length - 1] !== member) return 0;
+        return this.makeStructRef(ptr.stIdx, typeName, path.slice(0, -1));
+      }
+      case "fprintf":
       case "printf": {
         const fmt = isPtr(args[0]) ? this.readCStr(args[0]) : String(args[0]);
         const out = this.cFormat(fmt, args.slice(1));
@@ -1475,7 +1657,7 @@ class Interp {
       case "malloc": case "calloc": {
         const bytes = name === "calloc" ? toNum(args[0]) * toNum(args[1]) : toNum(args[0]);
         if (this.structDefs && this.structDefs.size > 0) {
-          const structName = this.structDefs.keys().next().value;
+          const structName = this.structDefs.has("Node") ? "Node" : this.structDefs.keys().next().value;
           return this.allocStruct(structName);
         }
         const arr = this.makeArray(new Array(Math.max(1, Math.min(Math.trunc(bytes / 4) || bytes, 64))).fill(0), false, "heap");
@@ -1523,9 +1705,10 @@ class Interp {
 export function traceC(source, opts = {}) {
   const src = opts.preprocessedSource || source;
   const structDefs = opts.structDefs || null;
+  const fnPtrTypeNames = opts.fnPtrTypes ? new Set(opts.fnPtrTypes) : new Set();
   const toks = tokenize(src);
   const structNames = structDefs ? new Set(structDefs.keys()) : null;
-  const prog = new Parser(toks, structNames).parseProgram();
-  const interp = new Interp(prog, src, opts.maxSteps || 1500, structDefs);
+  const prog = new Parser(toks, structNames, fnPtrTypeNames).parseProgram();
+  const interp = new Interp(prog, src, opts.maxSteps || 2500, structDefs, fnPtrTypeNames);
   return interp.run();
 }
