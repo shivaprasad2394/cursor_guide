@@ -17,11 +17,12 @@ for (const f of files) {
   if (!m) { failures.push([f, "no solution block"]); fail += 1; continue; }
   try {
     const code = m[1].trim();
-    const { source, structDefs, fnPtrTypes } = preprocessVizSource(code);
+    const { source, structDefs, fnPtrTypes, enumConstants } = preprocessVizSource(code);
     const trace = traceC(code, {
       vizStructs: structDefs.size > 0,
       structDefs,
       fnPtrTypes: [...fnPtrTypes],
+      enumConstants,
       preprocessedSource: source,
       maxSteps: 2500,
     });

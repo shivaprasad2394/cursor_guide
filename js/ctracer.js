@@ -5,11 +5,12 @@
  *
  * Supported: int/char/long scalars, arrays, char* strings, pointers into
  * arrays, address-of scalars, arithmetic/bitwise/logical ops, if/while/
- * for/do-while, user functions + recursion, printf/putchar/puts, common
+ * for/do-while/switch, user functions + recursion, printf/putchar/puts,
+ * qsort/bsearch/realloc, va_list (variadic), function pointers, common
  * <string.h> and <ctype.h> helpers, sizeof, casts.
  *
- * Unsupported constructs (structs, typedef, switch, sscanf, …) throw
- * CUnsupported so the caller can fall back to the pattern demo.
+ * Unsupported constructs (full ISO C, goto, …) throw CUnsupported so the
+ * caller can fall back to the pattern demo.
  */
 
 export class CUnsupported extends Error {}
@@ -17,13 +18,12 @@ class StopTrace extends Error {}
 
 const TYPES = new Set([
   "int", "char", "long", "short", "unsigned", "signed", "const", "void",
-  "float", "double", "size_t", "bool",
+  "float", "double", "size_t", "bool", "va_list",
   "uint8_t", "uint16_t", "uint32_t", "uint64_t",
   "int8_t", "int16_t", "int32_t", "int64_t",
-  "size_t",
 ]);
 
-const UNSUPPORTED_KEYWORDS = new Set(["struct", "typedef", "enum", "union", "switch", "goto"]);
+const UNSUPPORTED_KEYWORDS = new Set(["struct", "typedef", "enum", "union", "goto"]);
 
 /* ── Tokenizer ────────────────────────────────────────────── */
 
@@ -187,6 +187,7 @@ class Parser {
   parseFunction(name, type) {
     this.eat("(");
     const params = [];
+    let variadic = false;
     if (!this.at(")")) {
       while (true) {
         const ptype = this.parseType();
@@ -202,6 +203,7 @@ class Parser {
           structName: ptype.structName,
         });
         if (this.at(",")) { this.next(); continue; }
+        if (this.at("...")) { this.next(); variadic = true; break; }
         break;
       }
     }
@@ -209,7 +211,7 @@ class Parser {
     if (this.at(";")) { this.next(); return null; } // prototype
     const line = this.peek().line;
     const body = this.parseBlock();
-    return { name, params, body, line, type };
+    return { name, params, body, line, type, variadic };
   }
 
   parseBlock() {
@@ -283,6 +285,37 @@ class Parser {
         }
         case "break": { this.next(); this.eat(";"); return { k: "break", line }; }
         case "continue": { this.next(); this.eat(";"); return { k: "continue", line }; }
+        case "switch": {
+          this.next(); this.eat("(");
+          const expr = this.parseExpr();
+          this.eat(")");
+          this.eat("{");
+          const cases = [];
+          let defaultCase = null;
+          while (!this.at("}")) {
+            if (this.at("case")) {
+              this.next();
+              const val = this.parseExpr();
+              this.eat(":");
+              const body = [];
+              while (!this.at("case") && !this.at("default") && !this.at("}")) {
+                body.push(this.parseStmt());
+              }
+              cases.push({ val, body });
+            } else if (this.at("default")) {
+              this.next(); this.eat(":");
+              const body = [];
+              while (!this.at("case") && !this.at("}")) {
+                body.push(this.parseStmt());
+              }
+              defaultCase = body;
+            } else {
+              this.err("expected case or default in switch");
+            }
+          }
+          this.eat("}");
+          return { k: "switch", expr, cases, defaultCase, line };
+        }
         default: break;
       }
     }
@@ -475,8 +508,11 @@ class Parser {
           }
         }
         this.eat(")");
-        if (e.k !== "id") this.err("indirect calls not supported");
-        e = { k: "call", name: e.name, args };
+        if (e.k === "call") {
+          e = { k: "call", callee: e.callee, args: [...e.args, ...args] };
+        } else {
+          e = { k: "call", callee: e, args };
+        }
         continue;
       }
       if (this.at("[")) {
@@ -566,7 +602,7 @@ function toNum(v) {
 }
 
 class Interp {
-  constructor(prog, source, maxSteps, structDefs = null, fnPtrTypeNames = null) {
+  constructor(prog, source, maxSteps, structDefs = null, fnPtrTypeNames = null, enumConstants = null) {
     this.fns = new Map(prog.fns.map((f) => [f.name, f]));
     this.globals = new Map();
     this.frames = [];
@@ -581,6 +617,8 @@ class Interp {
     this.stopNote = "";
     this.srcLines = source.split("\n");
     this.lastIdxAccess = null;
+    this.vaCallArgs = [];
+    this.vaParamNames = [];
 
     this.globals.set("NULL", { v: 0 });
     this.globals.set("EXIT_SUCCESS", { v: 0 });
@@ -589,6 +627,11 @@ class Interp {
     this.globals.set("INT_MIN", { v: -2147483648 });
     this.globals.set("UINT_MAX", { v: 4294967295 });
     this.globals.set("CHAR_BIT", { v: 8 });
+    if (enumConstants) {
+      for (const [name, val] of enumConstants) {
+        this.globals.set(name, { v: val });
+      }
+    }
 
     for (const g of prog.globals) this.execStmt(g, true);
   }
@@ -1019,10 +1062,32 @@ class Interp {
       vars.set(p.name, { v: args[i] !== undefined ? args[i] : 0, isChar: p.isChar && !p.isPtr });
     });
     this.frames.push({ name: fn.name, vars });
+    this.vaCallArgs = args;
+    this.vaParamNames = fn.params.map((p) => p.name);
     this.snap(fn.line, "call", `→ enter ${fn.name}(${fn.params.map((p) => p.name).join(", ")})`);
     const sig = this.execStmt(fn.body);
     this.frames.pop();
+    this.vaCallArgs = [];
+    this.vaParamNames = [];
     return sig && sig.type === "return" ? sig.value : 0;
+  }
+
+  invokeCompar(compar, a, b) {
+    if (compar && compar.fnTarget && this.fns.has(compar.fnTarget)) {
+      return toNum(this.callFn(this.fns.get(compar.fnTarget), [a, b]));
+    }
+    if (typeof compar === "object" && compar !== null && compar.fnTarget && this.fns.has(compar.fnTarget)) {
+      return toNum(this.callFn(this.fns.get(compar.fnTarget), [a, b]));
+    }
+    try {
+      const box = this.lookup(compar?.name || "");
+      if (box?.v?.fnTarget && this.fns.has(box.v.fnTarget)) {
+        return toNum(this.callFn(this.fns.get(box.v.fnTarget), [a, b]));
+      }
+    } catch (_) {
+      /* not a named compar */
+    }
+    return 0;
   }
 
   execStmt(stmt, quiet = false) {
@@ -1137,9 +1202,33 @@ class Interp {
           const sig = this.execStmt(stmt.body);
           if (sig) {
             if (sig.type === "break") break;
+            if (sig.type === "continue") continue;
             if (sig.type === "return") return sig;
           }
           if (stmt.step) this.evalExpr(stmt.step);
+        }
+        return null;
+      }
+      case "switch": {
+        const val = toNum(this.evalExpr(stmt.expr));
+        this.snap(stmt.line, "switch");
+        let matched = false;
+        for (const c of stmt.cases) {
+          if (!matched && toNum(this.evalExpr(c.val)) === val) matched = true;
+          if (matched) {
+            for (const s of c.body) {
+              const sig = this.execStmt(s);
+              if (sig?.type === "break") return null;
+              if (sig?.type === "return") return sig;
+            }
+          }
+        }
+        if (!matched && stmt.defaultCase) {
+          for (const s of stmt.defaultCase) {
+            const sig = this.execStmt(s);
+            if (sig?.type === "break") return null;
+            if (sig?.type === "return") return sig;
+          }
         }
         return null;
       }
@@ -1556,21 +1645,60 @@ class Interp {
 
   evalCall(e) {
     const args = e.args.map((a) => this.evalExpr(a));
-    const name = e.name;
+    const callee = e.callee || (e.name ? { k: "id", name: e.name } : null);
+    if (!callee) throw new CUnsupported("invalid call");
 
-    try {
-      const box = this.lookup(name);
-      if (box.v && box.v.fnTarget && this.fns.has(box.v.fnTarget)) {
-        return this.callFn(this.fns.get(box.v.fnTarget), args);
+    if (callee.k === "id") {
+      const name = callee.name;
+      try {
+        const box = this.lookup(name);
+        if (box.v && box.v.fnTarget && this.fns.has(box.v.fnTarget)) {
+          return this.callFn(this.fns.get(box.v.fnTarget), args);
+        }
+      } catch (_) {
+        /* not a variable — fall through to named function / builtin */
       }
-    } catch (_) {
-      /* not a variable — fall through to named function */
+      if (this.fns.has(name)) return this.callFn(this.fns.get(name), args);
+      return this.evalBuiltin(name, e.args, args);
     }
 
-    const user = this.fns.get(name);
-    if (user) return this.callFn(user, args);
+    const fnVal = this.evalExpr(callee);
+    if (fnVal && fnVal.fnTarget && this.fns.has(fnVal.fnTarget)) {
+      return this.callFn(this.fns.get(fnVal.fnTarget), args);
+    }
+    throw new CUnsupported("indirect call target is not supported");
+  }
 
+  evalBuiltin(name, argExprs, args) {
     switch (name) {
+      case "va_start": {
+        const apLoc = this.readLvalue(argExprs[0]);
+        let idx = this.vaParamNames.length;
+        const last = argExprs[1];
+        if (last?.k === "id") {
+          const i = this.vaParamNames.indexOf(last.name);
+          if (i >= 0) idx = i + 1;
+        }
+        this.writeLoc(apLoc, { idx, args: this.vaCallArgs });
+        return 0;
+      }
+      case "va_arg": {
+        const apLoc = this.readLvalue(argExprs[0]);
+        const ap = this.readLoc(apLoc);
+        const v = ap?.args?.[ap.idx];
+        if (ap && ap.args) ap.idx += 1;
+        this.writeLoc(apLoc, ap || { idx: 0, args: this.vaCallArgs });
+        return v !== undefined ? v : 0;
+      }
+      case "va_end":
+        return 0;
+      case "assert":
+        if (!toNum(args[0])) {
+          this.stopNote = "assertion failed — trace stopped";
+          this.truncated = true;
+          throw new StopTrace();
+        }
+        return 0;
       case "viz_container_of": {
         const ptr = args[0];
         const typeName = typeof args[1] === "string" ? args[1] : this.readCStr(args[1]);
@@ -1663,7 +1791,65 @@ class Interp {
         const arr = this.makeArray(new Array(Math.max(1, Math.min(Math.trunc(bytes / 4) || bytes, 64))).fill(0), false, "heap");
         return { arr, off: 0 };
       }
+      case "realloc": {
+        const old = args[0];
+        const bytes = toNum(args[1]);
+        const count = Math.max(1, Math.min(Math.trunc(bytes / 4) || bytes, 128));
+        const arr = this.makeArray(new Array(count).fill(0), false, "heap");
+        if (isPtr(old) && old.arr) {
+          const n = Math.min(old.arr.data.length - old.off, count);
+          for (let i = 0; i < n; i += 1) arr.data[i] = old.arr.data[old.off + i] || 0;
+        }
+        return { arr, off: 0 };
+      }
       case "free": return 0;
+      case "qsort": {
+        const base = args[0];
+        const n = toNum(args[1]);
+        const size = toNum(args[2]);
+        const compar = args[3];
+        if (!isPtr(base) || !base.arr || n <= 0) return 0;
+        const arr = base.arr;
+        const start = base.off;
+        const elSize = Math.max(1, size);
+        const slice = [];
+        for (let i = 0; i < n; i += 1) {
+          const off = start + i * elSize;
+          slice.push({ i, vals: arr.data.slice(off, off + elSize) });
+        }
+        slice.sort((a, b) => {
+          const pa = { arr, off: start + a.i * elSize };
+          const pb = { arr, off: start + b.i * elSize };
+          return this.invokeCompar(compar, pa, pb);
+        });
+        slice.forEach((item, j) => {
+          const off = start + j * elSize;
+          for (let k = 0; k < elSize; k += 1) arr.data[off + k] = item.vals[k] || 0;
+        });
+        return 0;
+      }
+      case "bsearch": {
+        const key = args[0];
+        const base = args[1];
+        const n = toNum(args[2]);
+        const size = toNum(args[3]);
+        const compar = args[4];
+        if (!isPtr(base) || !base.arr || n <= 0) return 0;
+        const arr = base.arr;
+        const start = base.off;
+        const elSize = Math.max(1, size);
+        let lo = 0;
+        let hi = n - 1;
+        while (lo <= hi) {
+          const mid = (lo + hi) >> 1;
+          const elem = { arr, off: start + mid * elSize };
+          const cmp = this.invokeCompar(compar, key, elem);
+          if (cmp === 0) return elem;
+          if (cmp < 0) hi = mid - 1;
+          else lo = mid + 1;
+        }
+        return 0;
+      }
       case "tolower": { const c = toNum(args[0]); return c >= 65 && c <= 90 ? c + 32 : c; }
       case "toupper": { const c = toNum(args[0]); return c >= 97 && c <= 122 ? c - 32 : c; }
       case "isalpha": { const c = toNum(args[0]); return (c >= 65 && c <= 90) || (c >= 97 && c <= 122) ? 1 : 0; }
@@ -1706,9 +1892,10 @@ export function traceC(source, opts = {}) {
   const src = opts.preprocessedSource || source;
   const structDefs = opts.structDefs || null;
   const fnPtrTypeNames = opts.fnPtrTypes ? new Set(opts.fnPtrTypes) : new Set();
+  const enumConstants = opts.enumConstants || null;
   const toks = tokenize(src);
   const structNames = structDefs ? new Set(structDefs.keys()) : null;
   const prog = new Parser(toks, structNames, fnPtrTypeNames).parseProgram();
-  const interp = new Interp(prog, src, opts.maxSteps || 2500, structDefs, fnPtrTypeNames);
+  const interp = new Interp(prog, src, opts.maxSteps || 2500, structDefs, fnPtrTypeNames, enumConstants);
   return interp.run();
 }

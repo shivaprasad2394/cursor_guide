@@ -4,10 +4,10 @@
  * mini interpreter in ctracer.js and replays real execution.
  * Mode 2 "Pattern demo": falls back to the algorithm-pattern simulators.
  */
-import { traceC, CUnsupported } from "./ctracer.js?v=36";
+import { traceC, CUnsupported } from "./ctracer.js?v=37";
 import { createSession, renderStudio, stepCount } from "./visualizer.js?v=34";
-import { renderTraceStep } from "./tracer-view.js?v=36";
-import { preprocessVizSource } from "./viz-preprocess.js?v=33";
+import { renderTraceStep } from "./tracer-view.js?v=37";
+import { preprocessVizSource } from "./viz-preprocess.js?v=37";
 
 function escapeHtml(s) {
   return String(s)
@@ -53,13 +53,14 @@ function extractSection(body, heading) {
 }
 
 function traceForVizPage(code) {
-  const { source, structDefs, fnPtrTypes, simplified } = preprocessVizSource(code);
+  const { source, structDefs, fnPtrTypes, enumConstants, simplified } = preprocessVizSource(code);
   const opts =
-    structDefs.size || fnPtrTypes.size || simplified
+    structDefs.size || fnPtrTypes.size || enumConstants.size || simplified
       ? {
           vizStructs: structDefs.size > 0,
           structDefs,
           fnPtrTypes: [...fnPtrTypes],
+          enumConstants,
           preprocessedSource: source,
         }
       : {};

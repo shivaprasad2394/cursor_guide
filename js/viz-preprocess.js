@@ -9,6 +9,13 @@ function parseStructFields(body) {
   for (const part of body.split(";")) {
     const s = part.trim();
     if (!s) continue;
+    const scalar = s.match(
+      /^(?:unsigned\s+|signed\s+)?(?:u?int\d*_t|size_t|char|short|long|int|bool)\s+(\w+)\s*$/
+    );
+    if (scalar) {
+      fields.push({ name: scalar[1], type: "int" });
+      continue;
+    }
     const intFields = s.match(/^int\s+(.+)$/);
     if (intFields) {
       intFields[1].split(",").forEach((name) => {
@@ -51,6 +58,28 @@ function stripFnPtrTypedefs(source, fnPtrTypes) {
   return source.replace(/typedef\s+([^{;]+\(\*\s*(\w+)\s*\)\([^)]*\))\s*;/g, (_, _sig, alias) => {
     fnPtrTypes.add(alias);
     return `/* viz: fnptr ${alias} stripped */`;
+  });
+}
+
+function stripUnions(source) {
+  return source.replace(/(?:typedef\s+)?union\s+(?:\w+\s+)?\{[^}]*\}\s*(?:\w+\s*)?;/g, "/* viz: union stripped */");
+}
+
+function stripEnums(source, enumConstants) {
+  let nextVal = 0;
+  return source.replace(/(?:typedef\s+)?enum\s+(?:\w+\s+)?\{([^}]*)\}\s*(?:\w+\s*)?;/g, (_, body) => {
+    for (const part of body.split(",")) {
+      const s = part.trim();
+      if (!s) continue;
+      const m = s.match(/^(\w+)(?:\s*=\s*(-?\d+))?$/);
+      if (!m) continue;
+      if (m[2] !== undefined) {
+        nextVal = Number(m[2]);
+      }
+      enumConstants.set(m[1], nextVal);
+      nextVal += 1;
+    }
+    return "/* viz: enum stripped */";
   });
 }
 
@@ -198,14 +227,17 @@ function rewriteCharGridStringInits(source) {
   );
 }
 
-/** @returns {{ source: string, structDefs: Map, fnPtrTypes: Set<string>, simplified: boolean }} */
+/** @returns {{ source: string, structDefs: Map, fnPtrTypes: Set<string>, enumConstants: Map<string, number>, simplified: boolean }} */
 export function preprocessVizSource(source) {
   const structDefs = new Map();
   const fnPtrTypes = new Set();
+  const enumConstants = new Map();
   let out = source;
   const original = source;
 
   out = stripSimpleMacros(out);
+  out = stripEnums(out, enumConstants);
+  out = stripUnions(out);
   out = stripFnPtrTypedefs(out, fnPtrTypes);
   out = stripTypedefStructs(out, structDefs);
   out = stripPlainStructs(out, structDefs);
@@ -222,6 +254,7 @@ export function preprocessVizSource(source) {
     source: out,
     structDefs,
     fnPtrTypes,
+    enumConstants,
     simplified: out !== original,
   };
 }
